@@ -4,19 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Your Name | Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <header>
-        <h1>Hello, I'm [Your Name]</h1>
-        <p>Welcome to my portfolio 🚀</p>
-    </header>
-    <main>
-        <h2>Projects</h2>
-        <p>Project showcase coming soon...</p>
-    </main>
-</body>
+<body class="bg-gray-50 text-gray-900">
 
-</html>
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center p-6 max-w-6xl mx-auto">
+        <div class="text-2xl font-bold">Your Name</div>
+        <div class="space-x-6">
+            <a href="#about" class="hover:text-blue-500">About</a>
+            <a href="#projects" class="hover:text-blue-500">Projects</a>
+            <a href="#contact" class="hover:text-blue-500">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="about" class="text-center py-32 bg-white">
+        <h1 class="text-5xl font-extrabold mb-4">Hi, I'm Your Name</h1>
+        <p class="text-xl text-gray-700 max-w-xl mx-auto">I’m a software developer passionate about building web apps
+            and creating interactive user experiences.</p>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="max-w-6xl mx-auto py-32 px-6">
+        <h2 class="text-4xl font-bold mb-12 text-center">Projects</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+
+            <!-- Project Card -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition">
+                <h3 class="text-2xl font-semibold mb-2">Project 1</h3>
+                <p class="text-gray-600 mb-4">Short description of the project goes here.</p>
+                <a href="#" class="text-blue-500 hover:underline">View on GitHub</a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition">
+                <h3 class="text-2xl font-semibold mb-2">Project 2</h3>
+                <p class="text-gray-600 mb-4">Short description of the project goes here.</p>
+                <a href="#" class="text-blue-500 hover:underline">View on GitHub</a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition">
+                <h3 class="text-2xl font-semibold mb-2">Project 3</h3>
+                <p class="text-gray-600 mb-4">Short description of the project goes here.</p>
+                <a href="#" class="text-blue-500 hover:underline">View on GitHub</a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="text-center py-32 b
