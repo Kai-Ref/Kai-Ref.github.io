@@ -294,16 +294,15 @@ button:hover {
    =========================== */
 
 /* Timeline Container */
+/* Timeline Container */
 .timeline {
     position: relative;
     width: 100%;
     padding: 2rem;
     max-width: 800px;
     margin: 0 auto;
-    margin-top: 10rem;
-    /* More space for fixed headers */
+    margin-top: 8rem;
     min-height: 200vh;
-    /* Will be set dynamically by JS */
 }
 
 /* Timeline Line */
@@ -334,15 +333,22 @@ button:hover {
 /* Timeline Headers */
 .timeline-headers {
     position: fixed;
-    top: 120px;
-    left: 280px;
+    top: 0;
+    left: 250px;
     right: 0;
     z-index: 1000;
     background: #f5f5f5;
     padding: 1rem 2rem;
-    margin-bottom: 3rem;
     border-bottom: 2px solid #e0e0e0;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-headers-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .timeline-header {
@@ -374,14 +380,17 @@ button:hover {
 /* Timeline Content */
 .timeline-content {
     background: #fff;
-    padding: 1.5rem;
+    padding: 1rem;
+    /* Reduced from 1.5rem */
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-left: 4px solid #00bcd4;
     position: sticky;
-    top: 280px;
-    /* Below fixed header */
+    top: 120px;
     transition: all 0.3s ease;
+    z-index: 10;
+    min-height: 60px;
+    /* Add minimum height */
 }
 
 .timeline-content:hover {
@@ -484,12 +493,22 @@ button:hover {
         text-align: left !important;
         border-left: 4px solid #00bcd4 !important;
         border-right: none !important;
-        top: 320px;
-        /* More space for stacked headers on mobile */
+        top: 160px;
     }
 
     .timeline-year-marker {
         left: 15%;
         transform: none;
     }
+}
+
+/* Header styling */
+.header {
+    display: none;
+    /* Hide the header as we're using timeline-headers instead */
+}
+
+/* Main wrapper adjustments */
+.main-wrapper {
+    padding-top: 0;
 }
