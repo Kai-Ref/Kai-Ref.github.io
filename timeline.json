@@ -1,38 +1,56 @@
 [
     {
         "type": "education",
-        "start": "2019",
-        "end": "2023",
+        "start": "2019-10",
+        "end": "2023-05",
         "title": "BSc in Industrial Engineering",
         "institution": "KIT",
-        "description": "Studied physics, mathematics, and computer science.",
+        "description": "",
         "logo": "uni-logo.png"
     },
     {
         "type": "education",
-        "start": "2023",
-        "end": "2025",
+        "start": "2023-09",
+        "end": "2025-08",
         "title": "MSc in Data Science",
         "institution": "University of Mannheim",
-        "description": "Studied physics, mathematics, and computer science.",
+        "description": "",
+        "logo": "uni-logo.png"
+    },
+    {
+        "type": "education",
+        "start": "2025-08",
+        "end": "2025-12",
+        "title": "MSc in Computer Science (Exchange Program)",
+        "institution": "University of Adelaide",
+        "description": "",
         "logo": "uni-logo.png"
     },
     {
         "type": "professional",
-        "start": "2019",
-        "end": "2021",
-        "title": "Student Assistant",
+        "start": "2022-03",
+        "end": "2022-09",
+        "title": "Student Data Scientist",
         "company": "ICIS",
-        "description": "Worked on web applications.",
+        "description": "",
         "logo": "companyA-logo.png"
     },
     {
         "type": "professional",
-        "start": "2021",
-        "end": "2022",
-        "title": "Software Engineer",
-        "company": "Company B",
-        "description": "Focused on backend systems.",
+        "start": "2022-10",
+        "end": "2023-09",
+        "title": "Student Assistant",
+        "company": "KIT (ECON)",
+        "description": "",
+        "logo": "companyB-logo.png"
+    },
+    {
+        "type": "professional",
+        "start": "2024-02",
+        "end": "2025-02",
+        "title": "Student Assistant",
+        "company": "Fraunhofer SIT",
+        "description": "",
         "logo": "companyB-logo.png"
     }
 ]
