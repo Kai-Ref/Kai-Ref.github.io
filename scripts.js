@@ -89,7 +89,7 @@ document.addEventListener("scroll", () => {
     progress.style.height = `${scrollProgress * maxHeight}px`;
 }, { passive: true });
 
-// -------------------- UPDATED Timeline Generation with Configurable Overlap Prevention --------------------
+// -------------------- UPDATED Timeline Generation with Interactive Popup --------------------
 document.addEventListener('DOMContentLoaded', async () => {
     const timelineGrid = document.querySelector(".timeline-grid");
     if (!timelineGrid) return;
@@ -101,32 +101,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // ===== CONFIGURABLE PARAMETERS =====
         const CONFIG = {
-            minSpacing: 50,           // Minimum space between boxes (increase to 40-60 if still overlapping)
-            minBoxHeight: 80,         // Minimum height for each box
-            monthHeight: 35,          // Height per month (increase to 35-40 for more space)
-            maxCompressionRatio: 0.7, // Don't compress boxes below 70% of their ideal height
-            forceSpacing: true,       // Set to true to prioritize spacing over exact positioning
-            extraTimelinePadding: 300 // Extra space at bottom of timeline
+            minSpacing: 50,
+            minBoxHeight: 80,
+            monthHeight: 35,
+            maxCompressionRatio: 0.7,
+            forceSpacing: true,
+            extraTimelinePadding: 300
         };
-        // ===================================
+
+        // Global state for popup system
+        let allItems = [];
+        let currentActiveIndex = -1;
+        let popupElement = null;
 
         // Function to convert YYYY-MM to a numeric value for sorting and positioning
         function dateToNumeric(dateStr) {
             const [year, month] = dateStr.split('-').map(Number);
-            return year + (month - 1) / 12; // Convert to decimal years
+            return year + (month - 1) / 12;
         }
 
         // Sort by start date (NEWEST FIRST - REVERSED)
         const sortedData = [...data].sort((a, b) => dateToNumeric(b.start) - dateToNumeric(a.start));
 
-        // Calculate timeline dimensions with monthly precision
+        // Calculate timeline dimensions
         const currentYear = new Date().getFullYear();
         const currentMonth = new Date().getMonth() + 1;
         const currentDate = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
 
-        // Set timeline end to March 2026 or the latest end date, whichever is later
         const march2026 = dateToNumeric("2026-03");
-
         const allDates = [];
         sortedData.forEach(item => {
             allDates.push(dateToNumeric(item.start));
@@ -137,20 +139,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const latestDataDate = Math.max(...allDates);
         const maxDate = Math.max(march2026, latestDataDate);
         const totalTimeSpan = Math.max(0.5, maxDate - minDate);
+        const totalHeight = totalTimeSpan * 12 * CONFIG.monthHeight;
 
-        const totalHeight = totalTimeSpan * 12 * CONFIG.monthHeight; // Use configurable month height
-
-        // Set timeline height
         const timeline = document.querySelector('.timeline');
         if (timeline) {
             timeline.style.minHeight = `${totalHeight + CONFIG.extraTimelinePadding + 400}px`;
         }
 
-        // Create year and month markers
         const yearMarkers = new Set();
         const monthMarkers = [];
 
-        // Function to format dates for display
         function formatDate(dateStr) {
             if (!dateStr) return 'Present';
             const [year, month] = dateStr.split('-');
@@ -159,18 +157,121 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `${monthNames[parseInt(month) - 1]} ${year}`;
         }
 
-        // First pass: calculate initial positions for all items
+        // Create popup element
+        function createPopup() {
+            const popup = document.createElement('div');
+            popup.className = 'timeline-popup';
+            popup.innerHTML = `
+                <div class="timeline-popup-header">
+                    <div class="timeline-popup-nav">
+                        <button id="popup-prev" title="Previous">←</button>
+                        <button id="popup-next" title="Next">→</button>
+                    </div>
+                    <button class="timeline-popup-close" id="popup-close">×</button>
+                </div>
+                <div class="timeline-popup-content" id="popup-content">
+                    <!-- Content will be populated here -->
+                </div>
+            `;
+            document.body.appendChild(popup);
+            return popup;
+        }
+
+        // Update popup content
+        function updatePopupContent(entry, index) {
+            const content = document.getElementById('popup-content');
+            const prevBtn = document.getElementById('popup-prev');
+            const nextBtn = document.getElementById('popup-next');
+
+            const endText = entry.end ? formatDate(entry.end) : 'Present';
+            const startText = formatDate(entry.start);
+            const companyOrInstitution = entry.company || entry.institution || '';
+
+            // Handle rich HTML description or fallback to plain text
+            const description = entry.descriptionHtml || entry.description || 'No description available.';
+
+            // Add sample skills if not present
+            const skills = entry.skills || [];
+
+            content.innerHTML = `
+                ${entry.logo ? `<img src="${entry.logo}" class="logo" alt="${companyOrInstitution} logo">` : ''}
+                <h3>${entry.title}</h3>
+                <div class="company">${companyOrInstitution}</div>
+                <div class="duration">${startText} - ${endText}</div>
+                <div class="description">${description}</div>
+                ${skills.length > 0 ? `
+                    <div class="skills">
+                        <h4>Skills & Technologies</h4>
+                        <div class="skills-list">
+                            ${skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            // Update navigation buttons
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === allItems.length - 1;
+
+            currentActiveIndex = index;
+        }
+        // Show popup
+        function showPopup(entry, index, shouldStick = false) {
+            if (!popupElement) {
+                popupElement = createPopup();
+
+                // Add event listeners
+                document.getElementById('popup-close').addEventListener('click', hidePopup);
+                document.getElementById('popup-prev').addEventListener('click', () => {
+                    if (currentActiveIndex > 0) {
+                        navigateToItem(currentActiveIndex - 1);
+                    }
+                });
+                document.getElementById('popup-next').addEventListener('click', () => {
+                    if (currentActiveIndex < allItems.length - 1) {
+                        navigateToItem(currentActiveIndex + 1);
+                    }
+                });
+            }
+
+            updatePopupContent(entry, index);
+            popupElement.classList.add('visible');
+            popupElement.dataset.sticky = shouldStick;
+
+            // Highlight active timeline item
+            document.querySelectorAll('.timeline-content').forEach(el => el.classList.remove('active'));
+            const activeElement = document.querySelector(`[data-timeline-index="${index}"]`);
+            if (activeElement) {
+                activeElement.classList.add('active');
+            }
+        }
+
+        // Hide popup
+        function hidePopup() {
+            if (popupElement) {
+                popupElement.classList.remove('visible');
+                popupElement.dataset.sticky = 'false';
+                document.querySelectorAll('.timeline-content').forEach(el => el.classList.remove('active'));
+                currentActiveIndex = -1;
+            }
+        }
+
+        // Navigate to specific item
+        function navigateToItem(index) {
+            if (index >= 0 && index < allItems.length) {
+                showPopup(allItems[index].entry, index, true);
+            }
+        }
+
+        // Process timeline items
         const itemData = [];
 
         sortedData.forEach((entry, index) => {
             const startDate = dateToNumeric(entry.start);
             const endDate = dateToNumeric(entry.end || currentDate);
-
-            // For reversed timeline: calculate positions from the top (newest first)
             const endPosition = ((maxDate - endDate) / totalTimeSpan) * totalHeight;
             const startPosition = ((maxDate - startDate) / totalTimeSpan) * totalHeight;
             const itemHeight = Math.max(CONFIG.minBoxHeight, startPosition - endPosition);
-
             const sideClass = entry.type === "education" ? "left" : "right";
 
             itemData.push({
@@ -184,7 +285,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 index
             });
 
-            // Add year markers
             const startYear = Math.floor(startDate);
             const endYear = Math.floor(endDate);
             yearMarkers.add(startYear);
@@ -192,14 +292,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 yearMarkers.add(endYear);
             }
 
-            // Add start and end month markers
             monthMarkers.push({ date: startDate, label: formatDate(entry.start) });
             if (entry.end) {
                 monthMarkers.push({ date: endDate, label: formatDate(entry.end) });
             }
         });
 
-        // Second pass: adjust positions to prevent overlaps within each side
+        // Adjust positions to prevent overlaps
         const leftItems = itemData.filter(item => item.sideClass === "left").sort((a, b) => a.idealTop - b.idealTop);
         const rightItems = itemData.filter(item => item.sideClass === "right").sort((a, b) => a.idealTop - b.idealTop);
 
@@ -210,21 +309,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let adjustedTop = item.idealTop;
                 let adjustedHeight = item.idealHeight;
 
-                // Check for overlaps with previously placed items
                 for (let j = 0; j < adjustedItems.length; j++) {
                     const prevItem = adjustedItems[j];
                     const prevBottom = prevItem.finalTop + prevItem.finalHeight;
 
-                    // If current item overlaps with previous item
                     if (adjustedTop < prevBottom + CONFIG.minSpacing) {
-                        // Move current item down
                         adjustedTop = prevBottom + CONFIG.minSpacing;
 
                         if (CONFIG.forceSpacing) {
-                            // Prioritize spacing - allow items to extend beyond their ideal time boundaries
                             adjustedHeight = Math.max(CONFIG.minBoxHeight, item.idealHeight);
                         } else {
-                            // Try to stay within time boundaries
                             const maxAllowedBottom = item.idealBottom;
                             if (adjustedTop + item.idealHeight > maxAllowedBottom) {
                                 const availableHeight = maxAllowedBottom - adjustedTop;
@@ -248,25 +342,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             return adjustedItems;
         }
 
-        // Adjust positions for both sides
         const adjustedLeftItems = adjustPositions(leftItems);
         const adjustedRightItems = adjustPositions(rightItems);
         const allAdjustedItems = [...adjustedLeftItems, ...adjustedRightItems];
 
-        // Check if timeline height needs to be extended due to adjustments
+        // Store all items for navigation
+        allItems = allAdjustedItems.sort((a, b) => dateToNumeric(b.entry.start) - dateToNumeric(a.entry.start));
+
+        // Check if timeline height needs extension
         const maxUsedHeight = Math.max(...allAdjustedItems.map(item => item.finalBottom));
-        const originalTotalHeight = totalHeight;
-        if (maxUsedHeight > originalTotalHeight) {
+        if (maxUsedHeight > totalHeight) {
             const newTotalHeight = maxUsedHeight + CONFIG.extraTimelinePadding;
-            const timeline = document.querySelector('.timeline');
-            if (timeline) {
-                timeline.style.minHeight = `${newTotalHeight + 400}px`;
-            }
+            timeline.style.minHeight = `${newTotalHeight + 400}px`;
         }
 
-        // Third pass: create the actual timeline items with adjusted positions
-        allAdjustedItems.forEach(({ entry, finalTop, finalHeight, sideClass }) => {
-            // Create timeline item
+        // Create timeline items with interaction
+        allAdjustedItems.forEach(({ entry, finalTop, finalHeight, sideClass }, adjustedIndex) => {
             const item = document.createElement("div");
             item.className = "timeline-item " + sideClass;
             item.style.position = "absolute";
@@ -277,20 +368,46 @@ document.addEventListener('DOMContentLoaded', async () => {
             const startText = formatDate(entry.start);
             const companyOrInstitution = entry.company || entry.institution || '';
 
+            // Find the correct index in the sorted allItems array
+            const globalIndex = allItems.findIndex(item => item.entry === entry);
+
+            // Timeline box content - NO DESCRIPTION HERE
             item.innerHTML = `
-                <div class="timeline-content ${sideClass}">
+                <div class="timeline-content ${sideClass}" data-timeline-index="${globalIndex}">
                     ${entry.logo ? `<img src="${entry.logo}" class="timeline-logo">` : ''}
                     <h3>${entry.title}</h3>
                     <div class="company">${companyOrInstitution}</div>
-                    <div class="description">${entry.description || ''}</div>
                     <div class="duration">${startText} - ${endText}</div>
                 </div>
             `;
 
+            // Add event listeners for hover and click
+            const contentEl = item.querySelector('.timeline-content');
+
+            contentEl.addEventListener('mouseenter', () => {
+                if (!popupElement || popupElement.dataset.sticky !== 'true') {
+                    showPopup(entry, globalIndex, false);
+                }
+            });
+
+            contentEl.addEventListener('mouseleave', () => {
+                if (popupElement && popupElement.dataset.sticky !== 'true') {
+                    setTimeout(() => {
+                        if (popupElement && popupElement.dataset.sticky !== 'true') {
+                            hidePopup();
+                        }
+                    }, 200);
+                }
+            });
+
+            contentEl.addEventListener('click', () => {
+                showPopup(entry, globalIndex, true);
+            });
+
             timelineGrid.appendChild(item);
         });
 
-        // Create year markers on the timeline line
+        // Create year markers
         yearMarkers.forEach(year => {
             const yearPosition = ((maxDate - year) / totalTimeSpan) * totalHeight;
             const yearMarker = document.createElement("div");
@@ -303,7 +420,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             timelineGrid.appendChild(yearMarker);
         });
 
-        // Add March 2026 marker if it extends beyond the data
+        // Add March 2026 marker
         if (maxDate === march2026 && march2026 > latestDataDate) {
             const march2026Position = ((maxDate - march2026) / totalTimeSpan) * totalHeight;
             const futureMarker = document.createElement("div");
@@ -317,7 +434,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             timelineGrid.appendChild(futureMarker);
         }
 
-        // Create month markers (smaller, less prominent)
+        // Create month markers
         const uniqueMonths = [...new Set(monthMarkers.map(m => m.date))].sort((a, b) => b - a);
         uniqueMonths.forEach(monthDate => {
             const monthPosition = ((maxDate - monthDate) / totalTimeSpan) * totalHeight;
@@ -342,14 +459,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             monthMarker.textContent = monthNames[monthNum - 1] || '';
 
-            // Only show month markers that don't overlap with year markers
             const nearestYear = Math.round(monthDate);
-            if (Math.abs(monthDate - nearestYear) > 0.08) { // More than ~1 month from year boundary
+            if (Math.abs(monthDate - nearestYear) > 0.08) {
                 timelineGrid.appendChild(monthMarker);
             }
         });
 
-        // Fade-in effect for timeline items
+        // Fade-in effect
         const timelineContents = timelineGrid.querySelectorAll('.timeline-content');
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
@@ -365,6 +481,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             el.style.transform = 'translateY(20px)';
             el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(el);
+        });
+
+        // Close popup when clicking outside
+        document.addEventListener('click', (e) => {
+            if (popupElement &&
+                !popupElement.contains(e.target) &&
+                !e.target.closest('.timeline-content')) {
+                hidePopup();
+            }
         });
 
     } catch (err) {

@@ -14,7 +14,15 @@
         "end": "2025-08",
         "title": "MSc in Data Science",
         "institution": "University of Mannheim",
-        "description": "",
+        "description": "Advanced studies in machine learning, statistical analysis, and big data technologies. Focused on predictive modeling, data visualization, and business intelligence applications.",
+        "skills": [
+            "Python",
+            "R",
+            "Machine Learning",
+            "Statistics",
+            "SQL",
+            "Tableau"
+        ],
         "logo": "uni-logo.png"
     },
     {
@@ -32,7 +40,15 @@
         "end": "2022-09",
         "title": "Student Data Scientist",
         "company": "ICIS",
-        "description": "",
+        "descriptionHtml": "<p>Worked on <em>chemical market intelligence</em> projects, developing data pipelines and analytical models.</p><h4>Key Responsibilities:</h4><ul><li>Data extraction and cleaning from multiple sources</li><li>Development of price forecasting models</li><li>Creation of automated reporting dashboards</li></ul><h4>Major Achievement:</h4><div class='achievement'>📊 Developed a machine learning model that improved price prediction accuracy by <strong>23%</strong></div><h5>Technologies Used:</h5><p><code>Python</code>, <code>Pandas</code>, <code>Scikit-learn</code>, <code>Tableau</code>, <code>SQL Server</code></p>",
+        "skills": [
+            "Python",
+            "Machine Learning",
+            "Data Visualization",
+            "SQL",
+            "Tableau",
+            "Market Analysis"
+        ],
         "logo": "companyA-logo.png"
     },
     {
