@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[Your Name] - Home</title>
+    <title>[Your Name] - Timeline Portfolio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -34,14 +34,30 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content">
-        <section class="section home">
-            <h2>Welcome!</h2>
-            <p>I'm [Your Name], a passionate <span class="animated-text">[Your Role]</span>.</p>
-            <a href="contact.html" class="cta-button">Get in Touch</a>
-        </section>
-    </main>
+    <div class="main-wrapper">
+        <header class="header">
+            <h1>[Your Name]</h1>
+            <p>Professional & Education Journey</p>
+        </header>
 
+        <div class="timeline-headers">
+            <div class="timeline-headers-inner">
+                <div class="timeline-header left">🎓 Education</div>
+                <div class="timeline-header right">💼 Professional Experience</div>
+            </div>
+        </div>
+        <div class="timeline">
+            <div class="timeline-line"></div>
+            <div class="timeline-progress" id="timeline-progress"></div>
+            <div class="timeline-grid" id="timeline-content">
+                <!-- Timeline items will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© [Your Name] – <a href="mailto:[Your Email]">Contact Me</a></p>
+    </footer>
     <script src="scripts.js"></script>
 </body>
 

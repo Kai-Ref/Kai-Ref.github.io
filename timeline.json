@@ -1,0 +1,38 @@
+[
+    {
+        "type": "education",
+        "start": "2019",
+        "end": "2023",
+        "title": "BSc in Industrial Engineering",
+        "institution": "KIT",
+        "description": "Studied physics, mathematics, and computer science.",
+        "logo": "uni-logo.png"
+    },
+    {
+        "type": "education",
+        "start": "2023",
+        "end": "2025",
+        "title": "MSc in Data Science",
+        "institution": "University of Mannheim",
+        "description": "Studied physics, mathematics, and computer science.",
+        "logo": "uni-logo.png"
+    },
+    {
+        "type": "professional",
+        "start": "2019",
+        "end": "2021",
+        "title": "Student Assistant",
+        "company": "ICIS",
+        "description": "Worked on web applications.",
+        "logo": "companyA-logo.png"
+    },
+    {
+        "type": "professional",
+        "start": "2021",
+        "end": "2022",
+        "title": "Software Engineer",
+        "company": "Company B",
+        "description": "Focused on backend systems.",
+        "logo": "companyB-logo.png"
+    }
+]

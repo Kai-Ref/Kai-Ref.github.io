@@ -268,3 +268,228 @@ button:hover {
 .references li {
     margin-bottom: 0.5rem;
 }
+
+/* ===========================
+   Vertical Timeline
+   =========================== */
+
+/* Hide default scrollbar */
+.main-wrapper {
+    flex: 1;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+.main-wrapper::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+/* ===========================
+   TIMELINE SPECIFIC STYLES
+   Add these to your existing styles.css
+   =========================== */
+
+/* Timeline Container */
+.timeline {
+    position: relative;
+    width: 100%;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    margin-top: 10rem;
+    /* More space for fixed headers */
+    min-height: 200vh;
+    /* Will be set dynamically by JS */
+}
+
+/* Timeline Line */
+.timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #ccc;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+/* Timeline Progress */
+.timeline-progress {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 4px;
+    height: 0;
+    background: #00bcd4;
+    transform: translateX(-50%);
+    z-index: 2;
+    transition: height 0.1s ease-out;
+}
+
+/* Timeline Headers */
+.timeline-headers {
+    position: fixed;
+    top: 120px;
+    left: 280px;
+    right: 0;
+    z-index: 1000;
+    background: #f5f5f5;
+    padding: 1rem 2rem;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-header {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Timeline Items */
+.timeline-item {
+    position: absolute;
+    width: 45%;
+    z-index: 10;
+}
+
+.timeline-item.left {
+    right: 55%;
+}
+
+.timeline-item.right {
+    left: 55%;
+}
+
+/* Timeline Content */
+.timeline-content {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #00bcd4;
+    position: sticky;
+    top: 280px;
+    /* Below fixed header */
+    transition: all 0.3s ease;
+}
+
+.timeline-content:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.timeline-content.left {
+    text-align: right;
+    border-left: none;
+    border-right: 4px solid #00bcd4;
+}
+
+.timeline-content h3 {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content .company {
+    color: #00bcd4;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content .description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.timeline-content .duration {
+    color: #999;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.timeline-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+}
+
+/* Timeline Dots - REMOVED */
+
+/* Year Labels on Timeline */
+.timeline-year-marker {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #00bcd4;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 20;
+    white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .timeline-headers {
+        left: 0;
+        padding: 1rem;
+    }
+
+    .timeline-headers-inner {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .timeline-header.left {
+        grid-column: 1;
+    }
+
+    .timeline-header.right {
+        grid-column: 1;
+    }
+
+    .timeline-line {
+        left: 15%;
+        transform: none;
+    }
+
+    .timeline-progress {
+        left: 15%;
+        transform: none;
+    }
+
+    .timeline-item {
+        width: 85%;
+        left: 10% !important;
+        right: auto !important;
+    }
+
+    .timeline-content {
+        text-align: left !important;
+        border-left: 4px solid #00bcd4 !important;
+        border-right: none !important;
+        top: 320px;
+        /* More space for stacked headers on mobile */
+    }
+
+    .timeline-year-marker {
+        left: 15%;
+        transform: none;
+    }
+}
