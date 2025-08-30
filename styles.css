@@ -294,14 +294,14 @@ button:hover {
    =========================== */
 
 /* Timeline Container */
-/* Timeline Container */
 .timeline {
     position: relative;
     width: 100%;
     padding: 2rem;
     max-width: 800px;
     margin: 0 auto;
-    margin-top: 8rem;
+    margin-top: 12rem;
+    /* Increased from 8rem to give more space */
     min-height: 200vh;
 }
 
@@ -337,29 +337,82 @@ button:hover {
     left: 250px;
     right: 0;
     z-index: 1000;
-    background: #f5f5f5;
+    background: #ffffff;
     padding: 1rem 2rem;
-    border-bottom: 2px solid #e0e0e0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /* border-bottom: 2px solid #e0e0e0; */
+    /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
 }
 
 .timeline-headers-inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
     max-width: 800px;
     margin: 0 auto;
+    transform: translateX(-100px);
+    /* Shift header left by 30px - adjust this value as needed */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.timeline-main-header {
+    text-align: center;
+    background: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-main-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 700;
+}
+
+.timeline-instructions {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+}
+
+.timeline-section-headers {
+    display: grid;
+    grid-template-columns: 1fr 4px 1fr;
+    gap: 0;
+    align-items: center;
+    position: relative;
+}
+
+.timeline-section-headers::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 60%;
+    background: #00bcd4;
+    border-radius: 2px;
+    z-index: 1;
 }
 
 .timeline-header {
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #333;
     background: #fff;
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-header.left {
+    grid-column: 1;
+}
+
+.timeline-header.right {
+    grid-column: 3;
 }
 
 /* Timeline Items */
@@ -386,11 +439,19 @@ button:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-left: 4px solid #00bcd4;
     position: sticky;
-    top: 120px;
+    top: 160px;
     transition: all 0.3s ease;
     z-index: 10;
     min-height: 60px;
     /* Add minimum height */
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.timeline-content-text {
+    flex: 1;
+    min-width: 0;
 }
 
 .timeline-content:hover {
@@ -402,6 +463,11 @@ button:hover {
     text-align: right;
     border-left: none;
     border-right: 4px solid #00bcd4;
+    flex-direction: row-reverse;
+}
+
+.timeline-content.left .timeline-content-text {
+    text-align: right;
 }
 
 .timeline-content h3 {
@@ -429,11 +495,11 @@ button:hover {
 }
 
 .timeline-logo {
-    width: 32px;
-    height: 32px;
+    width: 70px;
+    height: 70px;
     object-fit: contain;
-    margin-bottom: 0.5rem;
-    border-radius: 4px;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
 
 /* Timeline Dots - REMOVED */
@@ -460,9 +526,18 @@ button:hover {
         padding: 1rem;
     }
 
-    .timeline-headers-inner {
+    .timeline {
+        margin-top: 14rem;
+        /* Even more space on mobile due to stacked headers */
+    }
+
+    .timeline-section-headers {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+
+    .timeline-section-headers::before {
+        display: none;
     }
 
     .timeline-header.left {
@@ -471,6 +546,14 @@ button:hover {
 
     .timeline-header.right {
         grid-column: 1;
+    }
+
+    .timeline-main-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .timeline-instructions {
+        font-size: 0.8rem;
     }
 
     .timeline-line {
@@ -552,7 +635,8 @@ button:hover {
 }
 
 .timeline-popup-nav button {
-    background: #f5f5f5;
+    background: #00bcd4;
+    /*##f5f5f5;*/
     border: 1px solid #ddd;
     border-radius: 50%;
     width: 32px;
@@ -598,9 +682,56 @@ button:hover {
     padding: 1.5rem;
 }
 
+.timeline-popup-content .location {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    padding: 0.4rem 0.6rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #28a745;
+}
+
+.timeline-popup-content .company-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    text-decoration: none;
+    margin-left: 0.5rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+}
+
+.timeline-popup-content .company-link:hover {
+    transform: scale(1.1);
+    background-color: #f0f0f0;
+}
+
+.timeline-popup-content .linkedin-link {
+    color: #0077b5;
+}
+
+.timeline-popup-content .linkedin-link:hover {
+    color: #005885;
+    background-color: #e8f4f8;
+}
+
+.timeline-popup-content .website-link {
+    color: #00bcd4;
+}
+
+.timeline-popup-content .website-link:hover {
+    color: #0097a7;
+    background-color: #e8f8f9;
+}
+
 .timeline-popup-content .logo {
-    width: 48px;
-    height: 48px;
+    width: 96px;
+    height: 96px;
     object-fit: contain;
     margin-bottom: 1rem;
     border-radius: 6px;

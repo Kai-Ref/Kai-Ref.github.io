@@ -193,10 +193,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Add sample skills if not present
             const skills = entry.skills || [];
 
+            // Build company/institution section with optional links
+            let companySection = companyOrInstitution;
+            if (entry.website || entry.linkedin) {
+                const links = [];
+                if (entry.website) {
+                    links.push(`<a href="${entry.website}" target="_blank" title="Visit website" class="company-link website-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                    </a>`);
+                }
+                if (entry.linkedin) {
+                    links.push(`<a href="${entry.linkedin}" target="_blank" title="View LinkedIn" class="company-link linkedin-link">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </a>`);
+                }
+                companySection = `${companyOrInstitution} ${links.join(' ')}`;
+            }
+
             content.innerHTML = `
                 ${entry.logo ? `<img src="${entry.logo}" class="logo" alt="${companyOrInstitution} logo">` : ''}
                 <h3>${entry.title}</h3>
-                <div class="company">${companyOrInstitution}</div>
+                <div class="company">${companySection}</div>
+                ${entry.location ? `<div class="location">📍 ${entry.location}</div>` : ''}
                 <div class="duration">${startText} - ${endText}</div>
                 <div class="description">${description}</div>
                 ${skills.length > 0 ? `
@@ -373,12 +396,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Timeline box content - NO DESCRIPTION HERE
             item.innerHTML = `
-                <div class="timeline-content ${sideClass}" data-timeline-index="${globalIndex}">
-                    ${entry.logo ? `<img src="${entry.logo}" class="timeline-logo">` : ''}
+            <div class="timeline-content ${sideClass}" data-timeline-index="${globalIndex}">
+                ${entry.logo ? `<img src="${entry.logo}" class="timeline-logo">` : ''}
+                <div class="timeline-content-text">
                     <h3>${entry.title}</h3>
                     <div class="company">${companyOrInstitution}</div>
                     <div class="duration">${startText} - ${endText}</div>
                 </div>
+            </div>
             `;
 
             // Add event listeners for hover and click

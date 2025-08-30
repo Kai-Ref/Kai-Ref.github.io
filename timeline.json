@@ -6,7 +6,7 @@
         "title": "BSc in Industrial Engineering",
         "institution": "KIT",
         "description": "",
-        "logo": "uni-logo.png"
+        "logo": "img/logos/kit.svg"
     },
     {
         "type": "education",
@@ -23,7 +23,7 @@
             "SQL",
             "Tableau"
         ],
-        "logo": "uni-logo.png"
+        "logo": "img/logos/uom.webp"
     },
     {
         "type": "education",
@@ -32,14 +32,17 @@
         "title": "MSc in Computer Science (Exchange Program)",
         "institution": "University of Adelaide",
         "description": "",
-        "logo": "uni-logo.png"
+        "logo": "img/logos/uoa.png"
     },
     {
         "type": "professional",
         "start": "2022-03",
         "end": "2022-09",
+        "location": "Karlsruhe, Germany",
         "title": "Student Data Scientist",
         "company": "ICIS",
+        "website": "https://www.icis.com/explore/",
+        "linkedin": "linkedin",
         "descriptionHtml": "<p>Worked on <em>chemical market intelligence</em> projects, developing data pipelines and analytical models.</p><h4>Key Responsibilities:</h4><ul><li>Data extraction and cleaning from multiple sources</li><li>Development of price forecasting models</li><li>Creation of automated reporting dashboards</li></ul><h4>Major Achievement:</h4><div class='achievement'>📊 Developed a machine learning model that improved price prediction accuracy by <strong>23%</strong></div><h5>Technologies Used:</h5><p><code>Python</code>, <code>Pandas</code>, <code>Scikit-learn</code>, <code>Tableau</code>, <code>SQL Server</code></p>",
         "skills": [
             "Python",
@@ -49,7 +52,7 @@
             "Tableau",
             "Market Analysis"
         ],
-        "logo": "companyA-logo.png"
+        "logo": "img/logos/icis.jpg"
     },
     {
         "type": "professional",
@@ -58,7 +61,7 @@
         "title": "Student Assistant",
         "company": "KIT (ECON)",
         "description": "",
-        "logo": "companyB-logo.png"
+        "logo": "img/logos/kit.svg"
     },
     {
         "type": "professional",
@@ -67,6 +70,6 @@
         "title": "Student Assistant",
         "company": "Fraunhofer SIT",
         "description": "",
-        "logo": "companyB-logo.png"
+        "logo": "img/logos/sit.webp"
     }
 ]
