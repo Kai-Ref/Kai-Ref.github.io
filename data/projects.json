@@ -1,0 +1,82 @@
+[
+    {
+        "title": "Chemical Market Intelligence Platform",
+        "description": "Developed a comprehensive data analytics platform for chemical market analysis, featuring real-time price tracking, demand forecasting, and market trend visualization.",
+        "image": "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+        "technologies": [
+            "Python",
+            "Machine Learning",
+            "Tableau",
+            "SQL",
+            "Pandas"
+        ],
+        "date": "2022",
+        "status": "completed",
+        "github": "https://github.com/kai-ref/market-intelligence",
+        "demo": null
+    },
+    {
+        "title": "Predictive Analytics Dashboard",
+        "description": "Built an interactive dashboard for predictive analytics using advanced statistical models and machine learning algorithms to forecast business metrics.",
+        "image": "https://images.pexels.com/photos/669610/pexels-photo-669610.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+        "technologies": [
+            "R",
+            "Shiny",
+            "ggplot2",
+            "Machine Learning",
+            "Statistics"
+        ],
+        "date": "2023",
+        "status": "completed",
+        "github": "https://github.com/kai-ref/predictive-dashboard",
+        "demo": "https://kai-ref-analytics.shinyapps.io/dashboard"
+    },
+    {
+        "title": "Data Pipeline Automation",
+        "description": "Designed and implemented automated data pipelines for ETL processes, reducing manual work by 80% and improving data quality through automated validation.",
+        "image": "https://images.pexels.com/photos/577585/pexels-photo-577585.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+        "technologies": [
+            "Python",
+            "Apache Airflow",
+            "PostgreSQL",
+            "Docker",
+            "AWS"
+        ],
+        "date": "2024",
+        "status": "in-progress",
+        "github": "https://github.com/kai-ref/data-pipeline",
+        "demo": null
+    },
+    {
+        "title": "Time Series Forecasting Model",
+        "description": "Developed sophisticated time series models for financial forecasting using LSTM networks and traditional statistical methods.",
+        "image": "https://images.pexels.com/photos/186461/pexels-photo-186461.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+        "technologies": [
+            "Python",
+            "TensorFlow",
+            "LSTM",
+            "Time Series",
+            "Financial Modeling"
+        ],
+        "date": "2024",
+        "status": "completed",
+        "github": "https://github.com/kai-ref/time-series-forecasting",
+        "demo": null
+    },
+    {
+        "title": "Research Data Analysis Platform",
+        "description": "Currently developing a comprehensive platform for academic research data analysis with collaborative features and advanced visualization capabilities.",
+        "image": "https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+        "technologies": [
+            "React",
+            "Node.js",
+            "D3.js",
+            "MongoDB",
+            "Machine Learning"
+        ],
+        "date": "2025",
+        "status": "in-progress",
+        "github": "https://github.com/kai-ref/research-platform",
+        "demo": null
+    }
+]
