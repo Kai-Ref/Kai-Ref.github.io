@@ -46,7 +46,6 @@ function initializeSidebar() {
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) {
         sidebar.innerHTML = createSidebar();
-
         // Set active navigation item
         const currentPage = document.body.dataset.page;
         if (currentPage) {

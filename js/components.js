@@ -454,7 +454,6 @@ function createLogosCarousel() {
 function createBlogCard(post) {
     const card = document.createElement('div');
     card.className = 'content-card blog-card';
-
     card.innerHTML = `
         <div class="card-image">
             <img src="${post.image || 'https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop'}" alt="${post.title}">
@@ -474,7 +473,6 @@ function createBlogCard(post) {
             <a href="posts/${post.link}" class="read-more">Read More →</a>
         </div>
     `;
-
     return card;
 }
 
@@ -482,7 +480,6 @@ function createBlogCard(post) {
 function createProjectCard(project) {
     const card = document.createElement('div');
     card.className = 'content-card project-card';
-
     card.innerHTML = `
         <div class="card-image">
             <img src="${project.image}" alt="${project.title}">
@@ -507,21 +504,18 @@ function createProjectCard(project) {
             </div>
         </div>
     `;
-
     return card;
 }
 
 // Initialize components based on page
 function initializeComponents() {
     const currentPage = document.body.dataset.page;
-
     if (currentPage === 'home') {
         const heroSection = document.querySelector('.hero-section');
         if (heroSection) {
             // Add background animation
             const bgCanvas = createTimeSeriesBackground();
             heroSection.appendChild(bgCanvas);
-
             // Add logos carousel
             const logosContainer = document.querySelector('.logos-container');
             if (logosContainer) {
