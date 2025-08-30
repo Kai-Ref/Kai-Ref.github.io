@@ -1300,7 +1300,8 @@ nav a.active::before {
 }
 
 .animated-text {
-    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    background: linear-gradient(45deg, #0f4c75, #2c3e50);
+    /* linear-gradient(45deg, var(--primary-color), var(--secondary-color)); */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
