@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kai Ref - Contact</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body data-page="contact">
+    <!-- Sidebar -->
+    <aside class="sidebar"></aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="section contact">
+            <h2>Get in Touch</h2>
+            <p>I'm always interested in discussing new opportunities, collaborations, or just having a conversation about data science and technology.</p>
+            
+            <div class="contact-grid">
+                <div class="contact-form-container">
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-button">Send Message</button>
+                    </form>
+                    <div id="form-response" class="form-response"></div>
+                </div>
+                
+                <div class="contact-info">
+                    <h3>Let's Connect</h3>
+                    <div class="contact-methods">
+                        <a href="mailto:kai@example.com" class="contact-method">
+                            <div class="method-icon">📧</div>
+                            <div>
+                                <strong>Email</strong>
+                                <span>kai@example.com</span>
+                            </div>
+                        </a>
+                        <a href="https://linkedin.com/in/kai-ref" target="_blank" class="contact-method">
+                            <div class="method-icon">💼</div>
+                            <div>
+                                <strong>LinkedIn</strong>
+                                <span>Connect professionally</span>
+                            </div>
+                        </a>
+                        <a href="https://github.com/kai-ref" target="_blank" class="contact-method">
+                            <div class="method-icon">💻</div>
+                            <div>
+                                <strong>GitHub</strong>
+                                <span>View my code</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/sidebar.js"></script>
+    <script src="scripts.js"></script>
+</body>
+
+</html>
+</parameter>

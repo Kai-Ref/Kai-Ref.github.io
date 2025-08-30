@@ -28,8 +28,8 @@ if (contactForm) {
 
 // -------------------- Dynamic Blog List --------------------
 async function loadBlogPosts() {
-    const blogList = document.getElementById('blog-list');
-    if (!blogList) return;
+    const blogGrid = document.getElementById('blog-grid');
+    if (!blogGrid) return;
 
     try {
         const response = await fetch('posts/posts.json');
@@ -40,30 +40,66 @@ async function loadBlogPosts() {
         posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         posts.forEach(post => {
-            const card = document.createElement('div');
-            card.className = 'blog-card';
-
-            card.innerHTML = `
-                <h3><a href="posts/${post.link}">${post.title}</a></h3>
-                <p class="meta">
-                    <span class="date">${post.date}</span> |
-                    <span class="author">${post.author}</span> |
-                    <span class="tags">${post.tags.join(', ')}</span>
-                </p>
-                <p>${post.summary}</p>
-            `;
-            blogList.appendChild(card);
+            const card = createBlogCard(post);
+            blogGrid.appendChild(card);
         });
     } catch (err) {
         console.error('Error loading blog posts:', err);
-        blogList.innerHTML = '<p>Failed to load blog posts.</p>';
+        blogGrid.innerHTML = '<p>Failed to load blog posts.</p>';
     }
 }
 
-if (document.getElementById('blog-list')) {
+// -------------------- Dynamic Projects List --------------------
+async function loadProjects() {
+    const projectsGrid = document.getElementById('projects-grid');
+    if (!projectsGrid) return;
+
+    try {
+        const response = await fetch('data/projects.json');
+        if (!response.ok) throw new Error('Failed to fetch projects.json');
+        const projects = await response.json();
+
+        // Sort by date descending
+        projects.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        projects.forEach(project => {
+            const card = createProjectCard(project);
+            projectsGrid.appendChild(card);
+        });
+    } catch (err) {
+        console.error('Error loading projects:', err);
+        projectsGrid.innerHTML = '<p>Failed to load projects.</p>';
+    }
+}
+
+// Initialize content based on page
+if (document.getElementById('blog-grid')) {
     window.addEventListener('DOMContentLoaded', loadBlogPosts);
 }
 
+if (document.getElementById('projects-grid')) {
+    window.addEventListener('DOMContentLoaded', loadProjects);
+}
+
+// -------------------- Enhanced Contact Form --------------------
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = this.name.value;
+        const email = this.email.value;
+        const subject = this.subject.value;
+        const message = this.message.value;
+
+        console.log({ name, email, subject, message });
+        const responseEl = document.getElementById('form-response');
+        if (responseEl) {
+            responseEl.textContent = "Thank you! Your message has been sent.";
+            responseEl.classList.add('show');
+        }
+        this.reset();
+    });
+}
 
 // -------------------- Timeline Scroll Progress --------------------
 document.addEventListener("scroll", () => {
