@@ -82,11 +82,7 @@ if (document.getElementById('projects-grid')) {
 }
 
 // -------------------- Enhanced Contact Form --------------------
-<<<<<<< HEAD
 // const contactForm = document.getElementById('contact-form');
-=======
-const contactForm = document.getElementById('contact-form');
->>>>>>> 1411863344c293338d42834b9d111a48973c55d3
 if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
         e.preventDefault();
