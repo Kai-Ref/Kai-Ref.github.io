@@ -46,6 +46,10 @@ function initializeSidebar() {
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) {
         sidebar.innerHTML = createSidebar();
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
         // Set active navigation item
         const currentPage = document.body.dataset.page;
         if (currentPage) {
@@ -59,3 +63,7 @@ function initializeSidebar() {
 
 // Call initialization when DOM is loaded
 document.addEventListener('DOMContentLoaded', initializeSidebar);
+<<<<<<< HEAD
+=======
+</parameter>
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3

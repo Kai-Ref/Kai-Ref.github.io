@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // // Background animation for home page
 // function createTimeSeriesBackground() {
 //     const canvas = document.createElement('canvas');
@@ -74,11 +75,15 @@
 // }
 
 // Enhanced Background animation for home page with realistic time series data
+=======
+// Background animation for home page
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
 function createTimeSeriesBackground() {
     const canvas = document.createElement('canvas');
     canvas.className = 'time-series-bg';
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+<<<<<<< HEAD
 
     const ctx = canvas.getContext('2d');
     const points = [];
@@ -213,19 +218,54 @@ function createTimeSeriesBackground() {
         // Vertical lines (time axis)
         const gridSpacing = 60;
         for (let i = 0; i < canvas.width; i += gridSpacing) {
+=======
+    
+    const ctx = canvas.getContext('2d');
+    const points = [];
+    const numLines = 3;
+    
+    // Generate time series data
+    for (let line = 0; line < numLines; line++) {
+        const linePoints = [];
+        for (let i = 0; i <= 100; i++) {
+            const x = (i / 100) * canvas.width;
+            const baseY = canvas.height * (0.3 + line * 0.2);
+            const noise = Math.sin(i * 0.1 + line * 2) * 50 + Math.random() * 20;
+            linePoints.push({ x, y: baseY + noise });
+        }
+        points.push(linePoints);
+    }
+    
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw grid
+        ctx.strokeStyle = 'rgba(0, 188, 212, 0.1)';
+        ctx.lineWidth = 1;
+        
+        // Vertical lines
+        for (let i = 0; i < canvas.width; i += 50) {
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
             ctx.beginPath();
             ctx.moveTo(i, 0);
             ctx.lineTo(i, canvas.height);
             ctx.stroke();
         }
+<<<<<<< HEAD
 
         // Horizontal lines (value axis)
         for (let i = 0; i < canvas.height; i += gridSpacing) {
+=======
+        
+        // Horizontal lines
+        for (let i = 0; i < canvas.height; i += 50) {
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
             ctx.beginPath();
             ctx.moveTo(0, i);
             ctx.lineTo(canvas.width, i);
             ctx.stroke();
         }
+<<<<<<< HEAD
 
         // Add subtle axis labels feel
         ctx.strokeStyle = 'rgba(25, 42, 86, 0.2)';
@@ -249,6 +289,16 @@ function createTimeSeriesBackground() {
             ctx.beginPath();
 
             data.forEach((point, i) => {
+=======
+        
+        // Draw time series lines
+        points.forEach((linePoints, lineIndex) => {
+            ctx.strokeStyle = `rgba(0, 188, 212, ${0.3 + lineIndex * 0.2})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            linePoints.forEach((point, i) => {
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
                 if (i === 0) {
                     ctx.moveTo(point.x, point.y);
                 } else {
@@ -256,6 +306,7 @@ function createTimeSeriesBackground() {
                 }
             });
             ctx.stroke();
+<<<<<<< HEAD
 
             // Add data points (dots) occasionally for more time series feel
             if (seriesIndex < 2) { // Only on first two series to avoid clutter
@@ -361,10 +412,26 @@ function createTimeSeriesBackground() {
 
     window.addEventListener('resize', handleResize);
 
+=======
+            
+            // Animate points
+            linePoints.forEach(point => {
+                point.y += Math.sin(Date.now() * 0.001 + point.x * 0.01) * 0.5;
+            });
+        });
+        
+        requestAnimationFrame(animate);
+    }
+    
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
     animate();
     return canvas;
 }
 
+<<<<<<< HEAD
+=======
+// Company logos carousel
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
 function createLogosCarousel() {
     const logos = [
         { name: 'KIT', src: 'img/logos/kit.svg' },
@@ -373,6 +440,7 @@ function createLogosCarousel() {
         { name: 'ICIS', src: 'img/logos/icis.jpg' },
         { name: 'Fraunhofer SIT', src: 'img/logos/sit.webp' }
     ];
+<<<<<<< HEAD
 
     const carousel = document.createElement('div');
     carousel.className = 'logos-carousel';
@@ -384,6 +452,17 @@ function createLogosCarousel() {
     const tripleLogos = [...logos, ...logos, ...logos];
 
     tripleLogos.forEach(logo => {
+=======
+    
+    const carousel = document.createElement('div');
+    carousel.className = 'logos-carousel';
+    
+    const track = document.createElement('div');
+    track.className = 'logos-track';
+    
+    // Create two sets for infinite scroll
+    [...logos, ...logos].forEach(logo => {
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
         const logoItem = document.createElement('div');
         logoItem.className = 'logo-item';
         logoItem.innerHTML = `
@@ -391,6 +470,7 @@ function createLogosCarousel() {
         `;
         track.appendChild(logoItem);
     });
+<<<<<<< HEAD
 
     carousel.appendChild(track);
 
@@ -447,6 +527,10 @@ function createLogosCarousel() {
         animateWithPause();
     }, 100);
 
+=======
+    
+    carousel.appendChild(track);
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
     return carousel;
 }
 
@@ -454,6 +538,10 @@ function createLogosCarousel() {
 function createBlogCard(post) {
     const card = document.createElement('div');
     card.className = 'content-card blog-card';
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
     card.innerHTML = `
         <div class="card-image">
             <img src="${post.image || 'https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop'}" alt="${post.title}">
@@ -473,6 +561,10 @@ function createBlogCard(post) {
             <a href="posts/${post.link}" class="read-more">Read More →</a>
         </div>
     `;
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
     return card;
 }
 
@@ -480,6 +572,10 @@ function createBlogCard(post) {
 function createProjectCard(project) {
     const card = document.createElement('div');
     card.className = 'content-card project-card';
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
     card.innerHTML = `
         <div class="card-image">
             <img src="${project.image}" alt="${project.title}">
@@ -504,18 +600,30 @@ function createProjectCard(project) {
             </div>
         </div>
     `;
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
     return card;
 }
 
 // Initialize components based on page
 function initializeComponents() {
     const currentPage = document.body.dataset.page;
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
     if (currentPage === 'home') {
         const heroSection = document.querySelector('.hero-section');
         if (heroSection) {
             // Add background animation
             const bgCanvas = createTimeSeriesBackground();
             heroSection.appendChild(bgCanvas);
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
             // Add logos carousel
             const logosContainer = document.querySelector('.logos-container');
             if (logosContainer) {
@@ -528,3 +636,7 @@ function initializeComponents() {
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', initializeComponents);
+<<<<<<< HEAD
+=======
+</parameter>
+>>>>>>> 1411863344c293338d42834b9d111a48973c55d3
