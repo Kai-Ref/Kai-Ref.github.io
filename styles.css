@@ -34,9 +34,16 @@ body {
     overflow-x: hidden;
 }
 
+a,
+button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
 /* ===========================
    SIDEBAR STYLES
    =========================== */
+
 .sidebar {
     width: 280px;
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -1330,12 +1337,48 @@ nav a.active::before {
     }
 }
 
+/* On desktop, hide the toggle button */
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
+    }
+}
+
+
 @media (max-width: 768px) {
-    .sidebar {
+
+    /* .sidebar {
         width: 100%;
         height: auto;
         position: relative;
         padding: 1rem;
+    } */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        /* off screen by default */
+        width: 80%;
+        height: 100%;
+        background: #0f172a;
+        transition: left 0.3s ease;
+        z-index: 2000;
+        overflow-y: auto;
+    }
+
+    .sidebar.open {
+        left: 0;
+        /* slide in */
+    }
+
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: white;
+        cursor: pointer;
+        margin: 1rem;
     }
 
     .main-content {
@@ -1424,11 +1467,31 @@ nav a.active::before {
     }
 }
 
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: navy;
+    /* 🔵 change to navy */
+    position: fixed;
+    top: 0rem;
+    left: -0.2rem;
+    z-index: 3000;
+    /* above sidebar */
+}
+
 @media (max-width: 480px) {
     .section {
         padding: 2rem 1rem;
         margin-bottom: 1rem;
     }
+
+    .menu-toggle {
+        display: block;
+    }
+
 
     .hero-content {
         padding: 1rem;
@@ -1436,5 +1499,13 @@ nav a.active::before {
 
     .content-grid {
         padding: 0 1rem 2rem;
+    }
+
+    .hero-stats {
+        gap: 1rem;
+    }
+
+    .quick-links {
+        padding: 2rem 1rem;
     }
 }

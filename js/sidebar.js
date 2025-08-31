@@ -1,6 +1,7 @@
 // Sidebar component generator
 function createSidebar() {
     return `
+        <button class="menu-toggle">☰</button>
         <div class="profile">
             <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop" alt="Profile Picture" class="profile-pic">
             <h1>Kai Ref</h1>
@@ -46,7 +47,8 @@ function initializeSidebar() {
     const sidebar = document.querySelector('.sidebar');
     if (sidebar) {
         sidebar.innerHTML = createSidebar();
-        // Set active navigation item
+
+        // Set active nav item
         const currentPage = document.body.dataset.page;
         if (currentPage) {
             const activeLink = sidebar.querySelector(`[data-page="${currentPage}"]`);
@@ -54,8 +56,15 @@ function initializeSidebar() {
                 activeLink.classList.add('active');
             }
         }
+
+        // Toggle button logic
+        const menuToggle = sidebar.querySelector('.menu-toggle');
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
     }
 }
+
 
 // Call initialization when DOM is loaded
 document.addEventListener('DOMContentLoaded', initializeSidebar);
