@@ -1,82 +1,120 @@
 [
         {
-                "title": "Chemical Market Intelligence Platform",
-                "description": "Developed a comprehensive data analytics platform for chemical market analysis, featuring real-time price tracking, demand forecasting, and market trend visualization.",
-                "image": "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+                "title": "Master's Thesis: Probabilistic LTSF",
+                "description": "Explored IMS vs. DMS trade-offs in probabilistic long-term and short-term time series forecasting. Combined probabilistic and point LTSF methods, demonstrating strong performance with quantile-based techniques.",
+                "image": "data/ltsf.png",
                 "technologies": [
-                        "Python",
-                        "Machine Learning",
-                        "Tableau",
-                        "SQL",
-                        "Pandas"
+                        "IMS vs DMS",
+                        "Probabilistic LTSF",
+                        "PyTorch"
                 ],
-                "date": "2022",
+                "date": "2025",
                 "status": "completed",
-                "github": "https://github.com/kai-ref/market-intelligence",
+                "github": "https://github.com/Kai-Ref/Probabilistic_LTSF",
                 "demo": null
         },
         {
-                "title": "Predictive Analytics Dashboard",
-                "description": "Built an interactive dashboard for predictive analytics using advanced statistical models and machine learning algorithms to forecast business metrics.",
-                "image": "https://images.pexels.com/photos/669610/pexels-photo-669610.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+                "title": "Explainable Deep Fake Detection",
+                "description": "Integrated B-Cos networks into XceptionNet for deepfake detection and proposed the Mask Pointing Game for evaluating explanation quality in interpretable AI.",
+                "image": "data/xai.jpg",
                 "technologies": [
-                        "R",
-                        "Shiny",
-                        "ggplot2",
+                        "Python",
+                        "Computer Vision",
+                        "B-Cos Networks",
+                        "Explainable AI",
+                        "PyTorch"
+                ],
+                "date": "2024",
+                "status": "completed",
+                "github": "https://github.com/nilsbecker0711/Interpretable-Deep-Fake-Detection",
+                "demo": null
+        },
+        {
+                "title": "STADS Datathon (Winner)",
+                "description": "Designed a data-driven simulation for targeted vaccination campaigns with interactive dashboards.",
+                "image": "data/datathon.jpg",
+                "technologies": [
+                        "Data Analysis",
+                        "Simulation",
+                        "Dashboards",
+                        "Reinforcement Learning",
+                        "LLM"
+                ],
+                "date": "2025",
+                "status": "completed",
+                "github": "https://github.com/tubbers7/STADS_Datathon2025",
+                "demo": null
+        },
+        {
+                "title": "Flight Price Prediction",
+                "description": "Modeled flight prices using XGBoost, RandomForest, and SVMs.",
+                "image": "data/fpr.jpg",
+                "technologies": [
                         "Machine Learning",
-                        "Statistics"
+                        "Scikit-Learn",
+                        "XGBoost",
+                        "RandomForest",
+                        "SVM"
                 ],
                 "date": "2023",
                 "status": "completed",
-                "github": "https://github.com/kai-ref/predictive-dashboard",
-                "demo": "https://kai-ref-analytics.shinyapps.io/dashboard"
-        },
-        {
-                "title": "Data Pipeline Automation",
-                "description": "Designed and implemented automated data pipelines for ETL processes, reducing manual work by 80% and improving data quality through automated validation.",
-                "image": "https://images.pexels.com/photos/577585/pexels-photo-577585.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
-                "technologies": [
-                        "Python",
-                        "Apache Airflow",
-                        "PostgreSQL",
-                        "Docker",
-                        "AWS"
-                ],
-                "date": "2024",
-                "status": "in-progress",
-                "github": "https://github.com/kai-ref/data-pipeline",
+                "github": "https://github.com/arschrei/dm-project-23",
                 "demo": null
         },
         {
-                "title": "Time Series Forecasting Model",
-                "description": "Developed sophisticated time series models for financial forecasting using LSTM networks and traditional statistical methods.",
-                "image": "https://images.pexels.com/photos/186461/pexels-photo-186461.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+                "title": "Football Data Integration",
+                "description": "Integrated football data from multiple sources using web scraping and schema matching in Java.",
+                "image": "data/wdi.jpg",
                 "technologies": [
-                        "Python",
-                        "TensorFlow",
-                        "LSTM",
-                        "Time Series",
-                        "Financial Modeling"
+                        "Java",
+                        "Web Scraping",
+                        "Web Data Integration",
+                        "Entity Matching"
                 ],
-                "date": "2024",
+                "date": "2023",
                 "status": "completed",
-                "github": "https://github.com/kai-ref/time-series-forecasting",
+                "github": "https://github.com/Kai-Ref/Web-Data-Integration",
                 "demo": null
         },
         {
-                "title": "Research Data Analysis Platform",
-                "description": "Currently developing a comprehensive platform for academic research data analysis with collaborative features and advanced visualization capabilities.",
-                "image": "https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+                "title": "Bachelor’s Thesis: DeepAR for Infectious Disease Forecasting",
+                "description": "Applied DeepAR for probabilistic influenza forecasting, outperforming traditional and neural baselines in accuracy and uncertainty quantification.",
+                "image": "data/deepar.png",
                 "technologies": [
-                        "React",
-                        "Node.js",
-                        "D3.js",
-                        "MongoDB",
-                        "Machine Learning"
+                        "Influenza Forecasting",
+                        "DeepAR",
+                        "Probabilistic Time Series Forecasting"
                 ],
-                "date": "2025",
-                "status": "in-progress",
-                "github": "https://github.com/kai-ref/research-platform",
+                "date": "2023",
+                "status": "completed",
+                "github": "https://github.com/Kai-Ref/DeepAR_InfluenzaForecast",
+                "demo": null
+        },
+        {
+                "title": "Regression Feature Selection",
+                "description": "Compared LASSO and Ridge for feature selection in regression tasks.",
+                "image": "data/lr.avif",
+                "technologies": [
+                        "Python",
+                        "R",
+                        "Statistics"
+                ],
+                "date": "2022",
+                "status": "completed",
+                "github": "https://github.com/Kai-Ref/Feature-Selection-in-Regression-Tasks",
+                "demo": null
+        },
+        {
+                "title": "Football Transfermarkt Webscraping",
+                "description": "Scraped football player and team data.",
+                "image": "data/tm.png",
+                "technologies": [
+                        "Python",
+                        "Web Scraping"
+                ],
+                "date": "2023",
+                "status": "completed",
+                "github": "https://github.com/Kai-Ref/footy",
                 "demo": null
         }
 ]

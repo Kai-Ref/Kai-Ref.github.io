@@ -2,10 +2,10 @@
     {
         "type": "education",
         "start": "2019-10",
-        "end": "2023-05",
+        "end": "2023-06",
         "title": "BSc in Industrial Engineering",
-        "institution": "KIT",
-        "description": "",
+        "institution": "Karlsruhe Institute of Technology (KIT)",
+        "description": "Completed a Bachelor's in Industrial Engineering with a focus on data analysis, process optimization, and statistical modeling. Achieved top 15% ranking, with a Bachelor's thesis graded 1.0.",
         "logo": "img/logos/kit.svg"
     },
     {
@@ -14,24 +14,27 @@
         "end": "2025-08",
         "title": "MSc in Data Science",
         "institution": "University of Mannheim",
-        "description": "Advanced studies in machine learning, statistical analysis, and big data technologies. Focused on predictive modeling, data visualization, and business intelligence applications.",
+        "description": "Master’s program focusing on Machine Learning and Artificial Intelligence. On track to graduate with a overall grade of 1.3 (top 3%).<p>Particualrly interesting courses:<ul><li>Machine Learning</li><li>Deep Learning</li><li>Seminar: Hot Topics in Machine Learning</li><li>Team Project: XAI Deepfake Detection</li></ul></p><div class='achievement'>🙌 Team Project <strong>XAI Deepfake Detection using B-Cos networks</strong> <p>Over 6 months, we (a team of 6 students) applied current SOTA XAI methods to DeepFake Detection.</div><div class='achievement'>🎓 Thesis <strong>Probabilistic LTSF: Investigating an DMS-IMS Trade-off </strong> <p>In short, two research directions:<ul><li>Combining point LTSF and probabilistic TSF research developments</li><li>Analysing the benefits of IMS models in creating realistic samples, whereas DMS models fail to do so</li></ul></p></div>",
         "skills": [
             "Python",
             "R",
             "Machine Learning",
-            "Statistics",
+            "Time Series Analysis",
             "SQL",
-            "Tableau"
+            "PyTorch",
+            "Scikit-Learn",
+            "Pandas",
+            "Numpy"
         ],
         "logo": "img/logos/uom.webp"
     },
     {
         "type": "education",
-        "start": "2025-08",
-        "end": "2026-01",
-        "title": "MSc in Computer Science (Exchange Program)",
+        "start": "2025-07",
+        "end": "2025-12",
+        "title": "MSc in Data Science (Exchange Program)",
         "institution": "University of Adelaide",
-        "description": "",
+        "description": "<p>Participating in an international exchange program.</p> <p><h4>Courses include:</h4><ul><li>Random processes</li><li>Statistical Modelling and Inference</li><li>Evolutionary Computation</li></ul></p>",
         "logo": "img/logos/uoa.png"
     },
     {
@@ -39,17 +42,16 @@
         "start": "2022-03",
         "end": "2022-09",
         "location": "Karlsruhe, Germany",
-        "title": "Student Data Scientist",
-        "company": "ICIS",
+        "title": "Student Data Scientist – EU Power Markets",
+        "company": "ICIS Tschach Solutions",
         "website": "https://www.icis.com/explore/",
-        "linkedin": "linkedin",
-        "descriptionHtml": "<p>Worked on <em>chemical market intelligence</em> projects, developing data pipelines and analytical models.</p><h4>Key Responsibilities:</h4><ul><li>Data extraction and cleaning from multiple sources</li><li>Development of price forecasting models</li><li>Creation of automated reporting dashboards</li></ul><h4>Major Achievement:</h4><div class='achievement'>📊 Developed a machine learning model that improved price prediction accuracy by <strong>23%</strong></div><h5>Technologies Used:</h5><p><code>Python</code>, <code>Pandas</code>, <code>Scikit-learn</code>, <code>Tableau</code>, <code>SQL Server</code></p>",
+        "description": "<p>Worked on short-term electricty market</em> projects.</p><h4>Key Responsibilities:</h4><ul><li>Implementation of an OTC backtesting statistic on the company website. </li><li>Development and refinement of several classification algorithms to identify price convergence between European borders.</li></ul><div class='achievement'>📊 These classifications ultimately improved electricity price forecasts by an average of <strong>5%</strong></div></p>",
         "skills": [
             "Python",
             "Machine Learning",
-            "Data Visualization",
+            "Data Analysis",
             "SQL",
-            "Tableau",
+            "Forecasting",
             "Market Analysis"
         ],
         "logo": "img/logos/icis.jpg"
@@ -58,18 +60,34 @@
         "type": "professional",
         "start": "2022-10",
         "end": "2023-09",
+        "location": "Karlsruhe, Germany",
         "title": "Student Assistant",
-        "company": "KIT (ECON)",
-        "description": "",
+        "company": "Institute of Econometrics, KIT",
+        "description": "Supported the development and documentation of a DeepAR pipeline for forecasting infectious diseases. Assisted in course organization.",
+        "skills": [
+            "Python",
+            "R",
+            "Time Series Forecasting",
+            "Data Analysis",
+            "DeepAR"
+        ],
         "logo": "img/logos/kit.svg"
     },
     {
         "type": "professional",
-        "start": "2024-02",
+        "start": "2024-03",
         "end": "2025-02",
-        "title": "Student Assistant",
-        "company": "Fraunhofer SIT",
-        "description": "",
+        "location": "Darmstadt, Germany",
+        "title": "Student Research Assistant – MaLeFiz Project",
+        "company": "Fraunhofer Institute for Secure Information Technology (SIT)",
+        "description": "Implemented models and methods for efficient and explainable detection of financial crime using graph data. Modeled synthetic financial transaction data, built a demonstrator app, and provided organizational support for Machine Learning lectures.",
+        "skills": [
+            "Python",
+            "Machine Learning",
+            "Graph Analysis",
+            "Data Simulation",
+            "App Development"
+        ],
         "logo": "img/logos/sit.webp"
     }
 ]

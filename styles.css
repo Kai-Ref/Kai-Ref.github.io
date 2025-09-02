@@ -191,6 +191,29 @@ nav a.active::before {
     overflow: hidden;
 }
 
+.hero-profile-wrapper {
+    width: 160px;
+    /* outer circle size */
+    height: 160px;
+    border: 4px solid navy;
+    /* navy border */
+    border-radius: 50%;
+    /* makes it circular */
+    overflow: hidden;
+    /* ensures image fits inside circle */
+    margin: 15px auto;
+    /* centers under the text */
+}
+
+.hero-profile-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* fills the circle without stretching */
+    display: block;
+}
+
+
 .time-series-bg {
     position: absolute;
     top: 0;
