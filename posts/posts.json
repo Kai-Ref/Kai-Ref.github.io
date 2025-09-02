@@ -1,42 +1,15 @@
 [
     {
-        "title": "Title of Scientific Work 1",
-        "author": "Kai Ref",
-        "date": "2025-08-28",
-        "readTime": "8 min read",
-        "image": "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
-        "tags": [
-            "Physics",
-            "Quantum Mechanics"
-        ],
-        "summary": "Short summary of the blog post content…",
-        "link": "post1.html"
-    },
-    {
-        "title": "Title of Scientific Work 2",
-        "author": "Kai Ref",
-        "date": "2025-08-15",
-        "readTime": "6 min read",
-        "image": "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
-        "tags": [
-            "Mathematics",
-            "Algebra"
-        ],
-        "summary": "Short summary of the blog post content…",
-        "link": "post2.html"
-    },
-    {
-        "title": "Machine Learning in Data Science",
-        "author": "Kai Ref",
-        "date": "2025-01-15",
+        "title": "Long-Term Time Series Forecasting",
+        "author": "Kai Reffert",
+        "date": "2025-07-14",
         "readTime": "12 min read",
-        "image": "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop",
+        "image": "posts/LTSF.jpg",
         "tags": [
-            "Machine Learning",
-            "Data Science",
-            "Python"
+            "LTSF",
+            "Literature Review"
         ],
-        "summary": "Exploring the latest trends and techniques in machine learning for data science applications.",
-        "link": "post3.html"
+        "summary": "Literature review of recent SOTA LTSF research.",
+        "link": "ltsf.html"
     }
 ]

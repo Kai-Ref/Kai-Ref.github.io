@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Kai Reffert" />
+  <meta name="dcterms.date" content="2025-07-14" />
+  <title>Long-Term Time Series Forecasting</title>
+  <!-- <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+
+      p,
+      h2,
+      h3 {
+        orphans: 3;
+        widows: 3;
+      }
+
+      h2,
+      h3,
+      h4 {
+        page-break-after: avoid;
+      }
+    }
+
+    p {
+      margin: 1em 0;
+    }
+
+    a {
+      color: #1a1a1a;
+    }
+
+    a:visited {
+      color: #1a1a1a;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-top: 1.4em;
+    }
+
+    h5,
+    h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+
+    h6 {
+      font-weight: normal;
+    }
+
+    ol,
+    ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+
+    li>ol,
+    li>ul {
+      margin-top: 0;
+    }
+
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+
+    .sourceCode {
+      background-color: transparent;
+      overflow: visible;
+    }
+
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+
+    table caption {
+      margin-bottom: 0.75em;
+    }
+
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+
+    #TOC li {
+      list-style: none;
+    }
+
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+
+    code {
+      white-space: pre-wrap;
+    }
+
+    span.smallcaps {
+      font-variant: small-caps;
+    }
+
+    span.underline {
+      text-decoration: underline;
+    }
+
+    div.column {
+      display: inline-block;
+      vertical-align: top;
+      width: 50%;
+    }
+
+    div.hanging-indent {
+      margin-left: 1.5em;
+      text-indent: -1.5em;
+    }
+
+    ul.task-list {
+      list-style: none;
+    }
+
+    div.csl-bib-body {}
+
+    div.csl-entry {
+      clear: both;
+    }
+
+    .hanging div.csl-entry {
+      margin-left: 2em;
+      text-indent: -2em;
+    }
+
+    div.csl-left-margin {
+      min-width: 2em;
+      float: left;
+    }
+
+    div.csl-right-inline {
+      margin-left: 2em;
+      padding-left: 1em;
+    }
+
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style> -->
+  <link rel="stylesheet" href="posts.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+
+<body data-page="blog">
+  <!-- Sidebar -->
+  <aside class="sidebar"></aside>
+  <!-- Main Content -->
+  <main class="main-content">
+    <header id="title-block-header">
+      <h1 class="title">Long-Term Time Series Forecasting</h1>
+      <p class="author">Kai Reffert</p>
+      <p class="date">July 14, 2025</p>
+    </header>
+    <!-- Table of Contents -->
+    <div id="toc" class="toc-container">
+      <ul class="toc"></ul>
+    </div>
+    <h2 id="ch:related_work_LTSF">Introduction into LTSF</h2>
+    <p>TSF has a long and extensive literature history. However, this work will primarily focus on recent developments
+      in
+      (long-term) TSF. For a comprehensive overview of earlier research and traditional TSF methods, readers are
+      referred
+      to existing surveys such as <span class="citation"
+        data-cites="box_box_2013 box_time_2015 de_gooijer_25_2006 mahalakshmi_survey_2016 hamilton_time_1994">Box (<a
+          href="#ref-box_box_2013" role="doc-biblioref">2013</a>; <a href="#ref-box_time_2015" role="doc-biblioref">Box
+          et
+          al. 2015</a>; <a href="#ref-de_gooijer_25_2006" role="doc-biblioref">De Gooijer and Hyndman 2006</a>; <a
+          href="#ref-mahalakshmi_survey_2016" role="doc-biblioref">Mahalakshmi et al. 2016</a>; <a
+          href="#ref-hamilton_time_1994" role="doc-biblioref">Hamilton 1994</a>)</span>. Some traditional statistical
+      time
+      series forecasting models, such as ARIMA <span class="citation" data-cites="box_distribution_1970">(<a
+          href="#ref-box_distribution_1970" role="doc-biblioref">Box and Pierce 1970</a>)</span> or Prophet <span
+        class="citation" data-cites="taylor_forecasting_2018">(<a href="#ref-taylor_forecasting_2018"
+          role="doc-biblioref">Taylor and Letham 2018</a>)</span>, are still popular to this day <span class="citation"
+        data-cites="long_forecasting_2023 ning_comparative_2022 albahli_lstm_2025">(<a href="#ref-long_forecasting_2023"
+          role="doc-biblioref">Long et al. 2023</a>; <a href="#ref-ning_comparative_2022" role="doc-biblioref">Ning et
+          al.
+          2022</a>; <a href="#ref-albahli_lstm_2025" role="doc-biblioref">Albahli 2025</a>)</span>. However, they are
+      often fit separately to each time series, come with many prior assumptions and their performances may deteriorate
+      for long-range forecasting, making them unsuitable for large scale TSF tasks <span class="citation"
+        data-cites="qin_dual-stage_2017 li_enhancing_2019">(<a href="#ref-qin_dual-stage_2017" role="doc-biblioref">Qin
+          et
+          al. 2017</a>; <a href="#ref-li_enhancing_2019" role="doc-biblioref">Li et al. 2019</a>)</span>. Therefore,
+      similar to other domains, TSF research showed an increasingly large interest towards deep learning based
+      approaches
+      <span class="citation" data-cites="benidis_deep_2022 hewamalage_recurrent_2021 lara-benitez_experimental_2021">(<a
+          href="#ref-benidis_deep_2022" role="doc-biblioref">Benidis et al. 2022</a>; <a
+          href="#ref-hewamalage_recurrent_2021" role="doc-biblioref">Hewamalage et al. 2021</a>; <a
+          href="#ref-lara-benitez_experimental_2021" role="doc-biblioref">Lara-Benítez et al. 2021</a>)</span>.
+    </p>
+    <p>At first, primarily recurrent neural networks (RNNs), which are specifically designed to work with sequential
+      data,
+      were adopted in the form of sequence-to-sequence architectures <span class="citation"
+        data-cites="sutskever_sequence_2014">(<a href="#ref-sutskever_sequence_2014" role="doc-biblioref">Sutskever et
+          al.
+          2014</a>)</span>. Furthermore, many SOTA performances across TSF tasks with shorter forecasting horizons stem
+      from models of this architecture, e.g. TimeGrad <span class="citation" data-cites="rasul_autoregressive_2021">(<a
+          href="#ref-rasul_autoregressive_2021" role="doc-biblioref">Rasul et al. 2021</a>)</span>, DA-RNN <span
+        class="citation" data-cites="qin_dual-stage_2017">(<a href="#ref-qin_dual-stage_2017" role="doc-biblioref">Qin
+          et
+          al. 2017</a>)</span> or DeepAR <span class="citation" data-cites="salinas_deepar_2020">(<a
+          href="#ref-salinas_deepar_2020" role="doc-biblioref">Salinas et al. 2020</a>)</span>. In contrast,
+      Convolutional
+      neural networks (CNNs), which are designed for tasks where the input data has a known sequential or spatial
+      structure, such as images or audio signals <span class="citation"
+        data-cites="dosovitskiy_image_2021 van_den_oord_wavenet_2016">(<a href="#ref-dosovitskiy_image_2021"
+          role="doc-biblioref">Dosovitskiy et al. 2021</a>; <a href="#ref-van_den_oord_wavenet_2016"
+          role="doc-biblioref">Van den Oord et al. 2016</a>)</span> but also time series <span class="citation"
+        data-cites="benidis_deep_2022 goodfellow_deep_2016">(<a href="#ref-benidis_deep_2022"
+          role="doc-biblioref">Benidis
+          et al. 2022</a>; <a href="#ref-goodfellow_deep_2016" role="doc-biblioref">Goodfellow et al. 2016</a>)</span>,
+      began to demonstrate superior performance over RNNs in various sequence modeling tasks, e.g. audio generation or
+      machine translation <span class="citation" data-cites="van_den_oord_wavenet_2016 kalchbrenner_neural_2017">(<a
+          href="#ref-van_den_oord_wavenet_2016" role="doc-biblioref">Van den Oord et al. 2016</a>; <a
+          href="#ref-kalchbrenner_neural_2017" role="doc-biblioref">Kalchbrenner et al. 2017</a>)</span>. Motivated by
+      these results, <span class="citation" data-cites="bai_empirical_2018">Bai et al. (<a
+          href="#ref-bai_empirical_2018" role="doc-biblioref">2018</a>)</span> conducted a comprehensive comparison
+      between CNNs and RNNs across a
+      diverse set of sequential learning benchmarks. Their findings showed that a simple convolutional architecture, the
+      Temporal Convolutional Network (TCN), consistently outperformed RNN-based models while also benefiting from longer
+      effective memory. These promising results spurred increased interest in applying CNNs to time series forecasting
+      as
+      well. For instance, <span class="citation" data-cites="borovykh_conditional_2018">Borovykh et al. (<a
+          href="#ref-borovykh_conditional_2018" role="doc-biblioref">2018</a>)</span> adapted the autoregressive WaveNet
+      CNN architecture <span class="citation" data-cites="van_den_oord_wavenet_2016">(<a
+          href="#ref-van_den_oord_wavenet_2016" role="doc-biblioref">Van den Oord et al. 2016</a>)</span>, originally
+      developed for raw audio synthesis, to the TSF domain and demonstrated superior performance over LSTM-based models.
+      DeepGLO <span class="citation" data-cites="sen_think_2019">(<a href="#ref-sen_think_2019" role="doc-biblioref">Sen
+          et al. 2019</a>)</span> combines a matrix factorization model with a TCN and outperforms traditional and
+      RNN-based methods. However, despite their promising empirical performance, CNNs have not emerged as a definitive
+      replacement for RNNs. Instead, the two architectures were generally viewed as complementary, with approximation
+      theory <span class="citation" data-cites="jiang_approximation_2021">(<a href="#ref-jiang_approximation_2021"
+          role="doc-biblioref">Jiang et al. 2021</a>)</span> supporting the idea that each bring distinct strengths to
+      time series modeling. Therefore, hybrid models like LSTNet <span class="citation"
+        data-cites="lai_modeling_2018">(<a href="#ref-lai_modeling_2018" role="doc-biblioref">Lai et al.
+          2018</a>)</span> or DCRNN <span class="citation" data-cites="li_diffusion_2018">(<a
+          href="#ref-li_diffusion_2018" role="doc-biblioref">Li et al. 2018</a>)</span>
+      gained popularity by combining CNNs and RNNs, effectively capturing both short-term dependencies and inter-series
+      correlations through CNNs, while leveraging RNNs for modeling longer-term temporal trends. Nevertheless, both RNNs
+      and CNNs exhibit inherent limitations when it comes to longer forecasting horizons. The main limitation of RNNs
+      are
+      their large information propagation paths, which directly lead to numerous issues. In particular, RNNs have
+      performance problems in capturing long-term dependencies with poor efficiency in sequential calculations <span
+        class="citation" data-cites="jia_pgn_2024">(<a href="#ref-jia_pgn_2024" role="doc-biblioref">Jia et al.
+          2024</a>)</span>. Furthermore, although RNN-cells, such as LSTM <span class="citation"
+        data-cites="hochreiter_long_1997">(<a href="#ref-hochreiter_long_1997" role="doc-biblioref">Hochreiter and
+          Schmidhuber 1997</a>)</span> or GRU <span class="citation" data-cites="cho_learning_2014">(<a
+          href="#ref-cho_learning_2014" role="doc-biblioref">Cho et al. 2014</a>)</span>, were designed to tackle
+      vanishing and exploding gradients <span class="citation" data-cites="bengio_learning_1994">(<a
+          href="#ref-bengio_learning_1994" role="doc-biblioref">Bengio et al. 1994</a>)</span>, those problems often
+      could
+      not be mitigated sufficiently for longer input sequences leading to an unstable training process <span
+        class="citation" data-cites="zhou_informer_2021">(<a href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et
+          al. 2021</a>)</span>. On the other hand, CNNs are limited by their local receptive fields; while some argue
+      that
+      they offer better long-term memory than RNNs <span class="citation" data-cites="bai_empirical_2018">(<a
+          href="#ref-bai_empirical_2018" role="doc-biblioref">Bai et al. 2018</a>)</span>, their 1D convolutions can
+      only
+      model variations in adjacent time steps <span class="citation" data-cites="wu_timesnet_2022">(<a
+          href="#ref-wu_timesnet_2022" role="doc-biblioref">Wu et al. 2022</a>)</span>. Therefore, compared to models
+      with
+      global receptive fields, e.g. Transformers <span class="citation" data-cites="vaswani_attention_2017">(<a
+          href="#ref-vaswani_attention_2017" role="doc-biblioref">Vaswani et al. 2017</a>)</span> or MLP-based
+      architectures <span class="citation" data-cites="zeng_are_2023">(<a href="#ref-zeng_are_2023"
+          role="doc-biblioref">Zeng et al. 2023</a>)</span>, CNNs often fall short in handling the complexity of
+      long-term
+      temporal dependencies <span class="citation" data-cites="donghao_moderntcn_2023">(<a
+          href="#ref-donghao_moderntcn_2023" role="doc-biblioref">Donghao and Xue 2023</a>)</span>. Altogether, these
+      limitations are critical in TSF tasks, which often require models to capture both short- and long-term repeating
+      patterns <span class="citation" data-cites="lai_modeling_2018">(<a href="#ref-lai_modeling_2018"
+          role="doc-biblioref">Lai et al. 2018</a>)</span>. In the context of long-term TSF, the importance of modeling
+      long-range dependencies becomes even more pronounced, as they tend to be more dispersed and harder to learn <span
+        class="citation" data-cites="li_enhancing_2019">(<a href="#ref-li_enhancing_2019" role="doc-biblioref">Li et al.
+          2019</a>)</span>.</p>
+    <p>In response to these challenges, Transformer-based models <span class="citation"
+        data-cites="vaswani_attention_2017">(<a href="#ref-vaswani_attention_2017" role="doc-biblioref">Vaswani et al.
+          2017</a>)</span> were proposed as a promising alternative <span class="citation"
+        data-cites="zhou_informer_2021 li_enhancing_2019">(<a href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou
+          et
+          al. 2021</a>; <a href="#ref-li_enhancing_2019" role="doc-biblioref">Li et al. 2019</a>)</span>, offering a
+      self-attention mechanism, which allows the model to access the entire input sequence at once, facilitating
+      parallel
+      processing and enabling global context understanding. Furthermore, Transformers have displayed state-of-the-art
+      performances in capturing long-range dependency structures <span class="citation"
+        data-cites="wen_transformers_2023">(<a href="#ref-wen_transformers_2023" role="doc-biblioref">Wen et al.
+          2023</a>)</span> and are SOTA across various domains, e.g. natural language processing <span class="citation"
+        data-cites="brown_language_2020">(<a href="#ref-brown_language_2020" role="doc-biblioref">Brown et al.
+          2020</a>)</span>, speech <span class="citation" data-cites="kim_squeezeformer_2022">(<a
+          href="#ref-kim_squeezeformer_2022" role="doc-biblioref">Kim et al. 2022</a>)</span> and computer vision <span
+        class="citation" data-cites="dosovitskiy_image_2021">(<a href="#ref-dosovitskiy_image_2021"
+          role="doc-biblioref">Dosovitskiy et al. 2021</a>)</span>. LogSparse, proposed by <span class="citation"
+        data-cites="li_enhancing_2019">Li et al. (<a href="#ref-li_enhancing_2019"
+          role="doc-biblioref">2019</a>)</span>,
+      was among the first Transformer-based methods applied to TSF. It demonstrated superior performance in modeling
+      long-term dependencies compared to DeepAR and statistical models. Although <span class="citation"
+        data-cites="li_enhancing_2019">Li et al. (<a href="#ref-li_enhancing_2019" role="doc-biblioref">2019</a>)</span>
+      extended the forecasting horizon relative to earlier work, the input and output sequences they considered were
+      still
+      shorter compared to modern LTSF tasks. A breakthrough came when <span class="citation"
+        data-cites="zhou_informer_2021">Zhou et al. (<a href="#ref-zhou_informer_2021"
+          role="doc-biblioref">2021</a>)</span> introduced Informer and formalized the modern LTSF problem setting by
+      substantially extending input and prediction horizons. Informer managed to outperform prior SOTA models including
+      LogSparse, DeepAR, other RNN-based and statistical baselines in LTSF. A key innovation of Informer came with its
+      switch to a DMS strategy <span class="citation" data-cites="zeng_are_2023">(<a href="#ref-zeng_are_2023"
+          role="doc-biblioref">Zeng et al. 2023</a>)</span>, which contrasts the IMS approach used in earlier methods.
+      Moreover, models that follow an IMS strategy are prone to slow inference and error accumulation, issues that
+      become
+      particularly problematic with longer forecast lengths <span class="citation" data-cites="zhou_informer_2021">(<a
+          href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et al. 2021</a>)</span>.</p>
+    <p>In succession, the DMS strategy was successfully adopted by most SOTA LTSF models, see Table <a href="#tab:ltsf"
+        data-reference-type="ref" data-reference="tab:ltsf">[tab:ltsf]</a>. However, DMS forecasting is not novel. In
+      fact, the first occurance of a DMS prediction model can be dated back to <span class="citation"
+        data-cites="cox_prediction_1961">Cox (<a href="#ref-cox_prediction_1961" role="doc-biblioref">1961</a>)</span>.
+      Over the years several theoretical and empirical studies have shown that the direct strategy performs better when
+      models are misspecified, i.e. the model class does not contain the true model, while the recursive approach tends
+      to
+      be superior for well-specified models <span class="citation"
+        data-cites="weiss_multi-step_1991 tiao_advances_1994 ing_accumulated_2007 chevillon_non-parametric_2005">(<a
+          href="#ref-weiss_multi-step_1991" role="doc-biblioref">Weiss 1991</a>; <a href="#ref-tiao_advances_1994"
+          role="doc-biblioref">Tiao and Tsay 1994</a>; <a href="#ref-ing_accumulated_2007" role="doc-biblioref">Ing
+          2007</a>; <a href="#ref-chevillon_non-parametric_2005" role="doc-biblioref">Chevillon and Hendry
+          2005</a>)</span>. In summary, <span class="citation" data-cites="chevillon_direct_2007">Chevillon (<a
+          href="#ref-chevillon_direct_2007" role="doc-biblioref">2007</a>)</span> showed that DMS is less biased, more
+      stable, more efficient and more robust to model misspecification. Later on, <span class="citation"
+        data-cites="taieb_bias_2016">Taieb and Atiya (<a href="#ref-taieb_bias_2016"
+          role="doc-biblioref">2016</a>)</span>
+      investigated different multi-step strategies with NNs in TSF and concluded that IMS is preferable for short-term
+      forecasts when the model is likely well-specified, whereas DMS is better suited for long time series or situations
+      where minimizing bias is crucial. Despite these findings the IMS strategy was still more popular around that time,
+      part of the reason is that it is highly similar to well-studied autoregressive and Markovian modeling assumptions
+      while benefiting from shorter forecasting horizons as well <span class="citation"
+        data-cites="wen_multi-horizon_2018">(<a href="#ref-wen_multi-horizon_2018" role="doc-biblioref">Wen et al.
+          2018</a>)</span>. Moreover, DMS was regarded as costly, since, without cross-learning, it required training
+      separate models for each horizon step <span class="citation" data-cites="bontempi_machine_2013">(<a
+          href="#ref-bontempi_machine_2013" role="doc-biblioref">Bontempi et al. 2013</a>)</span>. However, this
+      drawback
+      became negligible with newer architectures efficiently sharing parameters across time steps, for example only
+      requiring small changes in the prediction head while enabling faster prediction speeds <span class="citation"
+        data-cites="zhou_informer_2021">(<a href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et al.
+          2021</a>)</span>. Prior to Informer, other deep learning models also adopted DMS strategies. For instance,
+      MQ-RNN and MQ-CNN <span class="citation" data-cites="wen_multi-horizon_2018">(<a
+          href="#ref-wen_multi-horizon_2018" role="doc-biblioref">Wen et al. 2018</a>)</span> use shared-parameter
+      decoders at each time step to produce
+      forecasts. Building on MQ-CNN, <span class="citation" data-cites="wen_deep_2019">Wen and Torkkola (<a
+          href="#ref-wen_deep_2019" role="doc-biblioref">2019</a>)</span> added a generative quantile copula improving
+      the
+      forecast quality. NBeats <span class="citation" data-cites="oreshkin_n-beats_2019">(<a
+          href="#ref-oreshkin_n-beats_2019" role="doc-biblioref">Oreshkin et al. 2019</a>)</span> is built on a deep
+      residual stack of MLPs, whereas DeepTCN <span class="citation" data-cites="chen_probabilistic_2019">(<a
+          href="#ref-chen_probabilistic_2019" role="doc-biblioref">Chen et al. 2019</a>)</span> is a CNN-based DMS
+      approach. Nonetheless, the DMS strategy has important drawbacks: it treats the forecasted points as independent,
+      overlooking their mutual dependencies <span class="citation"
+        data-cites="kline_methods_2004 bontempi_machine_2013">(<a href="#ref-kline_methods_2004"
+          role="doc-biblioref">Kline 2004</a>; <a href="#ref-bontempi_machine_2013" role="doc-biblioref">Bontempi et al.
+          2013</a>)</span> and it must be retrained whenever the forecast horizon is extended.</p>
+    <p>The breaktrough of Informer led to a rising adoption of LTSF models, specifically Transformer models. However,
+      despite their advantages, the memory and time complexity of self-attention in Transformers grows quadratically
+      <span class="math inline">\(O(L^2)\)</span> with the input length <span class="math inline">\(L\)</span>, becoming
+      a
+      large bottleneck for long input sequences present in LTSF <span class="citation"
+        data-cites="zhou_informer_2021">(<a href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et al.
+          2021</a>)</span>. Hence, many of the first
+      Transformer-based models for LTSF focused on improving the efficiency of the attention module, in which <span
+        class="citation" data-cites="wen_transformers_2023">Wen et al. (<a href="#ref-wen_transformers_2023"
+          role="doc-biblioref">2023</a>)</span> classify the approaches into two branches. On the one hand, models such
+      as
+      LogSparse <span class="citation" data-cites="li_enhancing_2019">(<a href="#ref-li_enhancing_2019"
+          role="doc-biblioref">Li et al. 2019</a>)</span> or Pyraformer <span class="citation"
+        data-cites="liu_pyraformer_2021">(<a href="#ref-liu_pyraformer_2021" role="doc-biblioref">S. Liu et al.
+          2021</a>)</span> tried enforcing a sparsity bias into the attention module. On the other hand, Informer <span
+        class="citation" data-cites="zhou_informer_2021">(<a href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et
+          al. 2021</a>)</span> or FEDformer <span class="citation" data-cites="zhou_fedformer_2022">(<a
+          href="#ref-zhou_fedformer_2022" role="doc-biblioref">Zhou et al. 2022</a>)</span> analyzed low-rank properties
+      of the self-attention matrix. Furthermore, in their respective LTSF studies each model manages to outperform
+      previous traditional and RNN-based SOTA methods, such as ARIMA, Prophet or DeepAR on a variety of LTSF data sets
+      <span class="citation"
+        data-cites="zhou_informer_2021 wu_autoformer_2021 liu_pyraformer_2021 li_enhancing_2019 zhou_fedformer_2022">(<a
+          href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et al. 2021</a>; <a href="#ref-wu_autoformer_2021"
+          role="doc-biblioref">Wu et al. 2021</a>; <a href="#ref-liu_pyraformer_2021" role="doc-biblioref">S. Liu et al.
+          2021</a>; <a href="#ref-li_enhancing_2019" role="doc-biblioref">Li et al. 2019</a>; <a
+          href="#ref-zhou_fedformer_2022" role="doc-biblioref">Zhou et al. 2022</a>)</span>. Despite their performances,
+      <span class="citation" data-cites="zeng_are_2023">Zeng et al. (<a href="#ref-zeng_are_2023"
+          role="doc-biblioref">2023</a>)</span> point out that they were evaluated solely against IMS approaches and
+      suggest that the observed improvement is primarily due to the adoption of the DMS strategy rather than the
+      Transformer architecture itself. To investigate this, <span class="citation" data-cites="zeng_are_2023">Zeng et
+        al.
+        (<a href="#ref-zeng_are_2023" role="doc-biblioref">2023</a>)</span> introduce DLinear and NLinear, two simple
+      linear MLP DMS models, which were able to outperform the Transformer-based methods on multiple different
+      benchmarks.
+      Thus, challenging the effectiveness of Transformers on LTSF tasks. An important aspect of DLinear and NLinear is
+      that they are CI methods, therefore they mitigate from modeling potentially misleading cross-channel dependencies
+      <span class="citation" data-cites="nie_time_2022">(<a href="#ref-nie_time_2022" role="doc-biblioref">Nie et al.
+          2022</a>)</span>. In contrast, many previous methods <span class="citation"
+        data-cites="zhou_informer_2021 wu_autoformer_2021 zhou_fedformer_2022">(<a href="#ref-zhou_informer_2021"
+          role="doc-biblioref">Zhou et al. 2021</a>; <a href="#ref-wu_autoformer_2021" role="doc-biblioref">Wu et al.
+          2021</a>; <a href="#ref-zhou_fedformer_2022" role="doc-biblioref">Zhou et al. 2022</a>)</span> tried to
+      incorporate information from all channels via a CD strategy, but this approach appeared to be ineffective in
+      comparison. Building on the success of <span class="citation" data-cites="zeng_are_2023">Zeng et al. (<a
+          href="#ref-zeng_are_2023" role="doc-biblioref">2023</a>)</span> with the CI strategy, many LTSF models adopted
+      it successfully, see Table <a href="#tab:ltsf" data-reference-type="ref" data-reference="tab:ltsf">[tab:ltsf]</a>.
+      Furthermore, <span class="citation" data-cites="han_capacity_2024">L. Han, Ye, et al. (<a
+          href="#ref-han_capacity_2024" role="doc-biblioref">2024</a>)</span> investigate the relation between CI and CD
+      methods more in-depth. By comparing a linear CI model to its CD counterpart, they propose that the CI approach
+      exhibits less distribution shift, because the sum of correlation differences between train and test data has lower
+      variation than the correlation differences of individual channels. Subsequently, <span class="citation"
+        data-cites="han_capacity_2024">L. Han, Ye, et al. (<a href="#ref-han_capacity_2024"
+          role="doc-biblioref">2024</a>)</span> propose that CD methods have high capacity and low robustness, whereas
+      CI
+      approaches have low capacity and high robustness. Lastly, coming to the conclusion that robustness is often more
+      important in real-world non-stationary time series with distribution shifts; therefore, CI methods often perform
+      better.
+    </p>
+    <p>Since the work of <span class="citation" data-cites="zeng_are_2023">Zeng et al. (<a href="#ref-zeng_are_2023"
+          role="doc-biblioref">2023</a>)</span> challenged the effectiveness of Transformers in LTSF, this opened the
+      door
+      for other architectures to gain back some ground. Furthermore, in what follows some important recent contributions
+      of LTSF models are briefly described, for a detailed categorization of these models see Table <a href="#tab:ltsf"
+        data-reference-type="ref" data-reference="tab:ltsf">[tab:ltsf]</a>.</p>
+    <h5 id="mlp-architectures.">MLP architectures.</h5>
+    <p>The success of DLinear <span class="citation" data-cites="zeng_are_2023">(<a href="#ref-zeng_are_2023"
+          role="doc-biblioref">Zeng et al. 2023</a>)</span> revived interest in pure MLP architectures for LTSF. At the
+      same time, the computer vision community saw the rise of MLP-Mixer models <span class="citation"
+        data-cites="tolstikhin_mlp-mixer_2021 liu_pay_2021 touvron_resmlp_2023">(<a
+          href="#ref-tolstikhin_mlp-mixer_2021" role="doc-biblioref">Tolstikhin et al. 2021</a>; <a
+          href="#ref-liu_pay_2021" role="doc-biblioref">H. Liu et al.
+          2021</a>; <a href="#ref-touvron_resmlp_2023" role="doc-biblioref">Touvron et al. 2023</a>)</span>, which use
+      simple MLPs to mix information within and across image input patches, achieving competitive results without
+      relying
+      on convolutions or self-attention. Building on this, TSMixer <span class="citation"
+        data-cites="ekambaram_tsmixer_2023">(<a href="#ref-ekambaram_tsmixer_2023" role="doc-biblioref">Ekambaram et al.
+          2023</a>)</span> adapts the Mixer architecture for LTSF, leveraging its well-suited compatibility with
+      sequential data due to the preservation of input order. TSMixer uses a patch-based MLP backbone enhanced with
+      online
+      reconciliation heads that capture hierarchical structure and cross-channel dependencies. Following TSMixer,
+      several
+      studies extended the idea to address specific challenges in time series modeling. TimeMixer <span class="citation"
+        data-cites="wang_timemixer_2023">(<a href="#ref-wang_timemixer_2023" role="doc-biblioref">S. Wang et al.
+          2023</a>)</span> leverages multiscale-mixing, differentiating finer seasonal patterns and coarser trends
+      through
+      novel mixing blocks. U-Mixer <span class="citation" data-cites="ma_u-mixer_2024">(<a href="#ref-ma_u-mixer_2024"
+          role="doc-biblioref">Ma et al. 2024</a>)</span> tackles the issue of non-stationarity by arranging MLP
+      encoder-decoder blocks in a U-Net structure <span class="citation" data-cites="ronneberger_u-net_2015">(<a
+          href="#ref-ronneberger_u-net_2015" role="doc-biblioref">Ronneberger et al. 2015</a>)</span> while also
+      introducing a stationarity correction mechanism. Furthermore, HDMixer <span class="citation"
+        data-cites="huang_hdmixer_2024">(<a href="#ref-huang_hdmixer_2024" role="doc-biblioref">Huang, Shen, et al.
+          2024</a>)</span> improves fixed-sized patching via length-extendable patching while also modeling hierarchical
+      short- and long-range dynamics. Beyond Mixer-based architectures, a range of MLP-centric models have emerged that
+      take alternative approaches to enhancing time series forecasting performance. NHITS <span class="citation"
+        data-cites="challu_nhits_2023">(<a href="#ref-challu_nhits_2023" role="doc-biblioref">Challu et al.
+          2023</a>)</span> extends NBEATS <span class="citation" data-cites="oreshkin_n-beats_2019">(<a
+          href="#ref-oreshkin_n-beats_2019" role="doc-biblioref">Oreshkin et al. 2019</a>)</span> by introducing
+      hierarchical interpolation and multi-rate sampling to sequentially assemble forecasts across multiple temporal
+      resolutions. FreTS <span class="citation" data-cites="yi_frequency-domain_2023">(<a
+          href="#ref-yi_frequency-domain_2023" role="doc-biblioref">Yi et al. 2023</a>)</span> operates entirely in the
+      frequency domain, using MLPs to learn real and imaginary components of transformed series. CycleNet <span
+        class="citation" data-cites="lin_cyclenet_2024">(<a href="#ref-lin_cyclenet_2024" role="doc-biblioref">Lin, Lin,
+          Hu, et al. 2024</a>)</span> leverages residual cycle forecasting to explicitly model periodic components.
+      SOFTS
+      <span class="citation" data-cites="han_softs_2024">(<a href="#ref-han_softs_2024" role="doc-biblioref">L. Han,
+          Chen,
+          et al. 2024</a>)</span> proposes a centralized STAR module to model inter-channel relationships more
+      efficiently
+      than attention mechanisms. Finally, TiDE <span class="citation" data-cites="das_long-term_2023">(<a
+          href="#ref-das_long-term_2023" role="doc-biblioref">Das et al. 2023</a>)</span> employs a simple MLP-based
+      encoder-decoder framework that combines the speed of linear models with the ability to capture nonlinear
+      dependencies.
+    </p>
+    <h5 id="transformers.">Transformers.</h5>
+    <p>Despite the success of MLP-based approaches, Transformers remained the popular choice for LTSF tasks, see Table
+      <a href="#tab:ltsf" data-reference-type="ref" data-reference="tab:ltsf">[tab:ltsf]</a>. One reason for this was
+      the
+      introduction of PatchTST <span class="citation" data-cites="nie_time_2022">(<a href="#ref-nie_time_2022"
+          role="doc-biblioref">Nie et al. 2022</a>)</span>, which marked a turning point for Transformer-based models in
+      time series forecasting. It adopts the CI strategy of DLinear <span class="citation"
+        data-cites="zeng_are_2023">(<a href="#ref-zeng_are_2023" role="doc-biblioref">Zeng et al. 2023</a>)</span> while
+      also introducing patching to
+      TSF. Patching, inspired by Vision Transformers <span class="citation" data-cites="dosovitskiy_image_2021">(<a
+          href="#ref-dosovitskiy_image_2021" role="doc-biblioref">Dosovitskiy et al. 2021</a>)</span>, segments a time
+      series into subseries-level patches. It allows the model to capture local semantic patterns, reduce attention
+      complexity, and extend its receptive field, significantly boosting long-term forecasting accuracy <span
+        class="citation" data-cites="nie_time_2022">(<a href="#ref-nie_time_2022" role="doc-biblioref">Nie et al.
+          2022</a>)</span>. As a result, patching has since become a standard practice in time series Transformers,
+      widely
+      adopted in models like Crossformer <span class="citation" data-cites="zhang_crossformer_2022">(<a
+          href="#ref-zhang_crossformer_2022" role="doc-biblioref">Zhang and Yan 2022</a>)</span>, MCFormer <span
+        class="citation" data-cites="han_mcformer_2024">(<a href="#ref-han_mcformer_2024" role="doc-biblioref">W. Han et
+          al. 2024</a>)</span> and Pathformer <span class="citation" data-cites="chen_pathformer_2023">(<a
+          href="#ref-chen_pathformer_2023" role="doc-biblioref">P. Chen et al. 2023</a>)</span>. In addition to its
+      success in Transformer-based models, patching has been adopted across other architectural families, including MLPs
+      <span class="citation" data-cites="chen_tsmixer_2023">(<a href="#ref-chen_tsmixer_2023" role="doc-biblioref">S.-A.
+          Chen et al. 2023</a>)</span>, CNNs <span class="citation" data-cites="gong_patchmixer_2024">(<a
+          href="#ref-gong_patchmixer_2024" role="doc-biblioref">Gong et al. 2024</a>)</span>, and RNNs <span
+        class="citation" data-cites="lin_segrnn_2023">(<a href="#ref-lin_segrnn_2023" role="doc-biblioref">Lin et al.
+          2023</a>)</span>. However, the dominance of classic fixed-length patching has recently been challenged. The
+      MLP-based HDMixer <span class="citation" data-cites="huang_hdmixer_2024">(<a href="#ref-huang_hdmixer_2024"
+          role="doc-biblioref">Huang, Shen, et al. 2024</a>)</span> critiques the inflexibility of fixed-length patches,
+      which can lead to information loss at the patch boundaries. It proposes length-extendable patches to better
+      preserve
+      local structure. In addition, DeformableTST <span class="citation" data-cites="luo_deformabletst_2024">(<a
+          href="#ref-luo_deformabletst_2024" role="doc-biblioref">Luo and Wang 2024</a>)</span> highlights that modern
+      Transformers have become overly reliant on patching to achieve strong performance, which limits their
+      applicability
+      in scenarios with short input sequences or tasks unsuited to patching. To address this, DeformableTST introduces
+      deformable attention, a data-driven sparse attention mechanism capable of focusing on important time points
+      without
+      explicit patching, allowing the model to generalize across a broader range of forecasting tasks. Lastly, several
+      works have sought alternatives to patching through other input transformations. Fredformer <span class="citation"
+        data-cites="piao_fredformer_2024">(<a href="#ref-piao_fredformer_2024" role="doc-biblioref">Piao et al.
+          2024</a>)</span> applies a Discrete Fourier Transform to overcome frequency bias in attention, enabling more
+      balanced learning across frequency bands. iTransformer <span class="citation"
+        data-cites="liu_itransformer_2023">(<a href="#ref-liu_itransformer_2023" role="doc-biblioref">Liu, Hu, et al.
+          2023</a>)</span> takes a different route
+      by inverting the input dimensions, treating time points as tokens and leveraging attention to capture multivariate
+      correlations, improving scalability and performance without altering the Transformer’s core components.
+    </p>
+    <p>Similar to patching, the standard Transformer encoder <span class="citation"
+        data-cites="vaswani_attention_2017">(<a href="#ref-vaswani_attention_2017" role="doc-biblioref">Vaswani et al.
+          2017</a>)</span> has become a standard modeling choice for Transformer-based time series models. In many
+      cases,
+      the decoder is simply replaced with a basic flatten and linear head, e.g. MCFormer <span class="citation"
+        data-cites="han_mcformer_2024">(<a href="#ref-han_mcformer_2024" role="doc-biblioref">W. Han et al.
+          2024</a>)</span>, PatchTST <span class="citation" data-cites="nie_time_2022">(<a href="#ref-nie_time_2022"
+          role="doc-biblioref">Nie et al. 2022</a>)</span>, iTransformer <span class="citation"
+        data-cites="liu_itransformer_2023">(<a href="#ref-liu_itransformer_2023" role="doc-biblioref">Liu, Hu, et al.
+          2023</a>)</span> and Fredformer <span class="citation" data-cites="piao_fredformer_2024">(<a
+          href="#ref-piao_fredformer_2024" role="doc-biblioref">Piao et al. 2024</a>)</span>. On top of that, many
+      models
+      make targeted replacements to the vanilla Transformer encoder, where it is common to make changes to the attention
+      mechanism: Triformer <span class="citation" data-cites="cirstea_triformer_2022">(<a
+          href="#ref-cirstea_triformer_2022" role="doc-biblioref">Cirstea et al. 2022</a>)</span> reduces complexity via
+      triangular patch attention, SDformer <span class="citation" data-cites="zhou_sdformer_2024">(<a
+          href="#ref-zhou_sdformer_2024" role="doc-biblioref">Z. Zhou et al. 2024</a>)</span> enhances expressiveness
+      with
+      spectral filtering and dynamic directional attention, SCAT <span class="citation" data-cites="zhou_scat_2024">(<a
+          href="#ref-zhou_scat_2024" role="doc-biblioref">C. Zhou et al. 2024</a>)</span> introduces alternating
+      attention
+      using spectral clustering centers and CARD <span class="citation" data-cites="wang_card_2023">(<a
+          href="#ref-wang_card_2023" role="doc-biblioref">X. Wang et al. 2023</a>)</span> aligns attention across
+      channels
+      to better model inter-channel dependencies. Similarly, CATS <span class="citation" data-cites="lu_cats_2024">(<a
+          href="#ref-lu_cats_2024" role="doc-biblioref">Lu et al. 2024</a>)</span> removes self-attention altogether,
+      opting for a cross-attention-only framework. To better capture long-range dependencies, <span class="citation"
+        data-cites="kang_introducing_2024">Kang et al. (<a href="#ref-kang_introducing_2024"
+          role="doc-biblioref">2024</a>)</span> introduce spectral attention, a frequency-based mechanism that preserves
+      temporal patterns and improves gradient flow. Outside of encoder-only Transformer models, a few different
+      architectures have been implemented as well. SMARTformer <span class="citation"
+        data-cites="li_smartformer_2023">(<a href="#ref-li_smartformer_2023" role="doc-biblioref">Yiduo Li et al.
+          2023</a>)</span> adopts a full
+      encoder-decoder Transformer architecture, but deviates from the standard non-autoregressive decoder commonly used
+      in
+      time series models. Crossformer <span class="citation" data-cites="zhang_crossformer_2022">(<a
+          href="#ref-zhang_crossformer_2022" role="doc-biblioref">Zhang and Yan 2022</a>)</span> also uses an
+      encoder-decoder architecture, but places special emphasis on modeling cross-dimension dependencies. To this end,
+      it
+      proposes a Two-Stage Attention mechanism within a hierarchical encoder-decoder structure that separately captures
+      temporal and inter-variable correlations. In contrast, FPPformer <span class="citation"
+        data-cites="shen_take_2024">(<a href="#ref-shen_take_2024" role="doc-biblioref">Shen et al. 2024</a>)</span>
+      also
+      retains the encoder-decoder setup but focuses on redesigning the decoder. It introduces a top-down decoder
+      architecture, inspired by feature pyramid networks in computer vision <span class="citation"
+        data-cites="lin_feature_2017">(<a href="#ref-lin_feature_2017" role="doc-biblioref">Lin et al. 2017</a>)</span>,
+      and enhances it with a combination of elementwise and patchwise attention to improve multiscale sequence
+      reconstruction.</p>
+    <h5 id="cnns.">CNNs.</h5>
+    <p>While Transformer- and MLP-based models have rapidly gained traction and became dominant in time series analysis,
+      convolutional approaches have been falling out of favor <span class="citation"
+        data-cites="donghao_moderntcn_2023">(<a href="#ref-donghao_moderntcn_2023" role="doc-biblioref">Donghao and Xue
+          2023</a>)</span>. Nevertheless, several recent studies have achieved SOTA performance in LTSF using CNN-based
+      models, renewing interest in convolutional methods. MICN <span class="citation" data-cites="wang_micn_2022">(<a
+          href="#ref-wang_micn_2022" role="doc-biblioref">Wang et al. 2022</a>)</span> introduces a multi-scale
+      convolutional architecture that captures both local features and global correlations, enabling separate modeling
+      of
+      trend and seasonality in time series forecasting. TimesNet <span class="citation"
+        data-cites="wu_timesnet_2022">(<a href="#ref-wu_timesnet_2022" role="doc-biblioref">Wu et al. 2022</a>)</span>
+      leverages the Fast Fourier
+      Transform (FFT) to identify periodic patterns in time series data, which it then restructures into 2D tensors. Its
+      core component, the TimesBlock, is built based on a convolutional inception block <span class="citation"
+        data-cites="szegedy_going_2015">(<a href="#ref-szegedy_going_2015" role="doc-biblioref">Szegedy et al.
+          2015</a>)</span>, enabling it to effectively model both inter-period and intra-period variations. PatchMixer
+      <span class="citation" data-cites="gong_patchmixer_2024">(<a href="#ref-gong_patchmixer_2024"
+          role="doc-biblioref">Gong et al. 2024</a>)</span> and ModernTCN <span class="citation"
+        data-cites="donghao_moderntcn_2023">(<a href="#ref-donghao_moderntcn_2023" role="doc-biblioref">Donghao and Xue
+          2023</a>)</span> process time series in patches <span class="citation" data-cites="nie_time_2022">(<a
+          href="#ref-nie_time_2022" role="doc-biblioref">Nie et al. 2022</a>)</span> and then utilize depthwise
+      separable
+      convolutions to achieve SOTA performance with faster training and inference speeds. Moreover, ModernTCN extends a
+      convolution block better suited for time series, resulting in larger effective receptive fields.
+    </p>
+    <h5 id="rnns.">RNNs.</h5>
+    <p>Despite their limitations and general subpar performance in LTSF, RNNs occasionally resurfaced in LTSF research.
+      <span class="citation" data-cites="lin_segrnn_2023">Lin et al. (<a href="#ref-lin_segrnn_2023"
+          role="doc-biblioref">2023</a>)</span> identify the large number of recurrent iterations as a primary drawback
+      of
+      traditional RNNs. To address this, they propose SegRNN, which adopts a patching mechanism to reduce the number of
+      recurrent steps when processing input time series. In addition, they employ a DMS strategy for prediction. This
+      involves incorporating positional embeddings, as in <span class="citation"
+        data-cites="vaswani_attention_2017">Vaswani et al. (<a href="#ref-vaswani_attention_2017"
+          role="doc-biblioref">2017</a>)</span>, which are combined with the last hidden state and then passed into a
+      GRU
+      cell with shared parameters. <span class="citation" data-cites="jia_witran_2023">Jia et al. (<a
+          href="#ref-jia_witran_2023" role="doc-biblioref">2023</a>)</span> introduced WITRAN, which operates on
+      rearranged 2D time series, i.e. a matrix of patches inspired by <span class="citation"
+        data-cites="wu_timesnet_2022">Wu et al. (<a href="#ref-wu_timesnet_2022" role="doc-biblioref">2022</a>)</span>.
+      Then, they propose a novel RNN cell alongside the recurrent acceleration network, which processes the data points
+      of
+      the matrix vertically and horizontally, enabling parallel computation. Lastly, they decode the processed
+      information
+      with a MLP in a DMS fashion. Similarly, <span class="citation" data-cites="jia_pgn_2024">Jia et al. (<a
+          href="#ref-jia_pgn_2024" role="doc-biblioref">2024</a>)</span> introduce TPGN, a dual-branch model that also
+      uses a 2D representation to capture long- and short-term patterns. At its core is the Parallel Gated Network,
+      which
+      replaces the sequential structure of RNNs with a layer that aggregates information from previous time steps in
+      parallel, reducing the propagation path to <span class="math inline">\(O(1)\)</span>.
+    </p>
+    <h5 id="other-model-types.">Other model types.</h5>
+    <p>Beyond common model archetypes, LTSF has recently seen novel architectures inspired by other domains. LLM-based
+      models like LeRet <span class="citation" data-cites="huang_leret_2024">(<a href="#ref-huang_leret_2024"
+          role="doc-biblioref">Huang, Zhou, et al. 2024</a>)</span>, AutoTimes <span class="citation"
+        data-cites="liu_autotimes_2024">(<a href="#ref-liu_autotimes_2024" role="doc-biblioref">Liu et al.
+          2024</a>)</span> or Time-LLM <span class="citation" data-cites="jin_time-llm_2023">(<a
+          href="#ref-jin_time-llm_2023" role="doc-biblioref">Jin et al. 2023</a>)</span> leverage pre-trained language
+      models by aligning time series with token-based representations, enabling few-shot and in-context forecasting.
+      Graph-based models such as Ada-MSHyper <span class="citation" data-cites="shang_ada-mshyper_2024">(<a
+          href="#ref-shang_ada-mshyper_2024" role="doc-biblioref">Shang et al. 2024</a>)</span>, CrossGNN <span
+        class="citation" data-cites="huang_crossgnn_2023">(<a href="#ref-huang_crossgnn_2023" role="doc-biblioref">Huang
+          et al. 2023</a>)</span> and MSGNet <span class="citation" data-cites="cai_msgnet_2024">(<a
+          href="#ref-cai_msgnet_2024" role="doc-biblioref">Cai et al. 2024</a>)</span> introduce graph structures to
+      better capture multi-scale or inter-series correlations. Lastly, dynamical system-based approaches like Koopa
+      <span class="citation" data-cites="liu_koopa_2023">(<a href="#ref-liu_koopa_2023" role="doc-biblioref">Liu, Li, et
+          al.
+          2023</a>)</span> and Attraos <span class="citation" data-cites="hu_attractor_2024">(<a
+          href="#ref-hu_attractor_2024" role="doc-biblioref">Hu et al. 2024</a>)</span> leverage Koopman embeddings to
+      linearize complex dynamics or draw on chaos theory, respectively.
+    </p>
+    <p>In addition to exploring different backbone NN architectures, studies have also examined the impact of other
+      design
+      choices.</p>
+    <h5 id="sparse-models.">Sparse models.</h5>
+    <p>Despite the success of <span class="citation" data-cites="zeng_are_2023">Zeng et al. (<a
+          href="#ref-zeng_are_2023" role="doc-biblioref">2023</a>)</span> with simple linear models, many of the
+      previously discussed methods rely
+      on significantly larger approaches with a high amount of parameters. To counter the trend toward increasingly
+      large
+      models, some methods focused on more efficient sparser models that often only implement one or a few linear
+      layers.
+      For instance, FITS <span class="citation" data-cites="xu_fits_2023">(<a href="#ref-xu_fits_2023"
+          role="doc-biblioref">Xu et al. 2023</a>)</span>, LightTS <span class="citation"
+        data-cites="zhang_less_2022">(<a href="#ref-zhang_less_2022" role="doc-biblioref">Zhang et al. 2022</a>)</span>,
+      SSCNN <span class="citation" data-cites="deng_parsimony_2024">(<a href="#ref-deng_parsimony_2024"
+          role="doc-biblioref">Deng et al.
+          2024</a>)</span>, Attraos <span class="citation" data-cites="hu_attractor_2024">(<a
+          href="#ref-hu_attractor_2024" role="doc-biblioref">Hu et al. 2024</a>)</span> and SparseTSF <span
+        class="citation" data-cites="lin_sparsetsf_2024">(<a href="#ref-lin_sparsetsf_2024" role="doc-biblioref">Lin,
+          Lin,
+          Wu, et al. 2024</a>)</span> achieve performances comparable to SOTA methods while being several magnitudes
+      smaller, resulting in faster training and inference speeds as well as a smaller memory footprint. These models
+      first
+      simplify the forecasting task by downsampling <span class="citation"
+        data-cites="lin_sparsetsf_2024 zhang_less_2022">(<a href="#ref-lin_sparsetsf_2024" role="doc-biblioref">Lin,
+          Lin,
+          Wu, et al. 2024</a>; <a href="#ref-zhang_less_2022" role="doc-biblioref">Zhang et al. 2022</a>)</span>, by
+      decomposition <span class="citation" data-cites="deng_parsimony_2024">(<a href="#ref-deng_parsimony_2024"
+          role="doc-biblioref">Deng et al. 2024</a>)</span> or by operating in the frequency domain via FFT <span
+        class="citation" data-cites="xu_fits_2023">(<a href="#ref-xu_fits_2023" role="doc-biblioref">Xu et al.
+          2023</a>)</span> or via phase space reconstruction <span class="citation" data-cites="hu_attractor_2024">(<a
+          href="#ref-hu_attractor_2024" role="doc-biblioref">Hu et al. 2024</a>)</span>. Then, they process the
+      condensed
+      representation with a smaller model, often containing only a single (non-) linear layer.</p>
+    <h5 id="channel-dependence.">Channel dependence.</h5>
+    <p>The success of DLinear <span class="citation" data-cites="zeng_are_2023">(<a href="#ref-zeng_are_2023"
+          role="doc-biblioref">Zeng et al. 2023</a>)</span> and PatchTST <span class="citation"
+        data-cites="nie_time_2022">(<a href="#ref-nie_time_2022" role="doc-biblioref">Nie et al. 2022</a>)</span> with
+      the
+      CI strategy led to many subsequent CI models such as Pathformer <span class="citation"
+        data-cites="chen_pathformer_2023">(<a href="#ref-chen_pathformer_2023" role="doc-biblioref">P. Chen et al.
+          2023</a>)</span>, CATS <span class="citation" data-cites="kim_are_2024">(<a href="#ref-kim_are_2024"
+          role="doc-biblioref">Kim et al. 2024</a>)</span> and DeformableTST <span class="citation"
+        data-cites="luo_deformabletst_2024">(<a href="#ref-luo_deformabletst_2024" role="doc-biblioref">Luo and Wang
+          2024</a>)</span>. However, growing interest in leveraging inter-series correlations developed into a
+      resurgence
+      of CD methods, which can be broadly categorized by their mechanism of capturing cross-channel interactions. A
+      large
+      subset utilizes cross-channel attention, with models like Crossformer <span class="citation"
+        data-cites="zhang_crossformer_2022">(<a href="#ref-zhang_crossformer_2022" role="doc-biblioref">Zhang and Yan
+          2022</a>)</span>, CARD <span class="citation" data-cites="wang_card_2023">(<a href="#ref-wang_card_2023"
+          role="doc-biblioref">X. Wang et al. 2023</a>)</span>, Client <span class="citation"
+        data-cites="gao_client_2023">(<a href="#ref-gao_client_2023" role="doc-biblioref">Gao et al. 2023</a>)</span>
+      and
+      MCformer <span class="citation" data-cites="han_mcformer_2024">(<a href="#ref-han_mcformer_2024"
+          role="doc-biblioref">W. Han et al. 2024</a>)</span> incorporating attention modules to jointly model temporal
+      and inter-channel dependencies. Another line of work applies spectral or frequency-based modeling, such as
+      SDformer
+      <span class="citation" data-cites="chen_sdformer_2024">(<a href="#ref-chen_sdformer_2024"
+          role="doc-biblioref">Chen
+          et al. 2024</a>)</span>, Fredformer <span class="citation" data-cites="piao_fredformer_2024">(<a
+          href="#ref-piao_fredformer_2024" role="doc-biblioref">Piao et al. 2024</a>)</span> and FreTS <span
+        class="citation" data-cites="yi_frequency-domain_2023">(<a href="#ref-yi_frequency-domain_2023"
+          role="doc-biblioref">Yi et al. 2023</a>)</span>, which leverage frequency-domain representations to capture
+      global dependencies and improve channel interaction modeling. Meanwhile, MLP-Mixer-based architectures offer an
+      alternative to attention-heavy designs. For instance, TSMixer <span class="citation"
+        data-cites="ekambaram_tsmixer_2023">(<a href="#ref-ekambaram_tsmixer_2023" role="doc-biblioref">Ekambaram et al.
+          2023</a>)</span> introduces hybrid channel modeling, while SOFTS <span class="citation"
+        data-cites="han_softs_2024">(<a href="#ref-han_softs_2024" role="doc-biblioref">L. Han, Chen, et al.
+          2024</a>)</span> similarly proposes a centralized STAR module to fuse global and intra-channel
+      representations.
+      On another note, models like TimeMixer <span class="citation" data-cites="wang_timemixer_2023">(<a
+          href="#ref-wang_timemixer_2023" role="doc-biblioref">S. Wang et al. 2023</a>)</span>, ModernTCN <span
+        class="citation" data-cites="donghao_moderntcn_2023">(<a href="#ref-donghao_moderntcn_2023"
+          role="doc-biblioref">Donghao and Xue 2023</a>)</span> and MICN <span class="citation"
+        data-cites="wang_micn_2022">(<a href="#ref-wang_micn_2022" role="doc-biblioref">Wang et al. 2022</a>)</span>
+      explore multi-scale decomposition and convolutional modeling to disentangle and aggregate information across
+      variables and temporal resolutions. Lastly, CrossGNN <span class="citation" data-cites="huang_crossgnn_2023">(<a
+          href="#ref-huang_crossgnn_2023" role="doc-biblioref">Huang et al. 2023</a>)</span> applies graph-based modules
+      to model cross-variable structure.
+    </p>
+    <h5 id="dms-dominance.">DMS dominance.</h5>
+    <p>Although <span class="citation" data-cites="li_enhancing_2019">Li et al. (<a href="#ref-li_enhancing_2019"
+          role="doc-biblioref">2019</a>)</span> were among the first to apply Transformers to LTSF in an IMS setting,
+      nearly all major recent models for LTSF adopt a DMS forecasting strategy, see Table <a href="#tab:ltsf"
+        data-reference-type="ref" data-reference="tab:ltsf">[tab:ltsf]</a>. This trend can be traced back to Informer
+      <span class="citation" data-cites="zhou_informer_2021">(<a href="#ref-zhou_informer_2021"
+          role="doc-biblioref">Zhou
+          et al. 2021</a>)</span>, which popularized the use of non-autoregressive decoding to mitigate error
+      accumulation
+      in long-range predictions of IMS methods, as mathematically shown by <span class="citation"
+        data-cites="sun_fredo_2022">Sun and Boning (<a href="#ref-sun_fredo_2022" role="doc-biblioref">2022</a>)</span>.
+      Even recurrent architectures, which are closely related to IMS forecasting, have adopted a DMS strategy for LTSF
+      <span class="citation" data-cites="lin_segrnn_2023 jia_witran_2023">(<a href="#ref-lin_segrnn_2023"
+          role="doc-biblioref">Lin et al. 2023</a>; <a href="#ref-jia_witran_2023" role="doc-biblioref">Jia et al.
+          2023</a>)</span>. Two recent works stand out as rare exceptions that reintroduce autoregressive principles
+      into
+      LTSF. SMARTformer <span class="citation" data-cites="li_smartformer_2023">(<a href="#ref-li_smartformer_2023"
+          role="doc-biblioref">Yiduo Li et al. 2023</a>)</span> proposes a semi-autoregressive (SAR) decoding approach,
+      consisting of two key components: a segment autoregressive layer that generates the forecast iteratively in
+      segments, and a non-autoregressive refining layer that globally refines the output in a DMS manner. This hybrid
+      structure captures both local and global temporal patterns. Empirical results show that SMARTformer achieves
+      consistent improvements in both univariate and multivariate forecasting tasks while an ablation study highlights
+      that other SOTA LTSF methods also benefit from a SAR decoder. On the other hand, AutoTimes <span class="citation"
+        data-cites="liu_autotimes_2024">(<a href="#ref-liu_autotimes_2024" role="doc-biblioref">Liu et al.
+          2024</a>)</span> leverages the autoregressive nature of LLMs to forecast time series through token-wise
+      next-step prediction. However, its main novelty lies in repurposing decoder-only LLMs for time series.
+    </p>
+    <div class="center">
+      <p><span id="tab:ltsf" label="tab:ltsf">[tab:ltsf]</span></p>
+    </div>
+    <table>
+      <thead>
+        <tr class="header">
+          <th style="text-align: left;"><strong>Model</strong></th>
+          <th style="text-align: center;"><strong>Venue</strong></th>
+          <th style="text-align: center;"><strong>IMS/DMS</strong></th>
+          <th style="text-align: left;"><strong>Backbone</strong></th>
+          <th style="text-align: center;"><strong>CI/CD</strong></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: left;"><strong>Model</strong></td>
+          <td style="text-align: center;"><strong>Venue</strong></td>
+          <td style="text-align: center;"><strong>IMS/DMS</strong></td>
+          <td style="text-align: left;"><strong>Backbone</strong></td>
+          <td style="text-align: center;"><strong>CI/CD</strong></td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;"></td>
+          <td style="text-align: center;"></td>
+          <td style="text-align: center;"></td>
+          <td style="text-align: left;"></td>
+          <td style="text-align: center;"></td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">LogSparse <span class="citation" data-cites="li_enhancing_2019">(<a
+                href="#ref-li_enhancing_2019" role="doc-biblioref">Li et al. 2019</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’19</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">Transformer (D)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Autoformer <span class="citation" data-cites="wu_autoformer_2021">(<a
+                href="#ref-wu_autoformer_2021" role="doc-biblioref">Wu et al. 2021</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’21</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E-D)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">Informer <span class="citation" data-cites="zhou_informer_2021">(<a
+                href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et al. 2021</a>)</span></td>
+          <td style="text-align: center;">AAAI’21</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E-D)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Triformer <span class="citation" data-cites="cirstea_triformer_2022">(<a
+                href="#ref-cirstea_triformer_2022" role="doc-biblioref">Cirstea et al. 2022</a>)</span></td>
+          <td style="text-align: center;">IJCAI’22</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">LightTS <span class="citation" data-cites="zhang_less_2022">(<a
+                href="#ref-zhang_less_2022" role="doc-biblioref">Zhang et al. 2022</a>)</span></td>
+          <td style="text-align: center;">-</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Koopa <span class="citation" data-cites="liu_koopa_2023">(<a
+                href="#ref-liu_koopa_2023" role="doc-biblioref">Liu, Li, et al. 2023</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Koopman Theory <span class="citation" data-cites="koopman_hamiltonian_1931">(<a
+                href="#ref-koopman_hamiltonian_1931" role="doc-biblioref">Koopman 1931</a>)</span></td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">CrossGNN <span class="citation" data-cites="huang_crossgnn_2023">(<a
+                href="#ref-huang_crossgnn_2023" role="doc-biblioref">Huang et al. 2023</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">GNN</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">WITRAN <span class="citation" data-cites="jia_witran_2023">(<a
+                href="#ref-jia_witran_2023" role="doc-biblioref">Jia et al. 2023</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">FreTS <span class="citation" data-cites="yi_frequency-domain_2023">(<a
+                href="#ref-yi_frequency-domain_2023" role="doc-biblioref">Yi et al. 2023</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">MICN <span class="citation" data-cites="wang_micn_2022">(<a
+                href="#ref-wang_micn_2022" role="doc-biblioref">Wang et al. 2022</a>)</span></td>
+          <td style="text-align: center;">ICLR’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">TimesNet <span class="citation" data-cites="wu_timesnet_2022">(<a
+                href="#ref-wu_timesnet_2022" role="doc-biblioref">Wu et al. 2022</a>)</span></td>
+          <td style="text-align: center;">ICLR’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Crossformer <span class="citation" data-cites="zhang_crossformer_2022">(<a
+                href="#ref-zhang_crossformer_2022" role="doc-biblioref">Zhang and Yan 2022</a>)</span></td>
+          <td style="text-align: center;">ICLR’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E-D)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">PatchTST <span class="citation" data-cites="nie_time_2022">(<a
+                href="#ref-nie_time_2022" role="doc-biblioref">Nie et al. 2022</a>)</span></td>
+          <td style="text-align: center;">ICLR’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">DLinear <span class="citation" data-cites="zeng_are_2023">(<a
+                href="#ref-zeng_are_2023" role="doc-biblioref">Zeng et al. 2023</a>)</span></td>
+          <td style="text-align: center;">AAAI’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">NHITS <span class="citation" data-cites="challu_nhits_2023">(<a
+                href="#ref-challu_nhits_2023" role="doc-biblioref">Challu et al. 2023</a>)</span></td>
+          <td style="text-align: center;">AAAI’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">SMARTformer <span class="citation" data-cites="li_smartformer_2023">(<a
+                href="#ref-li_smartformer_2023" role="doc-biblioref">Yiduo Li et al. 2023</a>)</span></td>
+          <td style="text-align: center;">IJCAI’23</td>
+          <td style="text-align: center;">IMS &amp; DMS</td>
+          <td style="text-align: left;">Transformer (E-D)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">TSMixer <span class="citation" data-cites="ekambaram_tsmixer_2023">(<a
+                href="#ref-ekambaram_tsmixer_2023" role="doc-biblioref">Ekambaram et al. 2023</a>)</span></td>
+          <td style="text-align: center;">KDD’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CI/CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">TiDE <span class="citation" data-cites="das_long-term_2023">(<a
+                href="#ref-das_long-term_2023" role="doc-biblioref">Das et al. 2023</a>)</span></td>
+          <td style="text-align: center;">TMLR’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">SegRNN <span class="citation" data-cites="lin_segrnn_2023">(<a
+                href="#ref-lin_segrnn_2023" role="doc-biblioref">Lin et al. 2023</a>)</span></td>
+          <td style="text-align: center;">-</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Client <span class="citation" data-cites="gao_client_2023">(<a
+                href="#ref-gao_client_2023" role="doc-biblioref">Gao et al. 2023</a>)</span></td>
+          <td style="text-align: center;">-</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">Attraos <span class="citation" data-cites="hu_attractor_2024">(<a
+                href="#ref-hu_attractor_2024" role="doc-biblioref">Hu et al. 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Chaos Theory <span class="citation" data-cites="devaney_introduction_2018">(<a
+                href="#ref-devaney_introduction_2018" role="doc-biblioref">Devaney 2018</a>)</span></td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Ada-MSHyper <span class="citation" data-cites="shang_ada-mshyper_2024">(<a
+                href="#ref-shang_ada-mshyper_2024" role="doc-biblioref">Shang et al. 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">HGNN <span class="citation" data-cites="feng_hypergraph_2019">(<a
+                href="#ref-feng_hypergraph_2019" role="doc-biblioref">Feng et al. 2019</a>)</span></td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">SSCNN <span class="citation" data-cites="deng_parsimony_2024">(<a
+                href="#ref-deng_parsimony_2024" role="doc-biblioref">Deng et al. 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN &amp; Decomposition</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">SOFTS <span class="citation" data-cites="han_softs_2024">(<a
+                href="#ref-han_softs_2024" role="doc-biblioref">L. Han, Chen, et al. 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">CycleNet <span class="citation" data-cites="deng_parsimony_2024">(<a
+                href="#ref-deng_parsimony_2024" role="doc-biblioref">Deng et al. 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">CATS <span class="citation" data-cites="kim_are_2024">(<a
+                href="#ref-kim_are_2024" role="doc-biblioref">Kim et al. 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">DeformableTST <span class="citation" data-cites="luo_deformabletst_2024">(<a
+                href="#ref-luo_deformabletst_2024" role="doc-biblioref">Luo and Wang 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">TPGN <span class="citation" data-cites="liu_autotimes_2024">(<a
+                href="#ref-liu_autotimes_2024" role="doc-biblioref">Liu et al. 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">AutoTimes <span class="citation" data-cites="liu_autotimes_2024">(<a
+                href="#ref-liu_autotimes_2024" role="doc-biblioref">Liu et al. 2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">LLM (D)</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">SparseTSF <span class="citation" data-cites="lin_sparsetsf_2024">(<a
+                href="#ref-lin_sparsetsf_2024" role="doc-biblioref">Lin, Lin, Wu, et al. 2024</a>)</span></td>
+          <td style="text-align: center;">ICML’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">SAMformer <span class="citation" data-cites="ilbert_samformer_2024">(<a
+                href="#ref-ilbert_samformer_2024" role="doc-biblioref">Ilbert et al. 2024</a>)</span></td>
+          <td style="text-align: center;">ICML’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">TimeMixer <span class="citation" data-cites="chen_pathformer_2023">(<a
+                href="#ref-chen_pathformer_2023" role="doc-biblioref">P. Chen et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">Pathformer <span class="citation" data-cites="chen_pathformer_2023">(<a
+                href="#ref-chen_pathformer_2023" role="doc-biblioref">P. Chen et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Time-LLM <span class="citation" data-cites="jin_time-llm_2023">(<a
+                href="#ref-jin_time-llm_2023" role="doc-biblioref">Jin et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">LLM</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">iTransformer <span class="citation" data-cites="liu_itransformer_2023">(<a
+                href="#ref-liu_itransformer_2023" role="doc-biblioref">Liu, Hu, et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">FITS <span class="citation" data-cites="xu_fits_2023">(<a
+                href="#ref-xu_fits_2023" role="doc-biblioref">Xu et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">CARD <span class="citation" data-cites="wang_card_2023">(<a
+                href="#ref-wang_card_2023" role="doc-biblioref">X. Wang et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">ModernTCN <span class="citation" data-cites="donghao_moderntcn_2023">(<a
+                href="#ref-donghao_moderntcn_2023" role="doc-biblioref">Donghao and Xue 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">MSGNet <span class="citation" data-cites="cai_msgnet_2024">(<a
+                href="#ref-cai_msgnet_2024" role="doc-biblioref">Cai et al. 2024</a>)</span></td>
+          <td style="text-align: center;">AAAI’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">GNN</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">UMixer <span class="citation" data-cites="ma_u-mixer_2024">(<a
+                href="#ref-ma_u-mixer_2024" role="doc-biblioref">Ma et al. 2024</a>)</span></td>
+          <td style="text-align: center;">AAAI’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">HDMixer <span class="citation" data-cites="huang_hdmixer_2024">(<a
+                href="#ref-huang_hdmixer_2024" role="doc-biblioref">Huang, Shen, et al. 2024</a>)</span></td>
+          <td style="text-align: center;">AAAI’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">LeRet <span class="citation" data-cites="huang_leret_2024">(<a
+                href="#ref-huang_leret_2024" role="doc-biblioref">Huang, Zhou, et al. 2024</a>)</span></td>
+          <td style="text-align: center;">IJCAI’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">LLM + Retentive Net</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">PatchMixer <span class="citation" data-cites="gong_patchmixer_2024">(<a
+                href="#ref-gong_patchmixer_2024" role="doc-biblioref">Gong et al. 2024</a>)</span></td>
+          <td style="text-align: center;">IJCAI’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">SDformer <span class="citation" data-cites="zhou_sdformer_2024">(<a
+                href="#ref-zhou_sdformer_2024" role="doc-biblioref">Z. Zhou et al. 2024</a>)</span></td>
+          <td style="text-align: center;">IJCAI’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">SCAT <span class="citation" data-cites="zhou_scat_2024">(<a
+                href="#ref-zhou_scat_2024" role="doc-biblioref">C. Zhou et al. 2024</a>)</span></td>
+          <td style="text-align: center;">IJCAI’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CI</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Fredformer <span class="citation" data-cites="piao_fredformer_2024">(<a
+                href="#ref-piao_fredformer_2024" role="doc-biblioref">Piao et al. 2024</a>)</span></td>
+          <td style="text-align: center;">KDD’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">MCformer <span class="citation" data-cites="han_mcformer_2024">(<a
+                href="#ref-han_mcformer_2024" role="doc-biblioref">W. Han et al. 2024</a>)</span></td>
+          <td style="text-align: center;">IoT-J’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer (E)</td>
+          <td style="text-align: center;">CD</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>In summary, the literature on point LTSF is extensive, with numerous methods achieving strong performances.
+      Hence,
+      determining the definitive state-of-the-art in point LTSF is challenging due to the vast and rapidly evolving
+      literature. However, certain models, DLinear, PatchTST and iTransformer <span class="citation"
+        data-cites="zeng_are_2023 nie_time_2022 liu_itransformer_2023">(<a href="#ref-zeng_are_2023"
+          role="doc-biblioref">Zeng et al. 2023</a>; <a href="#ref-nie_time_2022" role="doc-biblioref">Nie et al.
+          2022</a>; <a href="#ref-liu_itransformer_2023" role="doc-biblioref">Liu, Hu, et al. 2023</a>)</span>, have
+      emerged as de facto standards for comparison, frequently adopted as baseline or comparative methods in a wide
+      range
+      of recent works <span class="citation"
+        data-cites="jia_pgn_2024 jia_witran_2023 lu_cats_2024 lin_segrnn_2023 han_softs_2024 lin_cyclenet_2024 luo_deformabletst_2024 hu_attractor_2024 shang_ada-mshyper_2024">(<a
+          href="#ref-jia_pgn_2024" role="doc-biblioref">Jia et al. 2024</a>, <a href="#ref-jia_witran_2023"
+          role="doc-biblioref">2023</a>; <a href="#ref-lu_cats_2024" role="doc-biblioref">Lu et al. 2024</a>; <a
+          href="#ref-lin_segrnn_2023" role="doc-biblioref">Lin et al. 2023</a>; <a href="#ref-han_softs_2024"
+          role="doc-biblioref">L. Han, Chen, et al. 2024</a>; <a href="#ref-lin_cyclenet_2024" role="doc-biblioref">Lin,
+          Lin, Hu, et al. 2024</a>; <a href="#ref-luo_deformabletst_2024" role="doc-biblioref">Luo and Wang 2024</a>; <a
+          href="#ref-hu_attractor_2024" role="doc-biblioref">Hu et al. 2024</a>; <a href="#ref-shang_ada-mshyper_2024"
+          role="doc-biblioref">Shang et al. 2024</a>)</span>. Consequently, we consider them representative of the
+      current
+      state-of-the-art in point LTSF. Nonetheless, the distinction between IMS and DMS strategies has been largely
+      overlooked, with DMS decoding being often adopted by default. Moreover, DMS forecasting can underperform in
+      certain
+      settings, which has not been sufficiently investigated in prior work. To address this gap, we empirically examine
+      scenarios when and why DMS may fall short, using <em>multi-world</em> examples to highlight the conditions under
+      which IMS offers advantages. Furthermore, while SOTA point LTSF models are highly effective at predicting the
+      conditional mean <span class="citation" data-cites="li_transformer-modulated_2023">(<a
+          href="#ref-li_transformer-modulated_2023" role="doc-biblioref">Yuxin Li et al. 2023</a>)</span>, many
+      real-world
+      scenarios require a more nuanced understanding of uncertainty, making probabilistic forecasts preferable. Hence,
+      the
+      next section reviews existing probabilistic models proposed for time series forecasting.</p>
+    <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+      <div id="ref-albahli_lstm_2025" class="csl-entry" role="doc-biblioentry">
+        Albahli, Saleh. 2025. <span>“<span>LSTM</span> Vs. <span>Prophet</span>: <span>Achieving</span>
+          <span>Superior</span> <span>Accuracy</span> in <span>Dynamic</span> <span>Electricity</span>
+          <span>Demand</span>
+          <span>Forecasting</span>.”</span> <em>Energies</em> 18 (2): 278. <a
+          href="https://doi.org/10.3390/en18020278">https://doi.org/10.3390/en18020278</a>.
+      </div>
+      <div id="ref-bai_empirical_2018" class="csl-entry" role="doc-biblioentry">
+        Bai, Shaojie, J. Zico Kolter, and Vladlen Koltun. 2018. <em>An <span>Empirical</span> <span>Evaluation</span> of
+          <span>Generic</span> <span>Convolutional</span> and <span>Recurrent</span> <span>Networks</span> for
+          <span>Sequence</span> <span>Modeling</span></em>. arXiv. <a
+          href="https://doi.org/10.48550/arXiv.1803.01271">https://doi.org/10.48550/arXiv.1803.01271</a>.
+      </div>
+      <div id="ref-bengio_learning_1994" class="csl-entry" role="doc-biblioentry">
+        Bengio, Y., P. Simard, and P. Frasconi. 1994. <span>“Learning Long-Term Dependencies with Gradient Descent Is
+          Difficult.”</span> <em>IEEE Transactions on Neural Networks</em> 5 (2): 157–166. <a
+          href="https://doi.org/10.1109/72.279181">https://doi.org/10.1109/72.279181</a>.
+      </div>
+      <div id="ref-benidis_deep_2022" class="csl-entry" role="doc-biblioentry">
+        Benidis, Konstantinos, Syama Sundar Rangapuram, Valentin Flunkert, et al. 2022. <span>“Deep
+          <span>Learning</span>
+          for <span>Time</span> <span>Series</span> <span>Forecasting</span>: <span>Tutorial</span> and
+          <span>Literature</span> <span>Survey</span>.”</span> <em>ACM Computing Surveys</em> 55 (6). <a
+          href="https://doi.org/10.1145/3533382">https://doi.org/10.1145/3533382</a>.
+      </div>
+      <div id="ref-bontempi_machine_2013" class="csl-entry" role="doc-biblioentry">
+        Bontempi, Gianluca, Souhaib Ben Taieb, and Yann-Aël Le Borgne. 2013. <span>“Machine <span>Learning</span>
+          <span>Strategies</span> for <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> In
+        <em>Business <span>Intelligence</span>: <span>Second</span> <span>European</span> <span>Summer</span>
+          <span>School</span>, <span class="nocase">eBISS</span> 2012, <span>Brussels</span>, <span>Belgium</span>,
+          <span>July</span> 15-21, 2012, <span>Tutorial</span> <span>Lectures</span></em>, edited by Marie-Aude Aufaure
+        and Esteban Zimányi. Springer. <a
+          href="https://doi.org/10.1007/978-3-642-36318-4_3">https://doi.org/10.1007/978-3-642-36318-4_3</a>.
+      </div>
+      <div id="ref-borovykh_conditional_2018" class="csl-entry" role="doc-biblioentry">
+        Borovykh, Anastasia, Sander Bohte, and Cornelis W. Oosterlee. 2018. <em>Conditional <span>Time</span>
+          <span>Series</span> <span>Forecasting</span> with <span>Convolutional</span> <span>Neural</span>
+          <span>Networks</span></em>. arXiv. <a
+          href="https://doi.org/10.48550/arXiv.1703.04691">https://doi.org/10.48550/arXiv.1703.04691</a>.
+      </div>
+      <div id="ref-box_distribution_1970" class="csl-entry" role="doc-biblioentry">
+        Box, G. E. P., and David A. Pierce. 1970. <span>“Distribution of <span>Residual</span>
+          <span>Autocorrelations</span> in <span>Autoregressive</span>-<span>Integrated</span> <span>Moving</span>
+          <span>Average</span> <span>Time</span> <span>Series</span> <span>Models</span>.”</span> <em>Journal of the
+          American Statistical Association</em> 65 (332): 1509–1526. <a
+          href="https://doi.org/10.1080/01621459.1970.10481180">https://doi.org/10.1080/01621459.1970.10481180</a>.
+      </div>
+      <div id="ref-box_box_2013" class="csl-entry" role="doc-biblioentry">
+        Box, George. 2013. <span>“Box and <span>Jenkins</span>: <span>Time</span> <span>Series</span>
+          <span>Analysis</span>, <span>Forecasting</span> and <span>Control</span>.”</span> In <em>A <span>Very</span>
+          <span>British</span> <span>Affair</span>: <span>Six</span> <span>Britons</span> and the
+          <span>Development</span>
+          of <span>Time</span> <span>Series</span> <span>Analysis</span> <span>During</span> the 20th
+          <span>Century</span></em>, edited by Terence C. Mills. Palgrave Macmillan UK. <a
+          href="https://doi.org/10.1057/9781137291264_6">https://doi.org/10.1057/9781137291264_6</a>.
+      </div>
+      <div id="ref-box_time_2015" class="csl-entry" role="doc-biblioentry">
+        Box, George EP, Gwilym M Jenkins, Gregory C Reinsel, and Greta M Ljung. 2015. <em>Time Series Analysis:
+          Forecasting and Control</em>. Wiley <span>Series</span> in <span>Probability</span> and
+        <span>Statistics</span>.
+        John Wiley &amp; Sons.
+      </div>
+      <div id="ref-brown_language_2020" class="csl-entry" role="doc-biblioentry">
+        Brown, Tom, Benjamin Mann, Nick Ryder, et al. 2020. <span>“Language <span>Models</span> Are
+          <span>Few</span>-<span>Shot</span> <span>Learners</span>.”</span> In <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em>, edited by H. Larochelle, M.
+        Ranzato,
+        R. Hadsell, M. F. Balcan, and H. Lin, vol. 33, 33. Curran Associates, Inc. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf</a>.
+      </div>
+      <div id="ref-cai_msgnet_2024" class="csl-entry" role="doc-biblioentry">
+        Cai, Wanlin, Yuxuan Liang, Xianggen Liu, Jianshuai Feng, and Yuankai Wu. 2024. <span>“<span>MSGNet</span>:
+          <span>Learning</span> <span>Multi</span>-<span>Scale</span> <span>Inter</span>-Series
+          <span>Correlations</span>
+          for <span>Multivariate</span> <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of the <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 38 (March): 11141–11149. <a
+          href="https://doi.org/10.1609/aaai.v38i10.28991">https://doi.org/10.1609/aaai.v38i10.28991</a>.
+      </div>
+      <div id="ref-challu_nhits_2023" class="csl-entry" role="doc-biblioentry">
+        Challu, Cristian, Kin G. Olivares, Boris N. Oreshkin, Federico Garza Ramirez, Max Mergenthaler Canseco, and
+        Artur
+        Dubrawski. 2023. <span>“<span>NHITS</span>: <span>Neural</span> <span>Hierarchical</span>
+          <span>Interpolation</span> for <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of the <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 37 (June): 6989–6997. <a
+          href="https://doi.org/10.1609/aaai.v37i6.25854">https://doi.org/10.1609/aaai.v37i6.25854</a>.
+      </div>
+      <div id="ref-chen_pathformer_2023" class="csl-entry" role="doc-biblioentry">
+        Chen, Peng, Yingying Zhang, Yunyao Cheng, et al. 2023. <span>“Pathformer: <span>Multi</span>-Scale
+          <span>Transformers</span> with <span>Adaptive</span> <span>Pathways</span> for <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>.”</span> <em>International <span>Conference</span> on
+          <span>Learning</span> <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=lJkOCMP2aW">https://openreview.net/forum?id=lJkOCMP2aW</a>.
+      </div>
+      <div id="ref-chen_tsmixer_2023" class="csl-entry" role="doc-biblioentry">
+        Chen, Si-An, Chun-Liang Li, Sercan O. Arik, Nathanael Christian Yoder, and Tomas Pfister. 2023.
+        <span>“<span>TSMixer</span>: <span>An</span> <span>All</span>-<span>MLP</span> <span>Architecture</span> for
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Transactions on Machine Learning
+          Research</em>. <a
+          href="https://openreview.net/forum?id=wbpxTuXgm0">https://openreview.net/forum?id=wbpxTuXgm0</a>.
+      </div>
+      <div id="ref-chen_probabilistic_2019" class="csl-entry" role="doc-biblioentry">
+        Chen, Yitian, Yanfei Kang, Yixiong Chen, and Zizhuo Wang. 2019. <span>“Probabilistic Forecasting with Temporal
+          Convolutional Neural Network.”</span> <em><span>MileTS</span> ’19: 5th <span>KDD</span> <span>Workshop</span>
+          on
+          <span>Mining</span> and <span>Learning</span> from <span>Time</span> <span>Series</span></em> (Anchorage,
+        Alaska, USA), August, 11. https://doi.org/<a
+          href="https://doi.org/10.1145/1122445.1122456">https://doi.org/10.1145/1122445.1122456</a>.
+      </div>
+      <div id="ref-chen_sdformer_2024" class="csl-entry" role="doc-biblioentry">
+        Chen, Zhicheng, Shibo Feng, Zhong Zhang, Xi Xiao, Xingyu Gao, and Peilin Zhao. 2024.
+        <span>“<span>SDformer</span>:
+          <span>Similarity</span>-Driven <span>Discrete</span> <span>Transformer</span> <span>For</span>
+          <span>Time</span>
+          <span>Series</span> <span>Generation</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 37 (December): 132179–132207. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/ee6c4b99b4c0d3d60efd22c1ecdd9891-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/ee6c4b99b4c0d3d60efd22c1ecdd9891-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-chevillon_direct_2007" class="csl-entry" role="doc-biblioentry">
+        Chevillon, Guillaume. 2007. <span>“Direct <span>Multi</span>-<span>Step</span> <span>Estimation</span> and
+          <span>Forecasting</span>.”</span> <em>Journal of Economic Surveys</em> 21 (4): 746–785. <a
+          href="https://doi.org/10.1111/j.1467-6419.2007.00518.x">https://doi.org/10.1111/j.1467-6419.2007.00518.x</a>.
+      </div>
+      <div id="ref-chevillon_non-parametric_2005" class="csl-entry" role="doc-biblioentry">
+        Chevillon, Guillaume, and David F. Hendry. 2005. <span>“Non-Parametric Direct Multi-Step Estimation for
+          Forecasting Economic Processes.”</span> <em>International Journal of Forecasting</em> 21 (2): 201–218. <a
+          href="https://doi.org/10.1016/j.ijforecast.2004.08.004">https://doi.org/10.1016/j.ijforecast.2004.08.004</a>.
+      </div>
+      <div id="ref-cho_learning_2014" class="csl-entry" role="doc-biblioentry">
+        Cho, Kyunghyun, Bart van Merrienboer, Çaglar Gülçehre, et al. 2014. <span>“Learning <span>Phrase</span>
+          <span>Representations</span> Using <span>RNN</span> <span>Encoder</span>-<span>Decoder</span> for
+          <span>Statistical</span> <span>Machine</span> <span>Translation</span>.”</span> <em>Proceedings of the 2014
+          <span>Conference</span> on <span>Empirical</span> <span>Methods</span> in <span>Natural</span>
+          <span>Language</span> <span>Processing</span></em> (Doha, Qatar), 1724–1734. <a
+          href="http://aclweb.org/anthology/D/D14/D14-1179.pdf">http://aclweb.org/anthology/D/D14/D14-1179.pdf</a>.
+      </div>
+      <div id="ref-cirstea_triformer_2022" class="csl-entry" role="doc-biblioentry">
+        Cirstea, Razvan-Gabriel, Chenjuan Guo, Bin Yang, Tung Kieu, Xuanyi Dong, and Shirui Pan. 2022. <span>“Triformer:
+          <span>Triangular</span>, <span>Variable</span>-<span>Specific</span> <span>Attentions</span> for
+          <span>Long</span> <span>Sequence</span> <span>Multivariate</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>International <span>Joint</span> <span>Conference</span> on
+          <span>Artificial</span> <span>Intelligence</span></em> 3 (July): 1994–2001. <a
+          href="https://doi.org/10.24963/ijcai.2022/277">https://doi.org/10.24963/ijcai.2022/277</a>.
+      </div>
+      <div id="ref-cox_prediction_1961" class="csl-entry" role="doc-biblioentry">
+        Cox, D. R. 1961. <span>“Prediction by <span>Exponentially</span> <span>Weighted</span> <span>Moving</span>
+          <span>Averages</span> and <span>Related</span> <span>Methods</span>.”</span> <em>Journal of the Royal
+          Statistical Society: Series B (Methodological)</em> 23 (2): 414–422. <a
+          href="https://doi.org/10.1111/j.2517-6161.1961.tb00424.x">https://doi.org/10.1111/j.2517-6161.1961.tb00424.x</a>.
+      </div>
+      <div id="ref-das_long-term_2023" class="csl-entry" role="doc-biblioentry">
+        Das, Abhimanyu, Weihao Kong, Andrew Leach, Shaan K. Mathur, Rajat Sen, and Rose Yu. 2023. <span>“Long-Term
+          <span>Forecasting</span> with <span>TiDE</span>: <span>Time</span>-Series <span>Dense</span>
+          <span>Encoder</span>.”</span> <em>Transactions on Machine Learning Research</em>. <a
+          href="https://openreview.net/forum?id=pCbC3aQB5W">https://openreview.net/forum?id=pCbC3aQB5W</a>.
+      </div>
+      <div id="ref-de_gooijer_25_2006" class="csl-entry" role="doc-biblioentry">
+        De Gooijer, Jan G., and Rob J. Hyndman. 2006. <span>“25 Years of Time Series Forecasting.”</span>
+        <em>International Journal of Forecasting</em>, Twenty five years of forecasting, vol. 22 (3): 443–473. <a
+          href="https://doi.org/10.1016/j.ijforecast.2006.01.001">https://doi.org/10.1016/j.ijforecast.2006.01.001</a>.
+      </div>
+      <div id="ref-deng_parsimony_2024" class="csl-entry" role="doc-biblioentry">
+        Deng, Jinliang, Feiyang Ye, Du Yin, Xuan Song, Ivor Tsang, and Hui Xiong. 2024. <span>“Parsimony or
+          <span>Capability</span>? <span>Decomposition</span> <span>Delivers</span> <span>Both</span> in
+          <span>Long</span>-Term <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span> <span>Systems</span></em> 37 (December):
+        66687–66712. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/7b122d0a0dcb1a86ffa25ccba154652b-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/7b122d0a0dcb1a86ffa25ccba154652b-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-devaney_introduction_2018" class="csl-entry" role="doc-biblioentry">
+        Devaney, Robert. 2018. <em>An Introduction to Chaotic Dynamical Systems</em>. 2nd ed. CRC press.
+      </div>
+      <div id="ref-donghao_moderntcn_2023" class="csl-entry" role="doc-biblioentry">
+        Donghao, Luo, and Wang Xue. 2023. <span>“<span>ModernTCN</span>: <span>A</span> <span>Modern</span>
+          <span>Pure</span> <span>Convolution</span> <span>Structure</span> for <span>General</span> <span>Time</span>
+          <span>Series</span> <span>Analysis</span>.”</span> <em>Proceedings of the 12th <span>International</span>
+          <span>Conference</span> on <span>Learning</span> <span>Representations</span> (<span>ICLR</span> 2024)</em>,
+        October. <a href="https://openreview.net/forum?id=vpJMJerXHU">https://openreview.net/forum?id=vpJMJerXHU</a>.
+      </div>
+      <div id="ref-dosovitskiy_image_2021" class="csl-entry" role="doc-biblioentry">
+        Dosovitskiy, Alexey, Lucas Beyer, Alexander Kolesnikov, et al. 2021. <span>“An <span>Image</span> Is
+          <span>Worth</span> 16x16 <span>Words</span>: <span>Transformers</span> for <span>Image</span>
+          <span>Recognition</span> at <span>Scale</span>.”</span> <em>Proceedings of the 9th <span>International</span>
+          <span>Conference</span> on <span>Learning</span> <span>Representations</span> (<span>ICLR</span> 2021)</em>.
+        <a href="https://openreview.net/forum?id=YicbFdNTTy">https://openreview.net/forum?id=YicbFdNTTy</a>.
+      </div>
+      <div id="ref-ekambaram_tsmixer_2023" class="csl-entry" role="doc-biblioentry">
+        Ekambaram, Vijay, Arindam Jati, Nam Nguyen, Phanwadee Sinthong, and Jayant Kalagnanam. 2023.
+        <span>“<span>TSMixer</span>: <span>Lightweight</span> <span>MLP</span>-<span>Mixer</span> <span>Model</span> for
+          <span>Multivariate</span> <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of the 29th <span>ACM</span> <span>SIGKDD</span> <span>Conference</span> on
+          <span>Knowledge</span>
+          <span>Discovery</span> and <span>Data</span> <span>Mining</span></em> (New York, NY, USA), <span>KDD</span>
+        ’23,
+        August, 459–469. <a href="https://doi.org/10.1145/3580305.3599533">https://doi.org/10.1145/3580305.3599533</a>.
+      </div>
+      <div id="ref-feng_hypergraph_2019" class="csl-entry" role="doc-biblioentry">
+        Feng, Yifan, Haoxuan You, Zizhao Zhang, Rongrong Ji, and Yue Gao. 2019. <span>“Hypergraph Neural
+          Networks.”</span>
+        <em>Proceedings of the <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> (Honolulu, Hawaii, USA), <span>AAAI</span>’19, vol. 33 (January): 3558–3565. <a
+          href="https://doi.org/10.1609/aaai.v33i01.33013558">https://doi.org/10.1609/aaai.v33i01.33013558</a>.
+      </div>
+      <div id="ref-gao_client_2023" class="csl-entry" role="doc-biblioentry">
+        Gao, Jiaxin, Wenbo Hu, and Yuntian Chen. 2023. <em>Client: <span>Cross</span>-Variable <span>Linear</span>
+          <span>Integrated</span> <span>Enhanced</span> <span>Transformer</span> for <span>Multivariate</span>
+          <span>Long</span>-<span>Term</span> <span>Time</span> <span>Series</span> <span>Forecasting</span></em>.
+        arXiv.
+        <a href="https://doi.org/10.48550/arXiv.2305.18838">https://doi.org/10.48550/arXiv.2305.18838</a>.
+      </div>
+      <div id="ref-gong_patchmixer_2024" class="csl-entry" role="doc-biblioentry">
+        Gong, Zeying, Yujin Tang, and Junwei Liang. 2024. <span>“<span>PatchMixer</span>: <span>A</span>
+          <span>Patch</span>-<span>Mixing</span> <span>Architecture</span> for <span>Long</span>-<span>Term</span>
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of the 6th
+          <span>Data</span> <span>Science</span> <span>Meets</span> <span>Optimisation</span> <span>Workshop</span> at
+          the
+          <span>Thirty</span>-<span>Third</span> <span>International</span> <span>Joint</span> <span>Conference</span>
+          on
+          <span>Artificial</span> <span>Intelligence</span></em>, October.
+      </div>
+      <div id="ref-goodfellow_deep_2016" class="csl-entry" role="doc-biblioentry">
+        Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep <span>Learning</span></em>. The MIT Press.
+      </div>
+      <div id="ref-hamilton_time_1994" class="csl-entry" role="doc-biblioentry">
+        Hamilton, James D. 1994. <em>Time <span>Series</span> <span>Analysis</span></em>. Princeton University Press.
+      </div>
+      <div id="ref-han_softs_2024" class="csl-entry" role="doc-biblioentry">
+        Han, Lu, Xu-Yang Chen, Han-Jia Ye, and De-Chuan Zhan. 2024. <span>“<span>SOFTS</span>: <span>Efficient</span>
+          <span>Multivariate</span> <span>Time</span> <span>Series</span> <span>Forecasting</span> with
+          <span>Series</span>-<span>Core</span> <span>Fusion</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 37 (December): 64145–64175. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/754612bde73a8b65ad8743f1f6d8ddf6-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/754612bde73a8b65ad8743f1f6d8ddf6-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-han_capacity_2024" class="csl-entry" role="doc-biblioentry">
+        Han, Lu, Han-Jia Ye, and De-Chuan Zhan. 2024. <span>“The <span>Capacity</span> and <span>Robustness</span>
+          <span>Trade</span>-<span>Off</span>: <span>Revisiting</span> the <span>Channel</span> <span>Independent</span>
+          <span>Strategy</span> for <span>Multivariate</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>IEEE Transactions on Knowledge and Data Engineering</em> 36 (11):
+        7129–7142. <a href="https://doi.org/10.1109/TKDE.2024.3400008">https://doi.org/10.1109/TKDE.2024.3400008</a>.
+      </div>
+      <div id="ref-han_mcformer_2024" class="csl-entry" role="doc-biblioentry">
+        Han, Wenyong, Tao Zhu, Liming Chen, Huansheng Ning, Yang Luo, and Yaping Wan. 2024.
+        <span>“<span>MCformer</span>:
+          <span>Multivariate</span> <span>Time</span> <span>Series</span> <span>Forecasting</span> <span>With</span>
+          <span>Mixed</span>-<span>Channels</span> <span>Transformer</span>.”</span> <em>IEEE Internet of Things
+          Journal</em> 11 (17): 28320–28329. <a
+          href="https://doi.org/10.1109/JIOT.2024.3401697">https://doi.org/10.1109/JIOT.2024.3401697</a>.
+      </div>
+      <div id="ref-hewamalage_recurrent_2021" class="csl-entry" role="doc-biblioentry">
+        Hewamalage, Hansika, Christoph Bergmeir, and Kasun Bandara. 2021. <span>“Recurrent <span>Neural</span>
+          <span>Networks</span> for <span>Time</span> <span>Series</span> <span>Forecasting</span>: <span>Current</span>
+          <span>Status</span> and <span>Future</span> <span>Directions</span>.”</span> <em>International Journal of
+          Forecasting</em> 37 (1): 388–427. <a
+          href="https://doi.org/10.1016/j.ijforecast.2020.06.008">https://doi.org/10.1016/j.ijforecast.2020.06.008</a>.
+      </div>
+      <div id="ref-hochreiter_long_1997" class="csl-entry" role="doc-biblioentry">
+        Hochreiter, Sepp, and Jürgen Schmidhuber. 1997. <span>“Long <span>Short</span>-<span>Term</span>
+          <span>Memory</span>.”</span> <em>Neural Computing</em> 9 (8): 1735–1780. <a
+          href="https://doi.org/10.1162/neco.1997.9.8.1735">https://doi.org/10.1162/neco.1997.9.8.1735</a>.
+      </div>
+      <div id="ref-hu_attractor_2024" class="csl-entry" role="doc-biblioentry">
+        Hu, Jiaxi, Yuehong Hu, Wei Chen, et al. 2024. <span>“Attractor <span>Memory</span> for
+          <span>Long</span>-<span>Term</span> <span>Time</span> <span>Series</span> <span>Forecasting</span>:
+          <span>A</span> <span>Chaos</span> <span>Perspective</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 37 (December): 20786–20818. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/24ef004f733548db6b3197d9f68dcb85-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/24ef004f733548db6b3197d9f68dcb85-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-huang_crossgnn_2023" class="csl-entry" role="doc-biblioentry">
+        Huang, Qihe, Lei Shen, Ruixin Zhang, et al. 2023. <span>“<span>CrossGNN</span>: <span>Confronting</span>
+          <span>Noisy</span> <span>Multivariate</span> <span>Time</span> <span>Series</span> <span>Via</span>
+          <span>Cross</span> <span>Interaction</span> <span>Refinement</span>.”</span> <em>Advances in
+          <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 36 (December): 46885–46902. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2023/hash/9278abf072b58caf21d48dd670b4c721-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2023/hash/9278abf072b58caf21d48dd670b4c721-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-huang_hdmixer_2024" class="csl-entry" role="doc-biblioentry">
+        Huang, Qihe, Lei Shen, Ruixin Zhang, et al. 2024. <span>“<span>HDMixer</span>: <span>Hierarchical</span>
+          <span>Dependency</span> with <span>Extendable</span> <span>Patch</span> for <span>Multivariate</span>
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>AAAI</span>
+          <span>Conference</span> on <span>Artificial</span> <span>Intelligence</span></em> 38 (March): 12608–12616. <a
+          href="https://doi.org/10.1609/aaai.v38i11.29155">https://doi.org/10.1609/aaai.v38i11.29155</a>.
+      </div>
+      <div id="ref-huang_leret_2024" class="csl-entry" role="doc-biblioentry">
+        Huang, Qihe, Zhengyang Zhou, Kuo Yang, Gengyu Lin, Zhongchao Yi, and Yang Wang. 2024. <span>“<span>LeRet</span>:
+          <span>Language</span>-<span>Empowered</span> <span>Retentive</span> <span>Network</span> for <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Thirty</span>-<span>Third</span> <span>International</span> <span>Joint</span> <span>Conference</span>
+          on
+          <span>Artificial</span> <span>Intelligence</span></em> 5 (August): 4165–4173. <a
+          href="https://doi.org/10.24963/ijcai.2024/460">https://doi.org/10.24963/ijcai.2024/460</a>.
+      </div>
+      <div id="ref-ilbert_samformer_2024" class="csl-entry" role="doc-biblioentry">
+        Ilbert, Romain, Ambroise Odonnat, Vasilii Feofanov, et al. 2024. <span>“<span>SAMformer</span>:
+          <span>Unlocking</span> the <span>Potential</span> of <span>Transformers</span> in <span>Time</span>
+          <span>Series</span> <span>Forecasting</span> with <span>Sharpness</span>-<span>Aware</span>
+          <span>Minimization</span> and <span>Channel</span>-<span>Wise</span> <span>Attention</span>.”</span>
+        <em>Proceedings of the 41st <span>International</span> <span>Conference</span> on <span>Machine</span>
+          <span>Learning</span></em>, July, 20924–20954. <a
+          href="https://proceedings.mlr.press/v235/ilbert24a.html">https://proceedings.mlr.press/v235/ilbert24a.html</a>.
+      </div>
+      <div id="ref-ing_accumulated_2007" class="csl-entry" role="doc-biblioentry">
+        Ing, Ching-Kang. 2007. <span>“Accumulated Prediction Errors, Information Criteria and Optimal Forecasting for
+          Autoregressive Time Series.”</span> <em>The Annals of Statistics</em> 35 (3): 1238–1277. <a
+          href="https://doi.org/10.1214/009053606000001550">https://doi.org/10.1214/009053606000001550</a>.
+      </div>
+      <div id="ref-jia_witran_2023" class="csl-entry" role="doc-biblioentry">
+        Jia, Yuxin, Youfang Lin, Xinyan Hao, Yan Lin, Shengnan Guo, and Huaiyu Wan. 2023. <span>“<span>WITRAN</span>:
+          <span>Water</span>-Wave <span>Information</span> <span>Transmission</span> and <span>Recurrent</span>
+          <span>Acceleration</span> <span>Network</span> for <span>Long</span>-Range <span>Time</span>
+          <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 36 (December): 12389–12456. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2023/hash/2938ad0434a6506b125d8adaff084a4a-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2023/hash/2938ad0434a6506b125d8adaff084a4a-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-jia_pgn_2024" class="csl-entry" role="doc-biblioentry">
+        Jia, Yuxin, Youfang Lin, Jing Yu, Shuo Wang, Tianhao Liu, and Huaiyu Wan. 2024. <span>“<span>PGN</span>:
+          <span>The</span> <span>RNN</span>’s <span>New</span> <span>Successor</span> Is <span>Effective</span> for
+          <span>Long</span>-<span>Range</span> <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span> <span>Processing</span> <span>Systems</span></em>
+        37
+        (December): 84139–84168. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/990641d09f71bcee0060a8f1704ab8e2-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/990641d09f71bcee0060a8f1704ab8e2-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-jiang_approximation_2021" class="csl-entry" role="doc-biblioentry">
+        Jiang, Haotian, Zhong Li, and Qianxiao Li. 2021. <span>“Approximation <span>Theory</span> of
+          <span>Convolutional</span> <span>Architectures</span> for <span>Time</span> <span>Series</span>
+          <span>Modelling</span>.”</span> <em>Proceedings of the 38th <span>International</span> <span>Conference</span>
+          on <span>Machine</span> <span>Learning</span></em>, July, 4961–4970. <a
+          href="https://proceedings.mlr.press/v139/jiang21d.html">https://proceedings.mlr.press/v139/jiang21d.html</a>.
+      </div>
+      <div id="ref-jin_time-llm_2023" class="csl-entry" role="doc-biblioentry">
+        Jin, Ming, Shiyu Wang, Lintao Ma, et al. 2023. <span>“Time-<span>LLM</span>: <span>Time</span>
+          <span>Series</span>
+          <span>Forecasting</span> by <span>Reprogramming</span> <span>Large</span> <span>Language</span>
+          <span>Models</span>.”</span> <em>Proceedings of the <span>Twelfth</span> <span>International</span>
+          <span>Conference</span> on <span>Learning</span> <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=Unb5CVPtae">https://openreview.net/forum?id=Unb5CVPtae</a>.
+      </div>
+      <div id="ref-kalchbrenner_neural_2017" class="csl-entry" role="doc-biblioentry">
+        Kalchbrenner, Nal, Lasse Espeholt, Karen Simonyan, Aaron van den Oord, Alex Graves, and Koray Kavukcuoglu. 2017.
+        <em>Neural <span>Machine</span> <span>Translation</span> in <span>Linear</span> <span>Time</span></em>. arXiv.
+        <a href="https://doi.org/10.48550/arXiv.1610.10099">https://doi.org/10.48550/arXiv.1610.10099</a>.
+      </div>
+      <div id="ref-kang_introducing_2024" class="csl-entry" role="doc-biblioentry">
+        Kang, Bong G., Dongjun Lee, HyunGi Kim, DoHyun Chung, and Sungroh Yoon. 2024. <span>“Introducing
+          <span>Spectral</span> <span>Attention</span> for <span>Long</span>-<span>Range</span> <span>Dependency</span>
+          in
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 37 (December): 136509–136544. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/f6adf61977467560f79b95485d1f3a79-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/f6adf61977467560f79b95485d1f3a79-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-kim_are_2024" class="csl-entry" role="doc-biblioentry">
+        Kim, Dongbin, Jinseong Park, Jaewook Lee, and Hoki Kim. 2024. <span>“Are
+          <span>Self</span>-<span>Attentions</span>
+          <span>Effective</span> for <span>Time</span> <span>Series</span> <span>Forecasting</span>?”</span>
+        <em>Advances
+          in <span>Neural</span> <span>Information</span> <span>Processing</span> <span>Systems</span></em> 37
+        (December):
+        114180–114209. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/cf66f995883298c4db2f0dcba28fb211-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/cf66f995883298c4db2f0dcba28fb211-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-kim_squeezeformer_2022" class="csl-entry" role="doc-biblioentry">
+        Kim, Sehoon, Amir Gholami, Albert Shaw, et al. 2022. <span>“Squeezeformer: <span>An</span>
+          <span>Efficient</span>
+          <span>Transformer</span> for <span>Automatic</span> <span>Speech</span> <span>Recognition</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span> <span>Processing</span> <span>Systems</span></em>
+        35
+        (December): 9361–9373. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/3ccf6da39eeb8fefc8bbb1b0124adbd1-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2022/hash/3ccf6da39eeb8fefc8bbb1b0124adbd1-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-kline_methods_2004" class="csl-entry" role="doc-biblioentry">
+        Kline, Douglas M. 2004. <span>“Methods for <span>Multi</span>-<span>Step</span> <span>Time</span>
+          <span>Series</span> <span>Forecasting</span> <span>Neural</span> <span>Networks</span>.”</span> In <em>Neural
+          <span>Networks</span> in <span>Business</span> <span>Forecasting</span></em>. IGI Global Scientific
+        Publishing.
+        <a href="https://doi.org/10.4018/978-1-59140-176-6.ch012">https://doi.org/10.4018/978-1-59140-176-6.ch012</a>.
+      </div>
+      <div id="ref-koopman_hamiltonian_1931" class="csl-entry" role="doc-biblioentry">
+        Koopman, B. O. 1931. <span>“Hamiltonian <span>Systems</span> and <span>Transformation</span> in
+          <span>Hilbert</span> <span>Space</span>.”</span> <em>Proceedings of the National Academy of Sciences</em> 17
+        (5): 315–318. <a href="https://doi.org/10.1073/pnas.17.5.315">https://doi.org/10.1073/pnas.17.5.315</a>.
+      </div>
+      <div id="ref-lai_modeling_2018" class="csl-entry" role="doc-biblioentry">
+        Lai, Guokun, Wei-Cheng Chang, Yiming Yang, and Hanxiao Liu. 2018. <span>“Modeling <span>Long</span>- and
+          <span>Short</span>-<span>Term</span> <span>Temporal</span> <span>Patterns</span> with <span>Deep</span>
+          <span>Neural</span> <span>Networks</span>.”</span> <em>The 41st <span>International</span> <span>ACM</span>
+          <span>SIGIR</span> <span>Conference</span> on <span>Research</span> &amp; <span>Development</span> in
+          <span>Information</span> <span>Retrieval</span></em> (New York, NY, USA), <span>SIGIR</span> ’18, June,
+        95–104.
+        <a href="https://doi.org/10.1145/3209978.3210006">https://doi.org/10.1145/3209978.3210006</a>.
+      </div>
+      <div id="ref-lara-benitez_experimental_2021" class="csl-entry" role="doc-biblioentry">
+        Lara-Benítez, Pedro, Manuel Carranza-García, and José C. Riquelme. 2021. <span>“An <span>Experimental</span>
+          <span>Review</span> on <span>Deep</span> <span>Learning</span> <span>Architectures</span> for
+          <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>.”</span> <em>International Journal of Neural Systems</em> 31
+        (03):
+        2130001. <a href="https://doi.org/10.1142/S0129065721300011">https://doi.org/10.1142/S0129065721300011</a>.
+      </div>
+      <div id="ref-li_enhancing_2019" class="csl-entry" role="doc-biblioentry">
+        Li, Shiyang, Xiaoyong Jin, Yao Xuan, et al. 2019. <span>“Enhancing the <span>Locality</span> and
+          <span>Breaking</span> the <span>Memory</span> <span>Bottleneck</span> of <span>Transformer</span> on
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 32. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2019/hash/6775a0635c302542da2c32aa19d86be0-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2019/hash/6775a0635c302542da2c32aa19d86be0-Abstract.html</a>.
+      </div>
+      <div id="ref-li_diffusion_2018" class="csl-entry" role="doc-biblioentry">
+        Li, Yaguang, Rose Yu, Cyrus Shahabi, and Yan Liu. 2018. <span>“Diffusion <span>Convolutional</span>
+          <span>Recurrent</span> <span>Neural</span> <span>Network</span>: <span>Data</span>-<span>Driven</span>
+          <span>Traffic</span> <span>Forecasting</span>.”</span> <em>Proceedings of the <span>Sixth</span>
+          <span>International</span> <span>Conference</span> on <span>Learning</span> <span>Representations</span></em>.
+        <a href="https://openreview.net/forum?id=SJiHXGWAZ">https://openreview.net/forum?id=SJiHXGWAZ</a>.
+      </div>
+      <div id="ref-li_smartformer_2023" class="csl-entry" role="doc-biblioentry">
+        Li, Yiduo, Shiyi Qi, Zhe Li, Zhongwen Rao, Lujia Pan, and Zenglin Xu. 2023. <span>“<span>SMARTformer</span>:
+          <span>Semi</span>-<span>Autoregressive</span> <span>Transformer</span> with <span>Efficient</span>
+          <span>Integrated</span> <span>Window</span> <span>Attention</span> for <span>Long</span> <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Thirty</span>-<span>Second</span> <span>International</span> <span>Joint</span> <span>Conference</span>
+          on
+          <span>Artificial</span> <span>Intelligence</span></em> 3 (August): 2169–2177. <a
+          href="https://doi.org/10.24963/ijcai.2023/241">https://doi.org/10.24963/ijcai.2023/241</a>.
+      </div>
+      <div id="ref-li_transformer-modulated_2023" class="csl-entry" role="doc-biblioentry">
+        Li, Yuxin, Wenchao Chen, Xinyue Hu, Bo Chen, Baolin Sun, and Mingyuan Zhou. 2023.
+        <span>“Transformer-<span>Modulated</span> <span>Diffusion</span> <span>Models</span> for
+          <span>Probabilistic</span> <span>Multivariate</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the <span>Ninth</span> the <span>Twelfth</span>
+          <span>International</span> <span>Conference</span> on <span>Learning</span> <span>Representations</span></em>,
+        October. <a href="https://openreview.net/forum?id=qae04YACHs">https://openreview.net/forum?id=qae04YACHs</a>.
+      </div>
+      <div id="ref-lin_cyclenet_2024" class="csl-entry" role="doc-biblioentry">
+        Lin, Shengsheng, Weiwei Lin, Xinyi Hu, Wentai Wu, Ruichao Mo, and Haocheng Zhong. 2024.
+        <span>“<span>CycleNet</span>: <span>Enhancing</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span> Through <span>Modeling</span> <span>Periodic</span> <span>Patterns</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span> <span>Processing</span> <span>Systems</span></em>
+        37
+        (December): 106315–106345. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/bfe7998398779dde03cad7a73b1f81b6-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/bfe7998398779dde03cad7a73b1f81b6-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-lin_sparsetsf_2024" class="csl-entry" role="doc-biblioentry">
+        Lin, Shengsheng, Weiwei Lin, Wentai Wu, Haojun Chen, and Junjie Yang. 2024. <span>“<span>SparseTSF</span>:
+          <span>Modeling</span> <span>Long</span>-Term <span>Time</span> <span>Series</span> <span>Forecasting</span>
+          with
+          *1k* <span>Parameters</span>.”</span> <em>Proceedings of the 41st <span>International</span>
+          <span>Conference</span> on <span>Machine</span> <span>Learning</span></em>, July, 30211–30226. <a
+          href="https://proceedings.mlr.press/v235/lin24n.html">https://proceedings.mlr.press/v235/lin24n.html</a>.
+      </div>
+      <div id="ref-lin_segrnn_2023" class="csl-entry" role="doc-biblioentry">
+        Lin, Shengsheng, Weiwei Lin, Wentai Wu, Feiyu Zhao, Ruichao Mo, and Haotong Zhang. 2023.
+        <em><span>SegRNN</span>:
+          <span>Segment</span> <span>Recurrent</span> <span>Neural</span> <span>Network</span> for
+          <span>Long</span>-<span>Term</span> <span>Time</span> <span>Series</span> <span>Forecasting</span></em>.
+        arXiv.
+        <a href="https://doi.org/10.48550/arXiv.2308.11200">https://doi.org/10.48550/arXiv.2308.11200</a>.
+      </div>
+      <div id="ref-lin_feature_2017" class="csl-entry" role="doc-biblioentry">
+        Lin, Tsung-Yi, Piotr Dollar, Ross Girshick, Kaiming He, Bharath Hariharan, and Serge Belongie. 2017.
+        <span>“Feature <span>Pyramid</span> <span>Networks</span> for <span>Object</span>
+          <span>Detection</span>.”</span>
+        <em>Proceedings of the <span>IEEE</span> <span>Conference</span> on <span>Computer</span> <span>Vision</span>
+          and
+          <span>Pattern</span> <span>Recognition</span> (<span>CVPR</span>)</em>, July.
+      </div>
+      <div id="ref-liu_pay_2021" class="csl-entry" role="doc-biblioentry">
+        Liu, Hanxiao, Zihang Dai, David So, and Quoc V Le. 2021. <span>“Pay <span>Attention</span> to
+          <span>MLPs</span>.”</span> <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span>
+          <span>Systems</span></em> 34: 9204–9215. <a
+          href="https://proceedings.neurips.cc/paper/2021/hash/4cc05b35c2f937c5bd9e7d41d3686fff-Abstract.html">https://proceedings.neurips.cc/paper/2021/hash/4cc05b35c2f937c5bd9e7d41d3686fff-Abstract.html</a>.
+      </div>
+      <div id="ref-liu_pyraformer_2021" class="csl-entry" role="doc-biblioentry">
+        Liu, Shizhan, Hang Yu, Cong Liao, et al. 2021. <span>“Pyraformer: <span>Low</span>-<span>Complexity</span>
+          <span>Pyramidal</span> <span>Attention</span> for <span>Long</span>-<span>Range</span> <span>Time</span>
+          <span>Series</span> <span>Modeling</span> and <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Tenth</span> <span>International</span> <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=0EXmFzUn5I">https://openreview.net/forum?id=0EXmFzUn5I</a>.
+      </div>
+      <div id="ref-liu_itransformer_2023" class="csl-entry" role="doc-biblioentry">
+        Liu, Yong, Tengge Hu, Haoran Zhang, et al. 2023. <span>“<span class="nocase">iTransformer</span>:
+          <span>Inverted</span> <span>Transformers</span> <span>Are</span> <span>Effective</span> for <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of the <span>Twelfth</span>
+          <span>International</span> <span>Conference</span> on <span>Learning</span> <span>Representations</span></em>,
+        October. <a href="https://openreview.net/forum?id=JePfAI8fah">https://openreview.net/forum?id=JePfAI8fah</a>.
+      </div>
+      <div id="ref-liu_koopa_2023" class="csl-entry" role="doc-biblioentry">
+        Liu, Yong, Chenyu Li, Jianmin Wang, and Mingsheng Long. 2023. <span>“Koopa: <span>Learning</span>
+          <span>Non</span>-Stationary <span>Time</span> <span>Series</span> <span>Dynamics</span> with
+          <span>Koopman</span> <span>Predictors</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 36 (December): 12271–12290. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2023/hash/28b3dc0970fa4624a63278a4268de997-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2023/hash/28b3dc0970fa4624a63278a4268de997-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-liu_autotimes_2024" class="csl-entry" role="doc-biblioentry">
+        Liu, Yong, Guo Qin, Xiangdong Huang, Jianmin Wang, and Mingsheng Long. 2024. <span>“<span>AutoTimes</span>:
+          <span>Autoregressive</span> <span>Time</span> <span>Series</span> <span>Forecasters</span> via
+          <span>Large</span> <span>Language</span> <span>Models</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 37 (December): 122154–122184. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/dcf88cbc8d01ce7309b83d0ebaeb9d29-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/dcf88cbc8d01ce7309b83d0ebaeb9d29-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-long_forecasting_2023" class="csl-entry" role="doc-biblioentry">
+        Long, Bowen, Fangya Tan, and Mark Newman. 2023. <span>“Forecasting the <span>Monkeypox</span>
+          <span>Outbreak</span> <span>Using</span> <span>ARIMA</span>, <span>Prophet</span>, <span>NeuralProphet</span>,
+          and <span>LSTM</span> <span>Models</span> in the <span>United</span> <span>States</span>.”</span>
+        <em>Forecasting</em> 5 (1): 127–137. <a
+          href="https://doi.org/10.3390/forecast5010005">https://doi.org/10.3390/forecast5010005</a>.
+      </div>
+      <div id="ref-lu_cats_2024" class="csl-entry" role="doc-biblioentry">
+        Lu, Jiecheng, Xu Han, Yan Sun, and Shihao Yang. 2024. <span>“<span>CATS</span>: <span>Enhancing</span>
+          <span>Multivariate</span> <span>Time</span> <span>Series</span> <span>Forecasting</span> by
+          <span>Constructing</span> <span>Auxiliary</span> <span>Time</span> <span>Series</span> as
+          <span>Exogenous</span>
+          <span>Variables</span>.”</span> <em>Proceedings of the 41st <span>International</span> <span>Conference</span>
+          on <span>Machine</span> <span>Learning</span></em>, July, 32990–33006. <a
+          href="https://proceedings.mlr.press/v235/lu24d.html">https://proceedings.mlr.press/v235/lu24d.html</a>.
+      </div>
+      <div id="ref-luo_deformabletst_2024" class="csl-entry" role="doc-biblioentry">
+        Luo, Donghao, and Xue Wang. 2024. <span>“<span>DeformableTST</span>: <span>Transformer</span> for
+          <span>Time</span> <span>Series</span> <span>Forecasting</span> Without <span>Over</span>-Reliance on
+          <span>Patching</span>.”</span> <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 37 (December): 88003–88044. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/a0b1082fc7823c4c68abcab4fa850e9c-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/a0b1082fc7823c4c68abcab4fa850e9c-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-ma_u-mixer_2024" class="csl-entry" role="doc-biblioentry">
+        Ma, Xiang, Xuemei Li, Lexin Fang, Tianlong Zhao, and Caiming Zhang. 2024. <span>“U-<span>Mixer</span>:
+          <span>An</span> <span>Unet</span>-<span>Mixer</span> <span>Architecture</span> with <span>Stationarity</span>
+          <span>Correction</span> for <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of the <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 38 (March): 14255–14262. <a
+          href="https://doi.org/10.1609/aaai.v38i13.29337">https://doi.org/10.1609/aaai.v38i13.29337</a>.
+      </div>
+      <div id="ref-mahalakshmi_survey_2016" class="csl-entry" role="doc-biblioentry">
+        Mahalakshmi, G., S. Sridevi, and S. Rajaram. 2016. <span>“A Survey on Forecasting of Time Series Data.”</span>
+        <em>2016 <span>International</span> <span>Conference</span> on <span>Computing</span> <span>Technologies</span>
+          and <span>Intelligent</span> <span>Data</span> <span>Engineering</span> (<span>ICCTIDE</span>’16)</em>,
+        January,
+        1–8. <a href="https://doi.org/10.1109/ICCTIDE.2016.7725358">https://doi.org/10.1109/ICCTIDE.2016.7725358</a>.
+      </div>
+      <div id="ref-nie_time_2022" class="csl-entry" role="doc-biblioentry">
+        Nie, Yuqi, Nam H. Nguyen, Phanwadee Sinthong, and Jayant Kalagnanam. 2022. <span>“A <span>Time</span>
+          <span>Series</span> Is <span>Worth</span> 64 <span>Words</span>: <span>Long</span>-Term
+          <span>Forecasting</span>
+          with <span>Transformers</span>.”</span> <em>Proceedings of the <span>Eleventh</span>
+          <span>International</span>
+          <span>Conference</span> on <span>Learning</span> <span>Representations</span></em>, September. <a
+          href="https://openreview.net/forum?id=Jbdc0vTOcol">https://openreview.net/forum?id=Jbdc0vTOcol</a>.
+      </div>
+      <div id="ref-ning_comparative_2022" class="csl-entry" role="doc-biblioentry">
+        Ning, Yanrui, Hossein Kazemi, and Pejman Tahmasebi. 2022. <span>“A Comparative Machine Learning Study for Time
+          Series Oil Production Forecasting: <span>ARIMA</span>, <span>LSTM</span>, and <span>Prophet</span>.”</span>
+        <em>Computers &amp; Geosciences</em> 164: 105126. https://doi.org/<a
+          href="https://doi.org/10.1016/j.cageo.2022.105126">https://doi.org/10.1016/j.cageo.2022.105126</a>.
+      </div>
+      <div id="ref-oreshkin_n-beats_2019" class="csl-entry" role="doc-biblioentry">
+        Oreshkin, Boris N., Dmitri Carpov, Nicolas Chapados, and Yoshua Bengio. 2019. <span>“N-<span>BEATS</span>:
+          <span>Neural</span> Basis Expansion Analysis for Interpretable Time Series Forecasting.”</span>
+        <em>Proceedings
+          of the <span>Eighth</span> <span>International</span> <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, September. <a
+          href="https://openreview.net/forum?id=r1ecqn4YwB">https://openreview.net/forum?id=r1ecqn4YwB</a>.
+      </div>
+      <div id="ref-piao_fredformer_2024" class="csl-entry" role="doc-biblioentry">
+        Piao, Xihao, Zheng Chen, Taichi Murayama, Yasuko Matsubara, and Yasushi Sakurai. 2024. <span>“Fredformer:
+          <span>Frequency</span> <span>Debiased</span> <span>Transformer</span> for <span>Time</span>
+          <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the 30th <span>ACM</span> <span>SIGKDD</span>
+          <span>Conference</span> on <span>Knowledge</span> <span>Discovery</span> and <span>Data</span>
+          <span>Mining</span></em> (New York, NY, USA), <span>KDD</span> ’24, August, 2400–2410. <a
+          href="https://doi.org/10.1145/3637528.3671928">https://doi.org/10.1145/3637528.3671928</a>.
+      </div>
+      <div id="ref-qin_dual-stage_2017" class="csl-entry" role="doc-biblioentry">
+        Qin, Yao, Dongjin Song, Haifeng Chen, Wei Cheng, Guofei Jiang, and Garrison W. Cottrell. 2017. <span>“A
+          <span>Dual</span>-<span>Stage</span> <span>Attention</span>-<span>Based</span> <span>Recurrent</span>
+          <span>Neural</span> <span>Network</span> for <span>Time</span> <span>Series</span>
+          <span>Prediction</span>.”</span> <em>Proceedings of the <span>Twenty</span>-<span>Sixth</span>
+          <span>International</span> <span>Joint</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span>, <span>IJCAI</span>-17</em>, 2627–2633. <a
+          href="https://doi.org/10.24963/ijcai.2017/366">https://doi.org/10.24963/ijcai.2017/366</a>.
+      </div>
+      <div id="ref-rasul_autoregressive_2021" class="csl-entry" role="doc-biblioentry">
+        Rasul, Kashif, Calvin Seward, Ingmar Schuster, and Roland Vollgraf. 2021. <span>“Autoregressive
+          <span>Denoising</span> <span>Diffusion</span> <span>Models</span> for <span>Multivariate</span>
+          <span>Probabilistic</span> <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of the 38th <span>International</span> <span>Conference</span> on <span>Machine</span>
+          <span>Learning</span></em>, July, 8857–8868. <a
+          href="https://proceedings.mlr.press/v139/rasul21a.html">https://proceedings.mlr.press/v139/rasul21a.html</a>.
+      </div>
+      <div id="ref-ronneberger_u-net_2015" class="csl-entry" role="doc-biblioentry">
+        Ronneberger, Olaf, Philipp Fischer, and Thomas Brox. 2015. <span>“U-<span>Net</span>: <span>Convolutional</span>
+          <span>Networks</span> for <span>Biomedical</span> <span>Image</span> <span>Segmentation</span>.”</span> In
+        <em>Medical <span>Image</span> <span>Computing</span> and <span>Computer</span>-<span>Assisted</span>
+          <span>Intervention</span> – <span>MICCAI</span> 2015</em>, edited by Nassir Navab, Joachim Hornegger, William
+        M.
+        Wells, and Alejandro F. Frangi. Springer International Publishing. <a
+          href="https://doi.org/10.1007/978-3-319-24574-4_28">https://doi.org/10.1007/978-3-319-24574-4_28</a>.
+      </div>
+      <div id="ref-salinas_deepar_2020" class="csl-entry" role="doc-biblioentry">
+        Salinas, David, Valentin Flunkert, Jan Gasthaus, and Tim Januschowski. 2020. <span>“<span>DeepAR</span>:
+          <span>Probabilistic</span> Forecasting with Autoregressive Recurrent Networks.”</span> <em>International
+          Journal
+          of Forecasting</em> 36 (3): 1181–1191. <a
+          href="https://doi.org/10.1016/j.ijforecast.2019.07.001">https://doi.org/10.1016/j.ijforecast.2019.07.001</a>.
+      </div>
+      <div id="ref-sen_think_2019" class="csl-entry" role="doc-biblioentry">
+        Sen, Rajat, Hsiang-Fu Yu, and Inderjit S Dhillon. 2019. <span>“Think <span>Globally</span>, <span>Act</span>
+          <span>Locally</span>: <span>A</span> <span>Deep</span> <span>Neural</span> <span>Network</span>
+          <span>Approach</span> to <span>High</span>-<span>Dimensional</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 32. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2019/hash/3a0844cee4fcf57de0c71e9ad3035478-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2019/hash/3a0844cee4fcf57de0c71e9ad3035478-Abstract.html</a>.
+      </div>
+      <div id="ref-shang_ada-mshyper_2024" class="csl-entry" role="doc-biblioentry">
+        Shang, Zongjiang, Ling Chen, Binqing Wu, and Dongliang Cui. 2024. <span>“Ada-<span>MSHyper</span>:
+          <span>Adaptive</span> <span>Multi</span>-<span>Scale</span> <span>Hypergraph</span> <span>Transformer</span>
+          for
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span> <span>Systems</span></em> 37 (December): 33310–33337. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/3a6935d11910d6f9142b0a1e36fc6753-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/3a6935d11910d6f9142b0a1e36fc6753-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-shen_take_2024" class="csl-entry" role="doc-biblioentry">
+        Shen, Li, Yuning Wei, Yangzhu Wang, and Huaxin Qiu. 2024. <span>“Take an <span>Irregular</span>
+          <span>Route</span>: <span>Enhance</span> the <span>Decoder</span> of <span>Time</span>-<span>Series</span>
+          <span>Forecasting</span> <span>Transformer</span>.”</span> <em>IEEE Internet of Things Journal</em> 11 (8):
+        14344–14356. <a href="https://doi.org/10.1109/JIOT.2023.3341099">https://doi.org/10.1109/JIOT.2023.3341099</a>.
+      </div>
+      <div id="ref-sun_fredo_2022" class="csl-entry" role="doc-biblioentry">
+        Sun, Fan-Keng, and Duane S. Boning. 2022. <em><span>FreDo</span>: <span>Frequency</span>
+          <span>Domain</span>-Based
+          <span>Long</span>-<span>Term</span> <span>Time</span> <span>Series</span> <span>Forecasting</span></em>.
+        arXiv.
+        <a href="https://doi.org/10.48550/arXiv.2205.12301">https://doi.org/10.48550/arXiv.2205.12301</a>.
+      </div>
+      <div id="ref-sutskever_sequence_2014" class="csl-entry" role="doc-biblioentry">
+        Sutskever, Ilya, Oriol Vinyals, and Quoc V. Le. 2014. <span>“Sequence to <span>Sequence</span>
+          <span>Learning</span> with <span>Neural</span> <span>Networks</span>.”</span> <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span> <span>Systems</span></em> 27. <a
+          href="https://papers.nips.cc/paper_files/paper/2014/hash/5a18e133cbf9f257297f410bb7eca942-Abstract.html">https://papers.nips.cc/paper_files/paper/2014/hash/5a18e133cbf9f257297f410bb7eca942-Abstract.html</a>.
+      </div>
+      <div id="ref-szegedy_going_2015" class="csl-entry" role="doc-biblioentry">
+        Szegedy, Christian, Wei Liu, Yangqing Jia, et al. 2015. <span>“Going Deeper with Convolutions.”</span> <em>2015
+          <span>IEEE</span> <span>Conference</span> on <span>Computer</span> <span>Vision</span> and
+          <span>Pattern</span>
+          <span>Recognition</span> (<span>CVPR</span>)</em>, June, 1–9. <a
+          href="https://doi.org/10.1109/CVPR.2015.7298594">https://doi.org/10.1109/CVPR.2015.7298594</a>.
+      </div>
+      <div id="ref-taieb_bias_2016" class="csl-entry" role="doc-biblioentry">
+        Taieb, Souhaib Ben, and Amir F. Atiya. 2016. <span>“A <span>Bias</span> and <span>Variance</span>
+          <span>Analysis</span> for <span>Multistep</span>-<span>Ahead</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>IEEE Transactions on Neural Networks and Learning Systems</em> 27 (1):
+        62–76. <a href="https://doi.org/10.1109/TNNLS.2015.2411629">https://doi.org/10.1109/TNNLS.2015.2411629</a>.
+      </div>
+      <div id="ref-taylor_forecasting_2018" class="csl-entry" role="doc-biblioentry">
+        Taylor, Sean J., and Benjamin Letham. 2018. <span>“Forecasting at <span>Scale</span>.”</span> <em>The American
+          Statistician</em> 72 (1): 37–45. <a
+          href="https://doi.org/10.1080/00031305.2017.1380080">https://doi.org/10.1080/00031305.2017.1380080</a>.
+      </div>
+      <div id="ref-tiao_advances_1994" class="csl-entry" role="doc-biblioentry">
+        Tiao, George C., and Ruey S. Tsay. 1994. <span>“Some Advances in Non-Linear and Adaptive Modelling in
+          Time-Series.”</span> <em>Journal of Forecasting</em> 13 (2): 109–131. <a
+          href="https://doi.org/10.1002/for.3980130206">https://doi.org/10.1002/for.3980130206</a>.
+      </div>
+      <div id="ref-tolstikhin_mlp-mixer_2021" class="csl-entry" role="doc-biblioentry">
+        Tolstikhin, Ilya O, Neil Houlsby, Alexander Kolesnikov, et al. 2021. <span>“<span>MLP</span>-<span>Mixer</span>:
+          <span>An</span> All-<span>MLP</span> <span>Architecture</span> for <span>Vision</span>.”</span> <em>Advances
+          in
+          <span>Neural</span> <span>Information</span> <span>Processing</span> <span>Systems</span></em> 34:
+        24261–24272.
+        <a
+          href="https://proceedings.neurips.cc/paper/2021/hash/cba0a4ee5ccd02fda0fe3f9a3e7b89fe-Abstract.html">https://proceedings.neurips.cc/paper/2021/hash/cba0a4ee5ccd02fda0fe3f9a3e7b89fe-Abstract.html</a>.
+      </div>
+      <div id="ref-touvron_resmlp_2023" class="csl-entry" role="doc-biblioentry">
+        Touvron, Hugo, Piotr Bojanowski, Mathilde Caron, et al. 2023. <span>“<span>ResMLP</span>:
+          <span>Feedforward</span>
+          <span>Networks</span> for <span>Image</span> <span>Classification</span> <span>With</span>
+          <span>Data</span>-<span>Efficient</span> <span>Training</span>.”</span> <em>IEEE Transactions on Pattern
+          Analysis and Machine Intelligence</em> 45 (4): 5314–5321. <a
+          href="https://doi.org/10.1109/TPAMI.2022.3206148">https://doi.org/10.1109/TPAMI.2022.3206148</a>.
+      </div>
+      <div id="ref-van_den_oord_wavenet_2016" class="csl-entry" role="doc-biblioentry">
+        Van den Oord, Aaron, Sander Dieleman, Heiga Zen, et al. 2016. <em><span>WaveNet</span>: <span>A</span>
+          <span>Generative</span> <span>Model</span> for <span>Raw</span> <span>Audio</span></em>. arXiv. <a
+          href="https://doi.org/10.48550/arXiv.1609.03499">https://doi.org/10.48550/arXiv.1609.03499</a>.
+      </div>
+      <div id="ref-vaswani_attention_2017" class="csl-entry" role="doc-biblioentry">
+        Vaswani, Ashish, Noam Shazeer, Niki Parmar, et al. 2017. <span>“Attention Is <span>All</span> You
+          <span>Need</span>.”</span> <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span>
+          <span>Systems</span></em> 30. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html</a>.
+      </div>
+      <div id="ref-wang_micn_2022" class="csl-entry" role="doc-biblioentry">
+        Wang, Huiqiang, Jian Peng, Feihu Huang, Jince Wang, Junhui Chen, and Yifei Xiao. 2022. <span>“<span>MICN</span>:
+          <span>Multi</span>-Scale <span>Local</span> and <span>Global</span> <span>Context</span> <span>Modeling</span>
+          for <span>Long</span>-Term <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Eleventh</span> <span>International</span> <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, September. <a
+          href="https://openreview.net/forum?id=zt53IDUR1U">https://openreview.net/forum?id=zt53IDUR1U</a>.
+      </div>
+      <div id="ref-wang_timemixer_2023" class="csl-entry" role="doc-biblioentry">
+        Wang, Shiyu, Haixu Wu, Xiaoming Shi, et al. 2023. <span>“<span>TimeMixer</span>: <span>Decomposable</span>
+          <span>Multiscale</span> <span>Mixing</span> for <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the <span>Twelfth</span> <span>International</span>
+          <span>Conference</span> on <span>Learning</span> <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=7oLshfEIC2">https://openreview.net/forum?id=7oLshfEIC2</a>.
+      </div>
+      <div id="ref-wang_card_2023" class="csl-entry" role="doc-biblioentry">
+        Wang, Xue, Tian Zhou, Qingsong Wen, Jinyang Gao, Bolin Ding, and Rong Jin. 2023. <span>“<span>CARD</span>:
+          <span>Channel</span> <span>Aligned</span> <span>Robust</span> <span>Blend</span> <span>Transformer</span> for
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Twelfth</span> <span>International</span> <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=MJksrOhurE">https://openreview.net/forum?id=MJksrOhurE</a>.
+      </div>
+      <div id="ref-weiss_multi-step_1991" class="csl-entry" role="doc-biblioentry">
+        Weiss, Andrew A. 1991. <span>“Multi-Step Estimation and Forecasting in Dynamic Models.”</span> <em>Journal of
+          Econometrics</em> 48 (1): 135–149. <a
+          href="https://doi.org/10.1016/0304-4076(91)90035-C">https://doi.org/10.1016/0304-4076(91)90035-C</a>.
+      </div>
+      <div id="ref-wen_transformers_2023" class="csl-entry" role="doc-biblioentry">
+        Wen, Qingsong, Tian Zhou, Chaoli Zhang, et al. 2023. <span>“Transformers in <span>Time</span>
+          <span>Series</span>:
+          <span>A</span> <span>Survey</span>.”</span> <em>Proceedings of the <span>Thirty</span>-<span>Second</span>
+          <span>International</span> <span>Joint</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 6 (August): 6778–6786. <a
+          href="https://doi.org/10.24963/ijcai.2023/759">https://doi.org/10.24963/ijcai.2023/759</a>.
+      </div>
+      <div id="ref-wen_deep_2019" class="csl-entry" role="doc-biblioentry">
+        Wen, Ruofeng, and Kari Torkkola. 2019. <span>“Deep <span>Generative</span>
+          <span>Quantile</span>-<span>Copula</span> <span>Models</span> for <span>Probabilistic</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the <span>Time</span> <span>Series</span>
+          <span>Workshop</span> at 36th <span>International</span> <span>Conference</span> on <span>Machine</span>
+          <span>Learning</span></em> (Long Beach, California), July.
+      </div>
+      <div id="ref-wen_multi-horizon_2018" class="csl-entry" role="doc-biblioentry">
+        Wen, Ruofeng, Kari Torkkola, Balakrishnan Narayanaswamy, and Dhruv Madeka. 2018. <span>“A
+          <span>Multi</span>-<span>Horizon</span> <span>Quantile</span> <span>Recurrent</span>
+          <span>Forecaster</span>.”</span> <em>Time <span>Series</span> <span>Workshop</span> at 31st
+          <span>Conference</span> on <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> (Long Beach, California).
+      </div>
+      <div id="ref-wu_timesnet_2022" class="csl-entry" role="doc-biblioentry">
+        Wu, Haixu, Tengge Hu, Yong Liu, Hang Zhou, Jianmin Wang, and Mingsheng Long. 2022. <span>“<span>TimesNet</span>:
+          <span>Temporal</span> <span>2d</span>-<span>Variation</span> <span>Modeling</span> for <span>General</span>
+          <span>Time</span> <span>Series</span> <span>Analysis</span>.”</span> <em>Proceedings of the
+          <span>Eleventh</span> <span>International</span> <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, September. <a
+          href="https://openreview.net/forum?id=ju_Uqw384Oq">https://openreview.net/forum?id=ju_Uqw384Oq</a>.
+      </div>
+      <div id="ref-wu_autoformer_2021" class="csl-entry" role="doc-biblioentry">
+        Wu, Haixu, Jiehui Xu, Jianmin Wang, and Mingsheng Long. 2021. <span>“Autoformer: <span>Decomposition</span>
+          <span>Transformers</span> with <span>Auto</span>-<span>Correlation</span> for
+          <span>Long</span>-<span>Term</span> <span>Series</span> <span>Forecasting</span>.”</span> In <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span> <span>Systems</span></em>, edited by M.
+        Ranzato, A. Beygelzimer, Y. Dauphin, P. S. Liang, and J. Wortman Vaughan, vol. 34, 34. Curran Associates, Inc.
+        <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2021/file/bcc0d400288793e8bdcd7c19a8ac0c2b-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2021/file/bcc0d400288793e8bdcd7c19a8ac0c2b-Paper.pdf</a>.
+      </div>
+      <div id="ref-xu_fits_2023" class="csl-entry" role="doc-biblioentry">
+        Xu, Zhijian, Ailing Zeng, and Qiang Xu. 2023. <span>“<span>FITS</span>: <span>Modeling</span> <span>Time</span>
+          <span>Series</span> with $10k$ <span>Parameters</span>.”</span> <em>Proceedings of the <span>Twelfth</span>
+          <span>International</span> <span>Conference</span> on <span>Learning</span> <span>Representations</span></em>,
+        October. <a href="https://openreview.net/forum?id=bWcnvZ3qMb">https://openreview.net/forum?id=bWcnvZ3qMb</a>.
+      </div>
+      <div id="ref-yi_frequency-domain_2023" class="csl-entry" role="doc-biblioentry">
+        Yi, Kun, Qi Zhang, Wei Fan, et al. 2023. <span>“Frequency-Domain <span>MLPs</span> Are <span>More</span>
+          <span>Effective</span> <span>Learners</span> in <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 36 (December): 76656–76679. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2023/hash/f1d16af76939f476b5f040fd1398c0a3-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2023/hash/f1d16af76939f476b5f040fd1398c0a3-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-zeng_are_2023" class="csl-entry" role="doc-biblioentry">
+        Zeng, Ailing, Muxi Chen, Lei Zhang, and Qiang Xu. 2023. <span>“Are <span>Transformers</span>
+          <span>Effective</span> for <span>Time</span> <span>Series</span> <span>Forecasting</span>?”</span>
+        <em>Proceedings of the <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 37 (June): 11121–11128. <a
+          href="https://doi.org/10.1609/aaai.v37i9.26317">https://doi.org/10.1609/aaai.v37i9.26317</a>.
+      </div>
+      <div id="ref-zhang_less_2022" class="csl-entry" role="doc-biblioentry">
+        Zhang, Tianping, Yizhuo Zhang, Wei Cao, et al. 2022. <em>Less <span>Is</span> <span>More</span>:
+          <span>Fast</span>
+          <span>Multivariate</span> <span>Time</span> <span>Series</span> <span>Forecasting</span> with
+          <span>Light</span>
+          <span>Sampling</span>-Oriented <span>MLP</span> <span>Structures</span></em>. arXiv. <a
+          href="https://doi.org/10.48550/arXiv.2207.01186">https://doi.org/10.48550/arXiv.2207.01186</a>.
+      </div>
+      <div id="ref-zhang_crossformer_2022" class="csl-entry" role="doc-biblioentry">
+        Zhang, Yunhao, and Junchi Yan. 2022. <span>“Crossformer: <span>Transformer</span> <span>Utilizing</span>
+          <span>Cross</span>-<span>Dimension</span> <span>Dependency</span> for <span>Multivariate</span>
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Eleventh</span> <span>International</span> <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, September. <a
+          href="https://openreview.net/forum?id=vSVLM2j9eie">https://openreview.net/forum?id=vSVLM2j9eie</a>.
+      </div>
+      <div id="ref-zhou_scat_2024" class="csl-entry" role="doc-biblioentry">
+        Zhou, Chengjie, Chao Che, Pengfei Wang, and Qiang Zhang. 2024. <span>“<span>SCAT</span>: <span>A</span>
+          <span>Time</span> <span>Series</span> <span>Forecasting</span> with <span>Spectral</span> <span>Central</span>
+          <span>Alternating</span> <span>Transformers</span>.”</span> <em>Proceedings of the
+          <span>Thirty</span>-<span>Third</span> <span>International</span> <span>Joint</span> <span>Conference</span>
+          on
+          <span>Artificial</span> <span>Intelligence</span></em> 6 (August): 5626–5634. <a
+          href="https://doi.org/10.24963/ijcai.2024/622">https://doi.org/10.24963/ijcai.2024/622</a>.
+      </div>
+      <div id="ref-zhou_informer_2021" class="csl-entry" role="doc-biblioentry">
+        Zhou, Haoyi, Shanghang Zhang, Jieqi Peng, et al. 2021. <span>“Informer: <span>Beyond</span>
+          <span>Efficient</span>
+          <span>Transformer</span> for <span>Long</span> <span>Sequence</span> <span>Time</span>-<span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the <span>AAAI</span> <span>Conference</span> on
+          <span>Artificial</span> <span>Intelligence</span></em> 35 (May): 11106–11115. <a
+          href="https://doi.org/10.1609/aaai.v35i12.17325">https://doi.org/10.1609/aaai.v35i12.17325</a>.
+      </div>
+      <div id="ref-zhou_fedformer_2022" class="csl-entry" role="doc-biblioentry">
+        Zhou, Tian, Ziqing Ma, Qingsong Wen, Xue Wang, Liang Sun, and Rong Jin. 2022. <span>“<span>FEDformer</span>:
+          <span>Frequency</span> <span>Enhanced</span> <span>Decomposed</span> <span>Transformer</span> for
+          <span>Long</span>-Term <span>Series</span> <span>Forecasting</span>.”</span> In <em>Proceedings of the 39th
+          <span>International</span> <span>Conference</span> on <span>Machine</span> <span>Learning</span></em>, edited
+        by
+        Kamalika Chaudhuri, Stefanie Jegelka, Le Song, Csaba Szepesvari, Gang Niu, and Sivan Sabato, vol. 162, 162.
+        Proceedings of <span>Machine</span> <span>Learning</span> <span>Research</span>. PMLR. <a
+          href="https://proceedings.mlr.press/v162/zhou22g.html">https://proceedings.mlr.press/v162/zhou22g.html</a>.
+      </div>
+      <div id="ref-zhou_sdformer_2024" class="csl-entry" role="doc-biblioentry">
+        Zhou, Ziyu, Gengyu Lyu, Yiming Huang, Zihao Wang, Ziyu Jia, and Zhen Yang. 2024. <span>“<span>SDformer</span>:
+          <span>Transformer</span> with <span>Spectral</span> <span>Filter</span> and <span>Dynamic</span>
+          <span>Attention</span> for <span>Multivariate</span> <span>Time</span> <span>Series</span>
+          <span>Long</span>-Term <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Thirty</span>-<span>Third</span> <span>International</span> <span>Joint</span> <span>Conference</span>
+          on
+          <span>Artificial</span> <span>Intelligence</span></em> 6 (August): 5689–5697. <a
+          href="https://doi.org/10.24963/ijcai.2024/629">https://doi.org/10.24963/ijcai.2024/629</a>.
+      </div>
+    </div>
+  </main>
+  <script src="../js/sidebar.js"></script>
+  <script src="../scripts.js"></script>
+</body>
+
+</html>

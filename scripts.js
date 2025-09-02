@@ -558,3 +558,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         timelineGrid.innerHTML = '<p style="text-align: center; color: #666;">Failed to load timeline data.</p>';
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const toc = document.getElementById('toc');
+    if (!toc) return;
+
+    // Select all h4 and h5 headings inside main content
+    const headings = document.querySelectorAll('.main-content h2, .main-content h4, .main-content h5');
+
+    headings.forEach(heading => {
+        // Ensure the heading has an ID
+        if (!heading.id) {
+            heading.id = heading.textContent.trim().replace(/\s+/g, '-').toLowerCase();
+        }
+
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+
+        a.href = `#${heading.id}`;
+        a.textContent = heading.textContent;
+
+        // Optional: indent h5 entries
+        if (heading.tagName === 'H5') {
+            li.style.marginLeft = '1.5rem';
+        }
+
+        li.appendChild(a);
+        toc.appendChild(li);
+    });
+});

@@ -3,18 +3,18 @@ function createSidebar() {
     return `
         <button class="menu-toggle">☰</button>
         <div class="profile">
-            <img src="profile_pic.jpg" alt="Profile Picture" class="profile-pic">
+            <img src="/img/profile_pic.jpg" alt="Profile Picture" class="profile-pic">
             <h1>Kai Ref</h1>
             <p class="rotating-text">Problem Solver</p>
         </div>
         <nav>
             <ul>
-                <li><a href="index.html" data-page="home">Home</a></li>
-                <li><a href="about.html" data-page="about">About</a></li>
-                <li><a href="portfolio.html" data-page="portfolio">Experience</a></li>
-                <li><a href="projects.html" data-page="projects">Projects</a></li>
-                <li><a href="blog.html" data-page="blog">Blog</a></li>
-                <li><a href="contact.html" data-page="contact">Contact</a></li>
+                <li><a href="/index.html" data-page="home">Home</a></li>
+                <li><a href="/about.html" data-page="about">About</a></li>
+                <li><a href="/portfolio.html" data-page="portfolio">Experience</a></li>
+                <li><a href="/projects.html" data-page="projects">Projects</a></li>
+                <li><a href="/blog.html" data-page="blog">Blog</a></li>
+                <li><a href="/contact.html" data-page="contact">Contact</a></li>
             </ul>
         </nav>
         <div class="contact-links">
