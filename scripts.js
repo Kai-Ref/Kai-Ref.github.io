@@ -1,13 +1,21 @@
 // -------------------- Contact Form --------------------
+// const contactForm = document.getElementById('contact-form');
+// if (contactForm) {
+//     contactForm.addEventListener('submit', function (e) {
+//         e.preventDefault();
+//         const name = this.name.value;
+//         const email = this.email.value;
+//         const message = this.message.value;
+
+//         console.log({ name, email, message });
+//         const responseEl = document.getElementById('form-response');
+//         if (responseEl) responseEl.textContent = "Thank you! Your message has been sent.";
+//         this.reset();
+//     });
+// }
 const contactForm = document.getElementById('contact-form');
 if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const name = this.name.value;
-        const email = this.email.value;
-        const message = this.message.value;
-
-        console.log({ name, email, message });
+    contactForm.addEventListener('submit', function () {
         const responseEl = document.getElementById('form-response');
         if (responseEl) responseEl.textContent = "Thank you! Your message has been sent.";
         this.reset();
