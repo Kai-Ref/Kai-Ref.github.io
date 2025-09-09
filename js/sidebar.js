@@ -1,6 +1,6 @@
 // -------------------- Rotating Text --------------------
 function startRotatingText() {
-    const rotatingTexts = ["Time Series Enthusiast", "Data Scientist", "ML Engineer", "Computer Visioneer", "AI Developer", "Tech Blogger", "Problem Solver"];
+    const rotatingTexts = ["Time Series Enthusiast", "Pfalzkind", "ML Engineer", "Computer Visioneer", "Werder Bremen Fan"];
     let index = 0;
     const rotatingElement = document.querySelector('.rotating-text');
 
