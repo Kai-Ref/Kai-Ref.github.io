@@ -18,7 +18,7 @@ function createSidebar() {
         <button class="menu-toggle">☰</button>
         <div class="profile">
             <img src="/img/profile_pics/profile_pic.jpg" alt="Profile Picture" class="profile-pic">
-            <h1>Kai Ref</h1>
+            <h1>Kai Reffert</h1>
             <p class="rotating-text">Time Series Enthusiast</p>
         </div>
         <nav>
