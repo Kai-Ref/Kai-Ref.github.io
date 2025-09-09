@@ -853,6 +853,27 @@ nav a.active::before {
     box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
 }
 
+.form-response {
+    font-size: 1.5rem;
+    /* Bigger text */
+    font-weight: 600;
+    /* Bold */
+    color: #00bcd4;
+    /* Nice blue, can change */
+    margin-top: 1rem;
+    /* Space from form */
+    text-align: center;
+    /* Centered */
+    opacity: 0;
+    /* Start invisible */
+    transition: opacity 0.5s ease;
+}
+
+.form-response.show {
+    opacity: 1;
+    /* Fade in */
+}
+
 .submit-button {
     background: var(--primary-color);
     color: white;

@@ -1,26 +1,30 @@
 // -------------------- Contact Form --------------------
-// const contactForm = document.getElementById('contact-form');
-// if (contactForm) {
-//     contactForm.addEventListener('submit', function (e) {
-//         e.preventDefault();
-//         const name = this.name.value;
-//         const email = this.email.value;
-//         const message = this.message.value;
-
-//         console.log({ name, email, message });
-//         const responseEl = document.getElementById('form-response');
-//         if (responseEl) responseEl.textContent = "Thank you! Your message has been sent.";
-//         this.reset();
-//     });
-// }
 const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-    contactForm.addEventListener('submit', function () {
-        const responseEl = document.getElementById('form-response');
-        if (responseEl) responseEl.textContent = "Thank you! Your message has been sent.";
-        this.reset();
-    });
-}
+contactForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const responseEl = document.getElementById('form-response');
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+            responseEl.textContent = "Thank you! Your message has been sent.";
+            responseEl.classList.add('show');   // Add class to fade in
+            this.reset();
+        } else {
+            responseEl.textContent = "Oops! Something went wrong.";
+            responseEl.classList.add('show');
+        }
+    } catch (err) {
+        responseEl.textContent = "Network error!";
+        responseEl.classList.add('show');
+    }
+});
 
 // -------------------- Dynamic Blog List --------------------
 async function loadBlogPosts() {
@@ -79,23 +83,23 @@ if (document.getElementById('projects-grid')) {
 
 // -------------------- Enhanced Contact Form --------------------
 // const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const name = this.name.value;
-        const email = this.email.value;
-        const subject = this.subject.value;
-        const message = this.message.value;
+// if (contactForm) {
+//     contactForm.addEventListener('submit', function (e) {
+//         e.preventDefault();
+//         const name = this.name.value;
+//         const email = this.email.value;
+//         const subject = this.subject.value;
+//         const message = this.message.value;
 
-        console.log({ name, email, subject, message });
-        const responseEl = document.getElementById('form-response');
-        if (responseEl) {
-            responseEl.textContent = "Thank you! Your message has been sent.";
-            responseEl.classList.add('show');
-        }
-        this.reset();
-    });
-}
+//         console.log({ name, email, subject, message });
+//         const responseEl = document.getElementById('form-response');
+//         if (responseEl) {
+//             responseEl.textContent = "Thank you! Your message has been sent.";
+//             responseEl.classList.add('show');
+//         }
+//         this.reset();
+//     });
+// }
 
 // -------------------- Timeline Scroll Progress --------------------
 document.addEventListener("scroll", () => {
