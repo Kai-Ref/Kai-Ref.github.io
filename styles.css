@@ -675,6 +675,144 @@ nav a.active::before {
     color: var(--text-primary);
 }
 
+/* ---------------- Personal Section ---------------- */
+/* ---------------- Hobbies / Chips ---------------- */
+.hobbies-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.hobbies-list span {
+    background: var(--primary-color, #4f46e5);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+}
+
+.hobbies-list span:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.hobbies-list span img {
+    width: 20px;
+    /* adjust the size of the GIF */
+    height: 20px;
+    margin-right: 0.5rem;
+    /* space between GIF and text */
+    vertical-align: middle;
+    /* align with text */
+}
+
+.personal-section {
+    margin-top: 4rem;
+    padding: 2rem;
+    background: var(--bg-tertiary, #f9f9f9);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light, 0 2px 10px rgba(0, 0, 0, 0.05));
+}
+
+.personal-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+/* Photo Grid */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    justify-items: center;
+}
+
+.photo-grid img {
+    width: 100%;
+    max-width: 200px;
+    border-radius: 15px;
+    object-fit: cover;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.photo-slide {
+    position: relative;
+    width: 100%;
+    max-width: 200px;
+    border-radius: 15px;
+    overflow: hidden;
+
+    /* NEW */
+    aspect-ratio: 4 / 8;
+    /* width / height ratio */
+}
+
+
+
+.photo-slide img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+/* Landscape images: fill width (like you wanted) */
+.photo-slide img.landscape {
+    width: 100%;
+    /* height: auto; */
+    object-fit: cover;
+}
+
+
+.photo-slide img.active {
+    opacity: 1;
+}
+
+
+.photo-grid img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Hobbies List Styling */
+.personal-section ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+}
+
+.personal-section ul li {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Optional: Add subtle separation line */
+.personal-section::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: var(--primary-color);
+    margin: 0 auto 2rem auto;
+    border-radius: 2px;
+}
+
+
 /* ===========================
    CONTACT PAGE STYLES
    =========================== */

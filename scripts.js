@@ -1,15 +1,3 @@
-// -------------------- Rotating Text --------------------
-const rotatingTexts = ["Problem Solver", "Leader", "Innovator", "Developer", "Data Scientist"];
-let index = 0;
-const rotatingElement = document.querySelector('.rotating-text');
-
-if (rotatingElement) {
-    setInterval(() => {
-        index = (index + 1) % rotatingTexts.length;
-        rotatingElement.textContent = rotatingTexts[index];
-    }, 3000);
-}
-
 // -------------------- Contact Form --------------------
 const contactForm = document.getElementById('contact-form');
 if (contactForm) {
@@ -587,3 +575,55 @@ document.addEventListener('DOMContentLoaded', function () {
         toc.appendChild(li);
     });
 });
+
+const slides = document.querySelectorAll('.photo-slide');
+
+slides.forEach(slide => {
+    const images = slide.querySelectorAll('img');
+    let current = 0;
+
+    if (images.length > 1) {
+        images[current].classList.add('active');
+
+        setInterval(() => {
+            images[current].classList.remove('active');
+            current = (current + 1) % images.length;
+            images[current].classList.add('active');
+        }, 4000); // 5000ms = 5s
+    } else {
+        images[0].classList.add('active'); // single image stays visible
+    }
+});
+
+document.querySelectorAll('.photo-slide img').forEach(img => {
+    img.addEventListener('load', () => {
+        if (img.naturalHeight > img.naturalWidth) {
+            img.classList.add('portrait');
+        } else {
+            img.classList.add('landscape');
+        }
+    });
+});
+
+// List of profile pictures
+const profilePics = [
+    "img/profile_pics/1.jpg",
+    "img/profile_pics/2.jpg",
+    "img/profile_pics/3.jpg",
+    "img/profile_pics/4.jpeg",
+    "img/profile_pics/5.jpeg",
+    "img/profile_pics/6.jpeg",
+    "img/profile_pics/7.jpeg",
+    "img/profile_pics/8.jpeg",
+    "img/profile_pics/9.jpeg"
+];
+
+let currentPic = 0;
+const profileImg = document.getElementById("profile-pic");
+
+// Change picture every 5 seconds
+setInterval(() => {
+    currentPic = (currentPic + 1) % profilePics.length;
+    profileImg.src = profilePics[currentPic];
+}, 5000);
+

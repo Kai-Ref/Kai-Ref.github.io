@@ -3,7 +3,7 @@
         "title": "Long-Term Time Series Forecasting",
         "author": "Kai Reffert",
         "date": "2025-07-14",
-        "readTime": "12 min read",
+        "readTime": "15 min read",
         "image": "posts/LTSF.jpg",
         "tags": [
             "LTSF",
@@ -11,5 +11,18 @@
         ],
         "summary": "Literature review of recent SOTA LTSF research.",
         "link": "ltsf.html"
+    },
+    {
+        "title": "Probabilistic Time Series Forecasting",
+        "author": "Kai Reffert",
+        "date": "2025-07-14",
+        "readTime": "15 min read",
+        "image": "posts/ptsf.png",
+        "tags": [
+            "Probabilistic TSF",
+            "Literature Review"
+        ],
+        "summary": "Literature review of recent SOTA Probabilistic TSF research.",
+        "link": "ptsf.html"
     }
 ]

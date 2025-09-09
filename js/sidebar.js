@@ -1,11 +1,25 @@
+// -------------------- Rotating Text --------------------
+function startRotatingText() {
+    const rotatingTexts = ["Time Series Enthusiast", "Data Scientist", "ML Engineer", "Computer Visioneer", "AI Developer", "Tech Blogger", "Problem Solver"];
+    let index = 0;
+    const rotatingElement = document.querySelector('.rotating-text');
+
+    if (rotatingElement) {
+        setInterval(() => {
+            index = (index + 1) % rotatingTexts.length;
+            rotatingElement.textContent = rotatingTexts[index];
+        }, 3000);
+    }
+}
+
 // Sidebar component generator
 function createSidebar() {
     return `
         <button class="menu-toggle">☰</button>
         <div class="profile">
-            <img src="/img/profile_pic.jpg" alt="Profile Picture" class="profile-pic">
+            <img src="/img/profile_pics/profile_pic.jpg" alt="Profile Picture" class="profile-pic">
             <h1>Kai Ref</h1>
-            <p class="rotating-text">Problem Solver</p>
+            <p class="rotating-text">Time Series Enthusiast</p>
         </div>
         <nav>
             <ul>
@@ -62,6 +76,9 @@ function initializeSidebar() {
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('open');
         });
+
+        // ✅ Start rotating text AFTER sidebar is rendered
+        startRotatingText();
     }
 }
 

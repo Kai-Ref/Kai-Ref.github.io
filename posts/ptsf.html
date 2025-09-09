@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Kai Reffert" />
+  <meta name="dcterms.date" content="2025-07-14" />
+  <link rel="stylesheet" href="posts.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+</head>
+
+<body data-page="blog">
+  <!-- Sidebar -->
+  <aside class="sidebar"></aside>
+  <!-- Main Content -->
+  <main class="main-content">
+    <header id="title-block-header">
+      <h1 class="title">Probabilistic Time Series Forecasting</h1>
+      <p class="author">Kai Reffert</p>
+      <p class="date">July 14, 2025</p>
+    </header>
+    <!-- Table of Contents -->
+    <div id="toc" class="toc-container">
+      <ul class="toc"></ul>
+    </div>
+    <h2 id="sec:related_work_PF">Related Work on Probabilistic
+      Forecasting</h2>
+    <p>Traditionally, point or single-valued forecasting methods have been
+      among the most common forecasting techniques due to their simplicity
+      <span class="citation" data-cites="benidis_deep_2022">(<a href="#ref-benidis_deep_2022"
+          role="doc-biblioref">Benidis
+          et al.
+          2022</a>)</span>. However, these methods lack information about
+      uncertainties of their predictions, which can be a major disadvantage
+      when the forecasts are used in decision-making. Hence, <span class="citation"
+        data-cites="gneiting_probabilistic_2014">Gneiting and
+        Katzfuss (<a href="#ref-gneiting_probabilistic_2014" role="doc-biblioref">2014</a>)</span> state that forecasts
+      should take
+      on a probabilistic form, as this enables the modelling of uncertainties
+      in forecasts. The general
+      goal is to produce a probabilistic estimate for <span class="math inline">\(p(x_{L+1:L+H}| x_{1:L})\)</span>.
+      Moreover, this
+      distribution can be represented equivalently by its probability density
+      function (PDF), the cumulative density function (CDF) or its inverse,
+      the quantile function <span class="citation" data-cites="benidis_deep_2022">(<a href="#ref-benidis_deep_2022"
+          role="doc-biblioref">Benidis et al. 2022</a>)</span>. In the following,
+      we present various methods for generating probabilistic forecasts, however
+      precise formulations of adopted approaches are not presented. </a>
+    </p>
+    <h4 id="parametric-distributional-forecasting.">Parametric
+      Distributional Forecasting.</h4>
+    <p>A common approach to produce an estimate for <span class="math inline">\(p(x_{L+1:L+H} | x_{1:L})\)</span> is via
+      parametric distributional forecasting, where models typically output
+      location and spread parameters of a pre-chosen probability distribution,
+      which can be maximized via the log-likelihood with respect to the
+      ground-truth <span class="math inline">\(x_{L+1:L+H}\)</span> <span class="citation"
+        data-cites="bergsma_c2far_2022">(<a href="#ref-bergsma_c2far_2022" role="doc-biblioref">Bergsma et al.
+          2022</a>)</span>. For instance, an early NN-based example is the work of
+      <span class="citation" data-cites="nix_estimating_1994">Nix and Weigend
+        (<a href="#ref-nix_estimating_1994" role="doc-biblioref">1994</a>)</span>, where neural networks were
+      trained to output the mean <span class="math inline">\(\hat{\mu}\)</span> and variance <span
+        class="math inline">\(\hat{\sigma}^2\)</span> of a Gaussian distribution
+      for regression tasks. While Gaussian likelihoods are common, alternative
+      distributions such as Student-t <span class="citation" data-cites="alexandrov_gluonts_2020">(<a
+          href="#ref-alexandrov_gluonts_2020" role="doc-biblioref">Alexandrov et
+          al. 2020</a>)</span>, negative binomial <span class="citation" data-cites="salinas_deepar_2020">(<a
+          href="#ref-salinas_deepar_2020" role="doc-biblioref">Salinas et al. 2020</a>)</span> or Gaussian mixture
+      distributions <span class="citation" data-cites="mukherjee_ar-mdn_2018">(<a href="#ref-mukherjee_ar-mdn_2018"
+          role="doc-biblioref">Mukherjee et al. 2018</a>)</span> have been used
+      depending on the statistical properties of the data. DeepAR <span class="citation"
+        data-cites="salinas_deepar_2020">(<a href="#ref-salinas_deepar_2020" role="doc-biblioref">Salinas et al.
+          2020</a>)</span>, an IMS CI RNN-based approach, adopts parametric
+      distributional forecasting with a negative binomial distribution to
+      model demand data. Building on this, VQ-AR <span class="citation" data-cites="rasul_vq-ar_2022">(<a
+          href="#ref-rasul_vq-ar_2022" role="doc-biblioref">Rasul et al. 2022</a>)</span> combines the DeepAR
+      backbone with a Vector Quantized-Variational Autoencoder (VQ-VAE)
+      architecture <span class="citation" data-cites="van_den_oord_neural_2017">(<a href="#ref-van_den_oord_neural_2017"
+          role="doc-biblioref">Van den Oord
+          et al. 2017</a>)</span>, introducing a discrete latent bottleneck that
+      captures recurring temporal patterns in probabilistic forecasting.
+      Extending this idea to Transformer-based architectures, VQ-TR <span class="citation"
+        data-cites="rasul_vq-tr_2023">(<a href="#ref-rasul_vq-tr_2023" role="doc-biblioref">Rasul et al.
+          2023</a>)</span> integrates VQ-VAE into the attention mechanism of
+      Transformers. Lastly, CNN-based models like BiTCN <span class="citation"
+        data-cites="sprangers_parameter-efficient_2023">(<a href="#ref-sprangers_parameter-efficient_2023"
+          role="doc-biblioref">Sprangers et al. 2023</a>)</span> and DeepTCN <span class="citation"
+        data-cites="chen_probabilistic_2019">(<a href="#ref-chen_probabilistic_2019" role="doc-biblioref">Chen et al.
+          2019</a>)</span> also leverage parametric distributional forecasting but
+      with a DMS CD strategy. A disadvantage of these approaches is that they
+      require an <em>a priori</em> choice of the distributional form and are
+      limited to the parametric assumptions, which may not capture complex
+      data dynamics. To address the limitations of fixed-form parametric
+      models, non-parametric approaches have gained interest in the
+      community.
+    </p>
+    <h4 id="flexible-density-estimation.">Flexible Density Estimation.</h4>
+    <p>Among non-parametric approaches, normalizing flows <span class="citation"
+        data-cites="tabak_family_2013 papamakarios_normalizing_2021">(<a href="#ref-tabak_family_2013"
+          role="doc-biblioref">Tabak and Turner
+          2013</a>; <a href="#ref-papamakarios_normalizing_2021" role="doc-biblioref">Papamakarios et al.
+          2021</a>)</span>
+      have emerged
+      as a powerful tool for flexible density estimation. Normalizing flows,
+      such as Real NVP <span class="citation" data-cites="dinh_density_2017">(<a href="#ref-dinh_density_2017"
+          role="doc-biblioref">Dinh et al. 2017</a>)</span> and Masked
+      Autoregressive Flow (MAF) <span class="citation" data-cites="papamakarios_masked_2017">(<a
+          href="#ref-papamakarios_masked_2017" role="doc-biblioref">Papamakarios
+          et al. 2017</a>)</span>, transform a simple base distribution, e.g.
+      isotropic Gaussian, into a complex target distribution through a series
+      of invertible and differentiable mappings. Invertibility ensures the
+      preservation of probability mass and enables the evaluation of the
+      corresponding density function at all points <span class="citation" data-cites="benidis_deep_2022">(<a
+          href="#ref-benidis_deep_2022" role="doc-biblioref">Benidis et al. 2022</a>)</span>. A unified
+      description of normalizing flows and their core principles is provided
+      by <span class="citation" data-cites="papamakarios_normalizing_2021">Papamakarios et al. (<a
+          href="#ref-papamakarios_normalizing_2021" role="doc-biblioref">2021</a>)</span>. For time series forecasting,
+      <span class="citation" data-cites="rasul_multivariate_2020">Rasul et al.
+        (<a href="#ref-rasul_multivariate_2020" role="doc-biblioref">2020</a>)</span> combine IMS backbones, e.g. RNN
+      and Transformer, with conditioned normalizing flows to capture
+      multivariate temporal dependencies without restrictive parametric
+      assumptions. Furthermore, MANF <span class="citation" data-cites="feng_multi-scale_2024">(<a
+          href="#ref-feng_multi-scale_2024" role="doc-biblioref">Feng, Miao, Xu, et al. 2024</a>)</span> combines
+      conditioned normalizing flows with multi-scale attention and relative
+      positional encoding to model multivariate dependencies efficiently in a
+      DMS fashion. TACTiS and TACTiS-2 <span class="citation" data-cites="drouin_tactis_2022 ashok_tactis-2_2023">(<a
+          href="#ref-drouin_tactis_2022" role="doc-biblioref">Drouin et al.
+          2022</a>; <a href="#ref-ashok_tactis-2_2023" role="doc-biblioref">Ashok
+          et al. 2023</a>)</span> introduce an IMS Transformer-based Copula model
+      using Deep Sigmoidal Flows <span class="citation" data-cites="huang_neural_2018">(<a href="#ref-huang_neural_2018"
+          role="doc-biblioref">Huang et al. 2018</a>)</span> to estimate marginal
+      CDFs. Although flow-based models retain tractable likelihood computation
+      via the change of variables formula, they have problems with discrete
+      data distributions, often present in TSF applications (e.g., sales data)
+      <span class="citation" data-cites="rasul_multivariate_2020">(<a href="#ref-rasul_multivariate_2020"
+          role="doc-biblioref">Rasul et al.
+          2020</a>)</span>. Moreover, learning highly flexible continuous
+      distributions for discrete data may encourage learning distributions
+      with spiking densities at each possible discrete value <span class="citation" data-cites="uria_rnade_2013">(<a
+          href="#ref-uria_rnade_2013" role="doc-biblioref">Uria et al.
+          2013</a>)</span>. Altogether, this hinders training the models to
+      maximize the likelihood <span class="citation" data-cites="bergsma_c2far_2022">(<a href="#ref-bergsma_c2far_2022"
+          role="doc-biblioref">Bergsma et al. 2022</a>)</span>. To address this,
+      dequantizing <span class="citation" data-cites="rasul_multivariate_2020">(<a href="#ref-rasul_multivariate_2020"
+          role="doc-biblioref">Rasul et al.
+          2020</a>)</span>, e.g. adding <code>Uniform[0,1]</code> noise, may be
+      applied to bound the log-likelihood <span class="citation" data-cites="theis_note_2016">(<a
+          href="#ref-theis_note_2016" role="doc-biblioref">Theis et al. 2016</a>)</span>. However, this
+      assumes that the discrete nature of the series is known in advance and
+      that the potential loss in precision is justified relative to the
+      advantages offered by continuous models <span class="citation" data-cites="bergsma_c2far_2022">(<a
+          href="#ref-bergsma_c2far_2022" role="doc-biblioref">Bergsma et al. 2022</a>)</span>. In contrast to
+      flow-based models, C2FAR <span class="citation" data-cites="bergsma_c2far_2022">(<a href="#ref-bergsma_c2far_2022"
+          role="doc-biblioref">Bergsma et al. 2022</a>)</span> represents time
+      series variables through a hierarchical sequence of categorical
+      distributions, built on top of the DeepAR framework. Instead of relying
+      on fixed parametric forms, C2FAR generates increasingly finer intervals
+      of support in an autoregressive manner, where each step is conditioned
+      on coarser previous intervals. This hierarchical discretization allows
+      it to better capture multi-modal behaviors and extreme values compared
+      to flat binning or standard parametric approaches. Building on this,
+      SutraNets <span class="citation" data-cites="bergsma_sutranets_2023">(<a href="#ref-bergsma_sutranets_2023"
+          role="doc-biblioref">Bergsma et al.
+          2023</a>)</span> extend the idea to long-term time series problems by
+      dividing inputs into frequency-based sub-series, which is different from
+      the regular patching of adjacent time steps as done in models like
+      PatchTST <span class="citation" data-cites="nie_time_2022">(<a href="#ref-nie_time_2022" role="doc-biblioref">Nie
+          et
+          al.
+          2022</a>)</span> or SegRNN <span class="citation" data-cites="lin_segrnn_2023">(<a href="#ref-lin_segrnn_2023"
+          role="doc-biblioref">Lin et al. 2023</a>)</span>. Each sub-series in
+      SutraNets is modeled by its own C2FAR-LSTM.
+    </p>
+    <h4 id="generative-diffusion-models.">Generative Diffusion Models.</h4>
+    <p>While normalizing flows offer tractable likelihoods and exact
+      sampling through invertible transformations, their structural
+      constraint, particularly invertibility and the need for tractable
+      Jacobians, can limit their expressiveness in modeling complex,
+      high-dimensional, and multimodal distributions <span class="citation" data-cites="benidis_deep_2022">(<a
+          href="#ref-benidis_deep_2022" role="doc-biblioref">Benidis et al. 2022</a>)</span>. In contrast,
+      energy-based models (EBMs) relax these constraints by modeling
+      unnormalized log-probabilities, especially important in high-dimensional
+      spaces <span class="citation" data-cites="lecun_tutorial_2006">(<a href="#ref-lecun_tutorial_2006"
+          role="doc-biblioref">LeCun et al.
+          2006</a>)</span>. However, EBMs are notoriously difficult to train due
+      to challenges in sampling and normalizing <span class="citation" data-cites="du_implicit_2019">(<a
+          href="#ref-du_implicit_2019" role="doc-biblioref">Du and Mordatch 2019</a>)</span>. Diffusion
+      probabilistic models <span class="citation"
+        data-cites="ho_denoising_2020 sohl-dickstein_deep_2015 graikos_diffusion_2022">(<a href="#ref-ho_denoising_2020"
+          role="doc-biblioref">Ho et al. 2020</a>;
+        <a href="#ref-sohl-dickstein_deep_2015" role="doc-biblioref">Sohl-Dickstein et al. 2015</a>; <a
+          href="#ref-graikos_diffusion_2022" role="doc-biblioref">Graikos et al.
+          2022</a>)</span>, such as the well-known denoising diffusion
+      probabilistic model (DDPM) <span class="citation" data-cites="ho_denoising_2020">(<a href="#ref-ho_denoising_2020"
+          role="doc-biblioref">Ho et al. 2020</a>)</span>, can be viewed as a
+      practical compromise: they implicitly learn energy gradients via
+      score-based training <span class="citation" data-cites="hyvarinen_estimation_2005 song_maximum_2021">(<a
+          href="#ref-hyvarinen_estimation_2005" role="doc-biblioref">Hyvärinen
+          2005</a>; <a href="#ref-song_maximum_2021" role="doc-biblioref">Song et
+          al. 2021</a>)</span> and enable stable sampling using Langevin-like
+      denoising processes <span class="citation" data-cites="neal_mcmc_2011 welling_bayesian_2011">(<a
+          href="#ref-neal_mcmc_2011" role="doc-biblioref">Neal 2011</a>; <a href="#ref-welling_bayesian_2011"
+          role="doc-biblioref">Welling and Teh
+          2011</a>)</span>. On a high level, diffusion probabilistic models
+      operate by first applying a forward process that gradually corrupts data
+      into noise, followed by a reverse process that reconstructs the original
+      data from the noise <span class="citation" data-cites="ho_denoising_2020">(<a href="#ref-ho_denoising_2020"
+          role="doc-biblioref">Ho et al. 2020</a>)</span>. Over the last few
+      years, diffusion-based generative models have emerged as strong
+      generative tools, achieving SOTA performances in text generation <span class="citation"
+        data-cites="li_diffusion-lm_2022">(<a href="#ref-li_diffusion-lm_2022" role="doc-biblioref">X. Li et al.
+          2022</a>)</span>, audio <span class="citation" data-cites="kong_diffwave_2020">(<a
+          href="#ref-kong_diffwave_2020" role="doc-biblioref">Kong et al. 2020</a>)</span> and image synthesis
+      <span class="citation" data-cites="dhariwal_diffusion_2021">(<a href="#ref-dhariwal_diffusion_2021"
+          role="doc-biblioref">Dhariwal and
+          Nichol 2021</a>)</span>. In the context of TSF, diffusion-based models
+      often guide generation by conditioning on partial observations,
+      reference samples, decompositions or architectural priors such as RNNs,
+      transformers or state space models <span class="citation"
+        data-cites="rasul_autoregressive_2021 tashiro_csdi_2021 alcaraz_diffusion-based_2022 shen_non-autoregressive_2023 liu_retrieval-augmented_2024 shen_multi-resolution_2023">(<a
+          href="#ref-rasul_autoregressive_2021" role="doc-biblioref">Rasul et al.
+          2021</a>; <a href="#ref-tashiro_csdi_2021" role="doc-biblioref">Tashiro
+          et al. 2021</a>; <a href="#ref-alcaraz_diffusion-based_2022" role="doc-biblioref">Alcaraz and Strodthoff
+          2022</a>; <a href="#ref-shen_non-autoregressive_2023" role="doc-biblioref">Shen and
+          Kwok 2023</a>; <a href="#ref-liu_retrieval-augmented_2024" role="doc-biblioref">Liu et al. 2024</a>; <a
+          href="#ref-shen_multi-resolution_2023" role="doc-biblioref">Shen et al.
+          2023</a>)</span>. For instance, TimeGrad <span class="citation" data-cites="rasul_autoregressive_2021">(<a
+          href="#ref-rasul_autoregressive_2021" role="doc-biblioref">Rasul et al.
+          2021</a>)</span> uses RNN hidden states, while TimeDiff <span class="citation"
+        data-cites="shen_non-autoregressive_2023">(<a href="#ref-shen_non-autoregressive_2023" role="doc-biblioref">Shen
+          and
+          Kwok 2023</a>)</span> incorporates task-specific conditioning like
+      future mixup and autoregressive initialization. On the other hand,
+      mr-Diff <span class="citation" data-cites="shen_multi-resolution_2023">(<a href="#ref-shen_multi-resolution_2023"
+          role="doc-biblioref">Shen et al.
+          2023</a>)</span> leverages the multi-scale structure of time series by
+      conditioning the denoising process on progressively refined trends,
+      starting from coarse to fine levels. Similarly, TMDM <span class="citation"
+        data-cites="li_transformer-modulated_2023">(<a href="#ref-li_transformer-modulated_2023" role="doc-biblioref">Li
+          et al.
+          2023</a>)</span> and RATD <span class="citation" data-cites="liu_retrieval-augmented_2024">(<a
+          href="#ref-liu_retrieval-augmented_2024" role="doc-biblioref">Liu et al.
+          2024</a>)</span> integrate transformer-based and retrieval-augmented
+      conditioning, respectively. Going one step further, D<span class="math inline">\(^3\)</span>M <span
+        class="citation" data-cites="yan_probabilistic_2024">(<a href="#ref-yan_probabilistic_2024"
+          role="doc-biblioref">Yan et al.
+          2024</a>)</span> introduces a decomposable denoising diffusion framework
+      that unifies continuous flow models and diffusion models, achieving
+      high-speed generation with fewer diffusion steps. Alternatively, TSDiff
+      <span class="citation" data-cites="kollovieh_predict_2023">(<a href="#ref-kollovieh_predict_2023"
+          role="doc-biblioref">Kollovieh et al.
+          2023</a>)</span> mitigates explicit conditioning during training by
+      adopting an unconditional framework, using a self-guidance mechanism at
+      inference time to adapt to tasks like forecasting and refinement without
+      auxiliary networks. Contrary to previous approaches, DSPD-GP <span class="citation"
+        data-cites="bilos_modeling_2023">(<a href="#ref-bilos_modeling_2023" role="doc-biblioref">Biloš et al.
+          2023</a>)</span> treats the time series as continuous functions rather
+      than discrete measurements, defining diffusion not over discrete vectors
+      but over functions, enabling direct handling of irregularly-sampled time
+      series. Moreover, their Stochastic Process Diffusion framework applies
+      diffusion in function space, using correlated noise from Gaussian
+      processes to preserve temporal continuity and handle irregular sampling.
+      On the other hand, D<span class="math inline">\(^3\)</span>VAE <span class="citation"
+        data-cites="li_generative_2022">(<a href="#ref-li_generative_2022" role="doc-biblioref">Y. Li et al.
+          2022</a>)</span> proposes a bidirectional VAE augmented with a coupled
+      diffusion process, which simultaneously diffuses input and target series
+      to reduce uncertainty. It further integrates denoising score matching
+      and disentangled latent variables to improve interpretability and
+      robustness, demonstrating strong performance on short and noisy time
+      series.
+    </p>
+    <h4 id="latent-generative-methods.">Latent Generative methods.</h4>
+    <p>While diffusion-based models have gained traction in generative
+      modeling for their flexibility and ability to capture complex,
+      multimodal distributions, they often suffer from high computational cost
+      and slow sampling, limitations that can be especially problematic in
+      time-sensitive or resource-constrained forecasting scenarios <span class="citation"
+        data-cites="yegin_generative_2024 yang_survey_2024">(<a href="#ref-yegin_generative_2024"
+          role="doc-biblioref">Yeğin and
+          Amasyalı 2024</a>; <a href="#ref-yang_survey_2024" role="doc-biblioref">Yang et al. 2024</a>)</span>. In
+      contrast,
+      latent-variable approaches such as Variational Autoencoders and
+      (probabilistic) State Space Models offer a compelling alternative by
+      trading off expressivity for faster inference and improved
+      interpretability <span class="citation" data-cites="tong_probabilistic_2022 de_bezenac_normalizing_2020">(<a
+          href="#ref-tong_probabilistic_2022" role="doc-biblioref">Tong et al.
+          2022</a>; <a href="#ref-de_bezenac_normalizing_2020" role="doc-biblioref">Bézenac et al.
+          2020</a>)</span>.<br />
+      Variational Autoencoders (VAEs) <span class="citation"
+        data-cites="kingma_auto-encoding_2014 rezende_stochastic_2014">(<a href="#ref-kingma_auto-encoding_2014"
+          role="doc-biblioref">Kingma and
+          Welling 2014</a>; <a href="#ref-rezende_stochastic_2014" role="doc-biblioref">Rezende et al. 2014</a>)</span>
+      simplify generative
+      modeling by learning to represent complex data distributions in a
+      lower-dimensional latent space using variational inference. In
+      variational inference, the main idea is to approximate the true
+      distribution with a simpler distribution, e.g. Gaussian, and minimize
+      the Kullback-Leibler (KL) divergence, shown in the upcoming Section <a href="#sec:related_work_Prob_Scores"
+        data-reference-type="ref" data-reference="sec:related_work_Prob_Scores">[sec:related_work_Prob_Scores]</a>
+      in Equation <a href="#eq:KL" data-reference-type="ref" data-reference="eq:KL">[eq:KL]</a>, between the approximate
+      and true
+      distribution, also known as evidence lower bound optimization <span class="citation"
+        data-cites="yegin_generative_2024">(<a href="#ref-yegin_generative_2024" role="doc-biblioref">Yeğin and
+          Amasyalı 2024</a>)</span>. Broadly speaking, VAEs first encode the data
+      into a lower-dimensional latent space where a simpler probabilistic
+      model can be imposed, then forecasts are generated by decoding samples
+      drawn from this latent distribution back into the observation space.
+      Compared to other likelihood-based models like normalizing flows or
+      energy-based models, VAEs offer efficient, tractable sampling and
+      readily accessible inference via encoder networks <span class="citation" data-cites="vahdat_nvae_2020">(<a
+          href="#ref-vahdat_nvae_2020" role="doc-biblioref">Vahdat and Kautz 2020</a>)</span>. Recent advances
+      in other generative tasks, e.g. image generation <span class="citation"
+        data-cites="vahdat_nvae_2020 luo_energy-calibrated_2025">(<a href="#ref-vahdat_nvae_2020"
+          role="doc-biblioref">Vahdat and Kautz
+          2020</a>; <a href="#ref-luo_energy-calibrated_2025" role="doc-biblioref">Luo et al. 2025</a>)</span>, have
+      motivated an
+      adoption in time series forecasting tasks. For instance, the Temporal
+      Latent AutoEncoder (TLAE) <span class="citation" data-cites="nguyen_temporal_2021">(<a
+          href="#ref-nguyen_temporal_2021" role="doc-biblioref">Nguyen and Quanz 2021</a>)</span> introduces a
+      nonlinear factorization framework for multivariate time series, enabling
+      end-to-end learning of complex latent dynamics while preserving
+      scalability. Similarly, VSMHN <span class="citation" data-cites="li_synergetic_2021">(<a
+          href="#ref-li_synergetic_2021" role="doc-biblioref">Li et al. 2021</a>)</span>, based on the
+      conditional VAE <span class="citation" data-cites="sohn_learning_2015">(<a href="#ref-sohn_learning_2015"
+          role="doc-biblioref">Sohn et al. 2015</a>)</span>, handles asynchronous
+      event-driven data with aligned time encodings to jointly forecast across
+      heterogeneous temporal sources. To better address long-range
+      dependencies and structural interpretability, PDTrans <span class="citation"
+        data-cites="tong_probabilistic_2022">(<a href="#ref-tong_probabilistic_2022" role="doc-biblioref">Tong et al.
+          2022</a>)</span> fuses Transformer-based temporal modeling with a
+      VAE-based latent decomposition, providing interpretable forecasts
+      through trend and seasonality disentanglement. The Latent Diffusion
+      Transformer (LDT) <span class="citation" data-cites="feng_latent_2024">(<a href="#ref-feng_latent_2024"
+          role="doc-biblioref">Feng, Miao, Zhang, et al. 2024</a>)</span>
+      compresses high-dimensional multivariate series into latent
+      representations using a statistics-aware autoencoder and generates
+      forecasts via a diffusion-based generator with self-conditioning.
+      Likewise, the D<span class="math inline">\(^3\)</span>VAE <span class="citation"
+        data-cites="li_generative_2022">(<a href="#ref-li_generative_2022" role="doc-biblioref">Y. Li et al.
+          2022</a>)</span> model fuses the Nouveau VAE <span class="citation" data-cites="vahdat_nvae_2020">(<a
+          href="#ref-vahdat_nvae_2020" role="doc-biblioref">Vahdat and Kautz 2020</a>)</span> with a coupled
+      diffusion process and multiscale denoising to enhance robustness under
+      limited or noisy data.<br />
+      State Space Models (SSMs)<span class="citation"
+        data-cites="hyndman_state_2002 seeger_bayesian_2016 durbin_time_2012">(<a href="#ref-hyndman_state_2002"
+          role="doc-biblioref">Hyndman et al.
+          2002</a>; <a href="#ref-seeger_bayesian_2016" role="doc-biblioref">Seeger et al. 2016</a>; <a
+          href="#ref-durbin_time_2012" role="doc-biblioref">Durbin and Koopman
+          2012</a>)</span> provide a framework for modeling sequential data via
+      latent variables that evolve over time according to structured
+      transition dynamics and generate observations through stochastic
+      emission processes. Commonly implemented deterministic time series
+      forecasting methods such as Exponential Smoothing <span class="citation"
+        data-cites="hyndman_state_2002 hyndman_forecasting_2008">(<a href="#ref-hyndman_state_2002"
+          role="doc-biblioref">Hyndman et al.
+          2002</a>; <a href="#ref-hyndman_forecasting_2008" role="doc-biblioref">Hyndman et al. 2008</a>)</span>, ARIMA
+      <span class="citation" data-cites="box_distribution_1970">(<a href="#ref-box_distribution_1970"
+          role="doc-biblioref">Box and Pierce
+          1970</a>)</span>, and LSTMs <span class="citation" data-cites="hochreiter_long_1997">(<a
+          href="#ref-hochreiter_long_1997" role="doc-biblioref">Hochreiter and Schmidhuber 1997</a>)</span> can all
+      be interpreted as special cases or deterministic approximations of SSMs
+      <span class="citation" data-cites="durbin_time_2012">(<a href="#ref-durbin_time_2012" role="doc-biblioref">Durbin
+          and Koopman
+          2012</a>)</span>. A classic probabilistic instance is the
+      linear-Gaussian SSM <span class="citation" data-cites="roweis_unifying_1999">(<a href="#ref-roweis_unifying_1999"
+          role="doc-biblioref">Roweis and Ghahramani 1999</a>)</span>, which
+      offers closed-form solutions for filtering, smoothing, and likelihood
+      computation, enabling efficient handling of missing data, and tractable
+      multi-step forecasting with full uncertainty quantification (avoiding
+      error accumulation) <span class="citation" data-cites="de_bezenac_normalizing_2020">(<a
+          href="#ref-de_bezenac_normalizing_2020" role="doc-biblioref">Bézenac et
+          al. 2020</a>)</span>. Furthermore, in their probabilistic form, SSMs
+      define joint distributions over latent states and observations, such as
+      in Gaussian Process SSMs <span class="citation" data-cites="ko_learning_2011 deisenroth_robust_2012">(<a
+          href="#ref-ko_learning_2011" role="doc-biblioref">Ko and Fox 2011</a>;
+        <a href="#ref-deisenroth_robust_2012" role="doc-biblioref">Deisenroth et
+          al. 2012</a>)</span>. This enables uncertainty quantification through
+      inference techniques like Kalman filtering <span class="citation" data-cites="kalman_new_1960">(<a
+          href="#ref-kalman_new_1960" role="doc-biblioref">Kalman 1960</a>)</span>, treating the hidden state
+      as a distribution that is recursively updated and propagated to generate
+      predictive distributions over future observations. In probabilistic TSF,
+      recent works have explored hybrid models that combine the structural
+      benefits of SSMs with the expressivity of deep learning, where one
+      prominent direction is the use of deep neural networks to parameterize
+      SSM components. For example, DeepState <span class="citation" data-cites="rangapuram_deep_2018">(<a
+          href="#ref-rangapuram_deep_2018" role="doc-biblioref">Rangapuram et al. 2018</a>)</span> employs an RNN
+      to learn a shared global mapping from covariates to the parameters of a
+      linear-Gaussian SSM, in which each individual time series has an
+      associated linear Gaussian SSM whose parameters are dynamically
+      generated by the RNN. Similarly, DNLSSM <span class="citation" data-cites="du_probabilistic_2023">(<a
+          href="#ref-du_probabilistic_2023" role="doc-biblioref">Du et al. 2023</a>)</span> integrates LSTM networks
+      with the unscented Kalman filter <span class="citation" data-cites="julier_unscented_2004">(<a
+          href="#ref-julier_unscented_2004" role="doc-biblioref">Julier and Uhlmann 2004</a>)</span> to better model
+      non-linear dynamics. Extending these ideas to attention-based temporal
+      dependencies, the Probabilistic Transformer (ProTran) <span class="citation"
+        data-cites="tang_probabilistic_2021">(<a href="#ref-tang_probabilistic_2021" role="doc-biblioref">Tang and
+          Matteson 2021</a>)</span> replaces recurrent components with a
+      Transformer architecture, enabling the model to learn non-Markovian
+      dependencies in the latent space via self-attention. From a different
+      standpoint, PR-SSM <span class="citation" data-cites="doerr_probabilistic_2018">(<a
+          href="#ref-doerr_probabilistic_2018" role="doc-biblioref">Doerr et al.
+          2018</a>)</span> substitute the parametric transition dynamics with
+      Gaussian Processes, where training relies on doubly stochastic
+      variational inference. To address the restrictive assumption of
+      Gaussianity, flow-based SSMs have been proposed. For instance, the
+      Normalizing Kalman Filter (NKF) <span class="citation" data-cites="de_bezenac_normalizing_2020">(<a
+          href="#ref-de_bezenac_normalizing_2020" role="doc-biblioref">Bézenac et
+          al. 2020</a>)</span> augments a linear-Gaussian SSM by integrating
+      normalizing flows into the observation model. This allows the latent
+      state dynamics to remain analytically tractable via Kalman filtering,
+      while enabling the observation distribution to flexibly model complex,
+      non-Gaussian behavior. Similarly, EMSSM <span class="citation" data-cites="sun_memory_2022">(<a
+          href="#ref-sun_memory_2022" role="doc-biblioref">Sun et al. 2022</a>)</span> implements an external
+      memory mechanism and conditional normalizing flows, enhancing the
+      model’s capacity to capture long-range dependencies and adapt to
+      distributional shifts.
+    </p>
+    <h4 id="generative-adversarial-paradigms.">Generative Adversarial
+      Paradigms.</h4>
+    <p>Generative Adversarial Networks (GANs) <span class="citation" data-cites="goodfellow_generative_2014">(<a
+          href="#ref-goodfellow_generative_2014" role="doc-biblioref">Goodfellow
+          et al. 2014</a>)</span>, on the other hand, bypass likelihood estimation
+      altogether, directly learning to generate realistic samples through
+      adversarial training. Furthermore, GANs typically consist of two NNs, a
+      generator and a discriminator. In their min-max adversarial training
+      game, the generator creates synthetic samples while the discriminator is
+      tasked with distinguishing between artificial samples from the generator
+      and real samples <span class="citation" data-cites="wu_adversarial_2020">(<a href="#ref-wu_adversarial_2020"
+          role="doc-biblioref">S. Wu et al. 2020</a>)</span>. GAN-based models
+      have demonstrated impressive results in various generative tasks, such
+      as image generation <span class="citation" data-cites="jiang_transgan_2021">(<a href="#ref-jiang_transgan_2021"
+          role="doc-biblioref">Jiang et al. 2021</a>)</span> and audio synthesis
+      <span class="citation" data-cites="donahue_adversarial_2018">(<a href="#ref-donahue_adversarial_2018"
+          role="doc-biblioref">Donahue et al.
+          2018</a>)</span>. Similarly, GANs primary focus in time series
+      applications also lies in time series synthesis and generation, e.g. see
+      timeGAN <span class="citation" data-cites="yoon_time-series_2019">(<a href="#ref-yoon_time-series_2019"
+          role="doc-biblioref">Yoon et al.
+          2019</a>)</span>, GT-GAN <span class="citation" data-cites="jeon_gt-gan_2022">(<a href="#ref-jeon_gt-gan_2022"
+          role="doc-biblioref">Jeon et al. 2022</a>)</span> or GAN-based
+      approaches in the Time Series Generative Modeling benchmark <span class="citation"
+        data-cites="nikitin_tsgm_2024">(<a href="#ref-nikitin_tsgm_2024" role="doc-biblioref">Nikitin et al.
+          2024</a>)</span>. Nevertheless, GAN-based probabilistic time series
+      forecasting approaches were implemented as well. For instance, the
+      Adversarial Sparse Transformer (AST) <span class="citation" data-cites="wu_adversarial_2020">(<a
+          href="#ref-wu_adversarial_2020" role="doc-biblioref">S. Wu et al. 2020</a>)</span> combines a sparse
+      Transformer with adversarial training to improve time series
+      forecasting. AST employs a generator-discriminator framework, where the
+      generator learns sparse attention patterns for forecasting, while the
+      discriminator ensures sequence-level fidelity. Furthermore, <span class="citation"
+        data-cites="koochali_if_2021">Koochali et al. (<a href="#ref-koochali_if_2021"
+          role="doc-biblioref">2021</a>)</span>
+      introduce ProbCast, a probabilistic forecasting model based on
+      conditional GAN <span class="citation" data-cites="mirza_conditional_2014">(<a href="#ref-mirza_conditional_2014"
+          role="doc-biblioref">Mirza and
+          Osindero 2014</a>)</span>. On a final note, despite their potential,
+      GANs remain notoriously difficult to train, often facing challenges such
+      as hyperparameter sensitivity, training instability, and mode collapse
+      <span class="citation" data-cites="yegin_generative_2024">(<a href="#ref-yegin_generative_2024"
+          role="doc-biblioref">Yeğin and
+          Amasyalı 2024</a>)</span>.
+    </p>
+    <h4 id="quantile.">Quantile.</h4>
+    <p>In practice, specifying an exact (parametric) distribution is often
+      unnecessary. Instead, estimating a few key quantiles is sufficient for
+      making optimal decisions, e.g. in epidemiologic forecasting <span class="citation"
+        data-cites="bracher_evaluating_2021 ray_ensemble_2020">(<a href="#ref-bracher_evaluating_2021"
+          role="doc-biblioref">Bracher et al.
+          2021</a>; <a href="#ref-ray_ensemble_2020" role="doc-biblioref">Ray et
+          al. 2020</a>)</span>, wind power forecasting <span class="citation" data-cites="wan_direct_2017">(<a
+          href="#ref-wan_direct_2017" role="doc-biblioref">Wan et al. 2017</a>)</span> or the classical
+      newsvendor problem <span class="citation"
+        data-cites="gneiting_model_2023 tarima_use_2020 harsha_prescriptive_2021">(<a href="#ref-gneiting_model_2023"
+          role="doc-biblioref">Gneiting et al.
+          2023</a>; <a href="#ref-tarima_use_2020" role="doc-biblioref">Tarima and
+          Zenkova 2020</a>; <a href="#ref-harsha_prescriptive_2021" role="doc-biblioref">Harsha et al. 2021</a>)</span>,
+      by helping quantify
+      uncertainty and minimize losses <span class="citation"
+        data-cites="bracher_evaluating_2021 wen_multi-horizon_2018 gneiting_model_2023">(<a
+          href="#ref-bracher_evaluating_2021" role="doc-biblioref">Bracher et al.
+          2021</a>; <a href="#ref-wen_multi-horizon_2018" role="doc-biblioref">Wen
+          et al. 2018</a>; <a href="#ref-gneiting_model_2023" role="doc-biblioref">Gneiting et al. 2023</a>)</span>. As
+      a
+      result, a
+      common non-parametric approach to modeling <span class="math inline">\(p(x_{L+1:L+H} | x_{1:L})\)</span> is via
+      the
+      quantile function, where the models are typically trained using the
+      quantile loss (see Equation <a href="#eq:QS" data-reference-type="ref" data-reference="eq:QS">[eq:QS]</a> of
+      Section
+      <a href="#sec:related_work_Prob_Scores" data-reference-type="ref"
+        data-reference="sec:related_work_Prob_Scores">[sec:related_work_Prob_Scores]</a>).
+      Quantile regression methods <span class="citation" data-cites="koenker_regression_1978 koenker_quantile_2005">(<a
+          href="#ref-koenker_regression_1978" role="doc-biblioref">Koenker and
+          Bassett 1978</a>; <a href="#ref-koenker_quantile_2005" role="doc-biblioref">Koenker 2005</a>)</span> are
+      frequently applied in
+      forecasting, either by predicting a single quantile (for point
+      forecasts) or multiple quantiles at once <span class="citation" data-cites="wen_multi-horizon_2018">(<a
+          href="#ref-wen_multi-horizon_2018" role="doc-biblioref">Wen et al.
+          2018</a>)</span>. Effectively, this method approximates the quantile
+      function by targeting specific quantile levels <span class="citation" data-cites="benidis_deep_2022">(<a
+          href="#ref-benidis_deep_2022" role="doc-biblioref">Benidis et al. 2022</a>)</span>. Two notable
+      approaches of this kind are the Multi-horizon Quantile Recurrent
+      Forecaster (MQ-RNN) <span class="citation" data-cites="wen_multi-horizon_2018">(<a
+          href="#ref-wen_multi-horizon_2018" role="doc-biblioref">Wen et al.
+          2018</a>)</span> and the Temporal Fusion Transformer (TFT) <span class="citation"
+        data-cites="lim_temporal_2021">(<a href="#ref-lim_temporal_2021" role="doc-biblioref">Lim et al.
+          2021</a>)</span>. MQ-RNN combines sequence-to-sequence NNs with quantile
+      regression and a DMS strategy. On the other hand, TFT leverages
+      attention mechanisms for interpretable DMS forecasting, using
+      specialized components like gating mechanisms and variable selection
+      networks to provide insights into temporal dynamics. Nevertheless, these
+      approaches require the specification of a set of quantile levels <em>a
+        priori</em>, necessitating retraining when querying new quantile levels
+      <span class="citation" data-cites="park_learning_2022">(<a href="#ref-park_learning_2022"
+          role="doc-biblioref">Park
+          et al.
+          2022</a>)</span>. As another option, Implicit Quantile Networks (IQNs)
+      <span class="citation" data-cites="dabney_implicit_2018">(<a href="#ref-dabney_implicit_2018"
+          role="doc-biblioref">Dabney et al.
+          2018</a>)</span> learn to map samples from a uniform distribution
+      (<code>Uniform[0,1]</code>) to corresponding quantile values of the
+      target distribution, removing the need for predefined quantile levels.
+      This allows for continuous and arbitrarily fine-grained quantile
+      estimation. Building on this, several models adapt IQNs for time series
+      forecasting. For example, IQN-RNN <span class="citation" data-cites="gouttes_probabilistic_2021">(<a
+          href="#ref-gouttes_probabilistic_2021" role="doc-biblioref">Gouttes et
+          al. 2021</a>)</span> combines the IQN framework with RNNs, enabling
+      autoregressive probabilistic forecasts without assuming a specific
+      distributional form. GQFormer <span class="citation" data-cites="jawed_gqformer_2022">(<a
+          href="#ref-jawed_gqformer_2022" role="doc-biblioref">Jawed and Schmidt-Thieme 2022</a>)</span>
+      introduces a novel multi-task loss that encourages both sharpness and
+      diversity in quantile estimates, allowing the model to capture multiple
+      modes in complex multivariate joint distributions. Finally,
+      GMQ-forecaster <span class="citation" data-cites="wen_deep_2019">(<a href="#ref-wen_deep_2019"
+          role="doc-biblioref">Wen and Torkkola
+          2019</a>)</span> integrates IQNs with multivariate copula modeling,
+      using IQNs for marginals and a learned copula to represent their
+      dependencies, resulting in a fully generative joint distribution.
+      Despite achieving SOTA performance in probabilistic TSF, the
+      aforementioned quantile-based models remain susceptible to the quantile
+      crossing problem, a violation of the inherent monotonicity of quantile
+      functions <span class="citation" data-cites="park_learning_2022">(<a href="#ref-park_learning_2022"
+          role="doc-biblioref">Park et al.
+          2022</a>)</span>. Specifically, when different quantile levels (e.g.,
+      <span class="math inline">\(\alpha_1&lt; \alpha_2\)</span>) are modeled
+      independently, for instance via separate functions (<span class="math inline">\(r_{\alpha_1}\)</span> and <span
+        class="math inline">\(r_{\alpha_2}\)</span>), it is possible to
+      encounter inputs <span class="math inline">\(x\)</span> for which <span
+        class="math inline">\(r_{\alpha_1}(x)&gt;r_{\alpha_2}(x)\)</span>,
+      thereby breaking the non-decreasing property of quantile functions <span class="citation"
+        data-cites="gasthaus_probabilistic_2019">(<a href="#ref-gasthaus_probabilistic_2019"
+          role="doc-biblioref">Gasthaus
+          et
+          al. 2019</a>)</span>. Therefore, as an alternative to traditional
+      quantile regression, one can directly model the entire quantile function
+      by imposing a parametric structure instead, which requires the function
+      to be defined over the unit interval [0,1] and to be monotonically
+      increasing <span class="citation" data-cites="benidis_deep_2022">(<a href="#ref-benidis_deep_2022"
+          role="doc-biblioref">Benidis et al.
+          2022</a>)</span>. A practical way to satisfy these constraints is
+      through the use of linear splines, as demonstrated in the Spline
+      Quantile Function (SQF)-RNN framework <span class="citation" data-cites="gasthaus_probabilistic_2019">(<a
+          href="#ref-gasthaus_probabilistic_2019" role="doc-biblioref">Gasthaus et
+          al. 2019</a>)</span>, where an RNN is trained to produce the parameters
+      of a monotonic spline. By construction, this avoids quantile crossing
+      and allows the full quantile function to be recovered from a compact
+      parameterization. However, the SQF-RNN model has reduced flexibility in
+      tail regions <span class="citation" data-cites="park_learning_2022">(<a href="#ref-park_learning_2022"
+          role="doc-biblioref">Park et al.
+          2022</a>)</span>. Hence, <span class="citation" data-cites="park_learning_2022">Park et al. (<a
+          href="#ref-park_learning_2022" role="doc-biblioref">2022</a>)</span>
+      propose Incremental (Spline) Quantile Functions, which extend SQF by
+      adding tail extrapolation strategies, such as exponential Pareto
+      distributions. Finally, the Multivariate Quantile Function Forecaster
+      (MQF<span class="math inline">\(^2\)</span>) <span class="citation" data-cites="kan_multivariate_2022">(<a
+          href="#ref-kan_multivariate_2022" role="doc-biblioref">Kan et al. 2022</a>)</span> models the multivariate
+      quantile function as the gradient of a convex function, parametrized via
+      partially input convex neural networks <span class="citation" data-cites="amos_input_2017 huang_convex_2020">(<a
+          href="#ref-amos_input_2017" role="doc-biblioref">Amos et al. 2017</a>;
+        <a href="#ref-huang_convex_2020" role="doc-biblioref">Huang et al.
+          2020</a>)</span>.
+    </p>
+    <h4 id="p:multivariate_dep">Multivariate dependencies.</h4>
+    <p>The probabilistic models considered so far involve an additional
+      layer of complexity: the presence of multivariate dependencies in
+      modeling the conditional distribution <span class="math inline">\(p(\mathbf{x}_{L+1:L+H} \mid
+        \mathbf{x}_{1:L})\)</span>. These dependencies can be broadly
+      categorized along two primary axes.</p>
+    <ul>
+      <li>
+        <p><strong>Cross-series (multi-channel) dependencies</strong>, for
+          instance involving the modeling of the multivariate distribution <span
+            class="math inline">\(p(\mathbf{x}_t)\)</span> across all <span class="math inline">\(N\)</span> series at
+          time step <span class="math inline">\(t\)</span>, with <span class="math inline">\(\mathbf{x}_t \in
+            \mathbb{R}^N\)</span>. Methods
+          that model these dependencies are often simply classified as
+          multivariate probabilistic forecasting methods <span class="citation" data-cites="benidis_deep_2022">(<a
+              href="#ref-benidis_deep_2022" role="doc-biblioref">Benidis et al. 2022</a>)</span>.</p>
+      </li>
+      <li>
+        <p><strong>Temporal dependencies</strong>, for example referring to
+          the joint modeling of the future horizon for a single series, <span
+            class="math inline">\(p(\mathbf{x}^{(i)}_{L+1:L+H})\)</span>, where
+          <span class="math inline">\(\mathbf{x}^{(i)}_{L+1:L+H} \in
+            \mathbb{R}^H\)</span>.
+        </p>
+      </li>
+    </ul>
+    <p>Models may capture neither, one, or both forms of dependencies.
+      Nevertheless, in the following, our analysis focuses primarily on
+      temporal dependencies. This emphasis is motivated by the observation
+      that DMS models, albeit dominant in point forecasting (see Table <a href="#tab:ltsf" data-reference-type="ref"
+        data-reference="tab:ltsf">[tab:ltsf]</a>), generate all future steps in
+      a single forward pass conditioned only on the input context. Moreover,
+      this means that DMS models cannot naturally model how future points
+      depend on each other, instead assuming independence between future steps
+      <span class="citation" data-cites="taieb_review_2012">(<a href="#ref-taieb_review_2012" role="doc-biblioref">Taieb
+          et al.
+          2012</a>)</span>, unless such dependencies are explicitly modeled. In
+      contrast, probabilistic IMS methods typically factorize the joint
+      temporal distribution <span class="math inline">\(p(\mathbf{x}_{L+1:L+H}
+        \mid \mathbf{x}_{1:L})\)</span> into a product of conditional one-step
+      distributions, as shown in Equation <a href="#eq:IMS" data-reference-type="ref"
+        data-reference="eq:IMS">[eq:IMS]</a>
+      of
+      Chapter <a href="#ch:preliminaries" data-reference-type="ref"
+        data-reference="ch:preliminaries">[ch:preliminaries]</a>. Therefore,
+      they naturally model temporal dependencies as sequential step-by-step
+      predictions. In addition to this, many point LTSF models adopt a CI
+      design, explicitly excluding cross-series dependencies. As such,
+      cross-series interactions are often not represented in the underlying
+      model architecture, making it difficult to include the probabilistic
+      multi-channel dependencies during the transition from point LTSF to
+      probabilistic LTSF. Irrespective of the type of multivariate
+      dependencies being modeled (cross-series, temporal, or both) various
+      modeling strategies can be employed to approximate multivariate
+      distributions. Two key challenges in modeling multivariate distributions
+      are the positive-definiteness constraint and the quadratic complexity of
+      estimating full covariance matrices, which requires <span class="math inline">\(O(N^2)\)</span> parameters, where
+      <span class="math inline">\(N=H\)</span> in the case of temporal dependencies
+      <span class="citation" data-cites="pourahmadi_covariance_2011">(<a href="#ref-pourahmadi_covariance_2011"
+          role="doc-biblioref">Pourahmadi
+          2011</a>)</span>. To address this, one approach is to impose structural
+      constraints on the covariance matrix by using a low-rank plus diagonal
+      decomposition, which ensures positive-definiteness and reduces the
+      number of parameters <span class="citation" data-cites="wu_high-dimensional_2020 horn_chapter_2012">(<a
+          href="#ref-wu_high-dimensional_2020" role="doc-biblioref">Y. Wu et al.
+          2020</a>; <a href="#ref-horn_chapter_2012" role="doc-biblioref">Horn and
+          Johnson 2012</a>)</span>. An alternative strategy is to bypass direct
+      estimation of the covariance structure and instead use copulas, which
+      provide a way to decouple the modeling of marginal distributions from
+      their joint dependence structure <span class="citation" data-cites="wilson_copula_2010 groser_copulae_2022">(<a
+          href="#ref-wilson_copula_2010" role="doc-biblioref">Wilson and
+          Ghahramani 2010</a>; <a href="#ref-groser_copulae_2022" role="doc-biblioref">Größer and Okhrin
+          2022</a>)</span>.
+      According to
+      Sklar’s theorem <span class="citation" data-cites="sklar_fonctions_1959">(<a href="#ref-sklar_fonctions_1959"
+          role="doc-biblioref">Sklar 1959</a>)</span>, any multivariate
+      distribution can be expressed in terms of its marginals and a copula
+      function that captures the dependencies among variables. This
+      decomposition is particularly useful in time series settings, where
+      marginals can exhibit diverse characteristics (e.g., skewness,
+      seasonality) and dependencies may be nonlinear and time-varying (e.g.,
+      temporal autocorrelation or inter-series interactions) <span class="citation"
+        data-cites="salinas_high-dimensional_2019">(<a href="#ref-salinas_high-dimensional_2019"
+          role="doc-biblioref">Salinas
+          et al. 2019</a>)</span>. GPVar <span class="citation" data-cites="salinas_high-dimensional_2019">(<a
+          href="#ref-salinas_high-dimensional_2019" role="doc-biblioref">Salinas
+          et al. 2019</a>)</span> is an example of a parametric copula approach,
+      in which the marginals are estimated independently and then transformed
+      into a latent Gaussian space, where dependencies are modeled using a
+      Gaussian copula with a low-rank plus diagonal covariance structure.
+      Although this reduces the parameter complexity from <span class="math inline">\(O(N^2)\)</span> to <span
+        class="math inline">\(O(N)\)</span>, parametric approaches make strong
+      assumptions about the underlying data distribution <span class="citation" data-cites="ashok_tactis-2_2023">(<a
+          href="#ref-ashok_tactis-2_2023" role="doc-biblioref">Ashok et al.
+          2023</a>)</span>. To address this, nonparametric copula estimators such
+      as TACTiS and TACTiS-2 <span class="citation" data-cites="drouin_tactis_2022 ashok_tactis-2_2023">(<a
+          href="#ref-drouin_tactis_2022" role="doc-biblioref">Drouin et al.
+          2022</a>; <a href="#ref-ashok_tactis-2_2023" role="doc-biblioref">Ashok
+          et al. 2023</a>)</span> offer greater flexibility by learning the copula
+      function directly from the data without assuming a fixed parametric
+      form. TACTiS <span class="citation" data-cites="drouin_tactis_2022">(<a href="#ref-drouin_tactis_2022"
+          role="doc-biblioref">Drouin et al.
+          2022</a>)</span> models the copula density autoregressively in the
+      copula-transformed space using a transformer-based architecture, where
+      each variable is conditioned on previously modeled ones. To ensure that
+      the learned copula is valid i.e., invariant to the ordering of
+      variables, TACTiS averages over multiple variable permutations during
+      training. However, achieving full permutation invariance would require
+      averaging over all possible orderings, which results in factorial
+      complexity <span class="math inline">\(O(N!)\)</span> in the number of
+      variables (with <span class="math inline">\(N = H\)</span> for temporal
+      dependencies) <span class="citation" data-cites="ashok_tactis-2_2023">(<a href="#ref-ashok_tactis-2_2023"
+          role="doc-biblioref">Ashok et al. 2023</a>)</span>. TACTiS-2 <span class="citation"
+        data-cites="ashok_tactis-2_2023">(<a href="#ref-ashok_tactis-2_2023" role="doc-biblioref">Ashok et al.
+          2023</a>)</span> mitigates this by implementing a two-stage training
+      protocol to learn marginals and the copula. It first fits normalizing
+      flows to estimate marginal CDFs, then uses a fixed-order attention
+      decoder with causal masking to model the joint copula density. This
+      reduces complexity from factorial <span class="math inline">\(O(!N)\)</span> to linear <span
+        class="math inline">\(O(N)\)</span>. Beyond the copula framework, a
+      different direction involves directly learning the multivariate quantile
+      function, the inverse CDF, as done by MQF<span class="math inline">\(^2\)</span> <span class="citation"
+        data-cites="kan_multivariate_2022">(<a href="#ref-kan_multivariate_2022" role="doc-biblioref">Kan et al.
+          2022</a>)</span>. Furthermore, MQF<span class="math inline">\(^2\)</span> represents the joint quantile
+      function
+      as the gradient of a convex function parameterized by an input convex
+      neural network (ICNN) <span class="citation" data-cites="amos_input_2017">(<a href="#ref-amos_input_2017"
+          role="doc-biblioref">Amos et al. 2017</a>)</span>, a NN architecture
+      designed to be convex with respect to a subset of its inputs through
+      specific structural constraints. MQF<span class="math inline">\(^2\)</span> avoids quantile crossing but
+      introduces additional complexity during both training and inference, as
+      evaluating the quantile function involves solving an optimization
+      problem. Lastly, several generative approaches naturally extend to
+      jointly model either or both of cross-series and temporal dependencies
+      by learning full multivariate distributions. For instance, this includes
+      diffusion (TMDM <span class="citation" data-cites="li_transformer-modulated_2023">(<a
+          href="#ref-li_transformer-modulated_2023" role="doc-biblioref">Li et al.
+          2023</a>)</span>), VAE (D<span class="math inline">\(^3\)</span>VAE <span class="citation"
+        data-cites="li_generative_2022">(<a href="#ref-li_generative_2022" role="doc-biblioref">Y. Li et al.
+          2022</a>)</span>) or GAN (AST <span class="citation" data-cites="wu_adversarial_2020">(<a
+          href="#ref-wu_adversarial_2020" role="doc-biblioref">S. Wu et al.
+          2020</a>)</span>) models.
+    </p>
+    <h4 id="ltsf-and-probabilistic-forecasting.">LTSF and probabilistic
+      forecasting.</h4>
+    <p>So far, we have seen two primary branches of time series forecasting:
+      long-term point forecasting methods and probabilistic forecasting
+      approaches. However, integrating both approaches into long-term
+      distributional forecasting is still a significant open challenge <span class="citation"
+        data-cites="zhang_probts_2024">(<a href="#ref-zhang_probts_2024" role="doc-biblioref">Zhang et al.
+          2024</a>)</span>. Furthermore, in their analysis <span class="citation" data-cites="zhang_probts_2024">Zhang
+        et
+        al. (<a href="#ref-zhang_probts_2024" role="doc-biblioref">2024</a>)</span> find
+      that point LTSF methods tend to focus on a DMS strategy, due to error
+      accumulation effects of IMS methods on longer forecasting horizons.
+      Additionally, their analysis shows that probabilistic TSF methods adopt
+      either IMS or DMS strategies without a clear preference, which they
+      account to shorter forecasting horizons. Looking at Table <a href="#tab:ltsf" data-reference-type="ref"
+        data-reference="tab:ltsf">[tab:ltsf]</a> and Table <a href="#tab:prob_tsf" data-reference-type="ref"
+        data-reference="tab:prob_tsf">[tab:prob_tsf]</a>, we come to the same
+      conclusion. Furthermore, although probabilistic methods consider mostly
+      the same datasets as point LTSF methods <span class="citation"
+        data-cites="kollovieh_predict_2023 rasul_vq-tr_2023 drouin_tactis_2022 tong_probabilistic_2022">(<a
+          href="#ref-kollovieh_predict_2023" role="doc-biblioref">Kollovieh et al.
+          2023</a>; <a href="#ref-rasul_vq-tr_2023" role="doc-biblioref">Rasul et
+          al. 2023</a>; <a href="#ref-drouin_tactis_2022" role="doc-biblioref">Drouin et al. 2022</a>; <a
+          href="#ref-tong_probabilistic_2022" role="doc-biblioref">Tong et al.
+          2022</a>)</span>, there are only a few probabilistic methods listed in
+      Table <a href="#tab:prob_tsf" data-reference-type="ref" data-reference="tab:prob_tsf">[tab:prob_tsf]</a>, where
+      the
+      forecasting
+      horizon <span class="math inline">\(H\)</span> is larger than 300. In
+      contrast, the longest forecasting horizon in the default LTSF setup is
+      720 <span class="citation" data-cites="zhou_informer_2021">(<a href="#ref-zhou_informer_2021"
+          role="doc-biblioref">Zhou et al.
+          2021</a>)</span>. Nevertheless, recent studies have begun to explore
+      modeling longer-term dependencies in probabilistic TSF. For instance,
+      SSSD <span class="citation" data-cites="alcaraz_diffusion-based_2022">(<a href="#ref-alcaraz_diffusion-based_2022"
+          role="doc-biblioref">Alcaraz
+          and Strodthoff 2022</a>)</span> includes a long-term forecasting
+      experiment inspired by the point-based LTSF framework of <span class="citation"
+        data-cites="zhou_informer_2021">Zhou
+        et al. (<a href="#ref-zhou_informer_2021" role="doc-biblioref">2021</a>)</span>.
+      However, their evaluation in this setting focuses solely on point
+      predictions, neglecting the probabilistic forecasting performance. More
+      recently, SutraNets <span class="citation" data-cites="bergsma_sutranets_2023">(<a
+          href="#ref-bergsma_sutranets_2023" role="doc-biblioref">Bergsma et al.
+          2023</a>)</span> and RATD <span class="citation" data-cites="liu_retrieval-augmented_2024">(<a
+          href="#ref-liu_retrieval-augmented_2024" role="doc-biblioref">Liu et al.
+          2024</a>)</span> have investigated probabilistic forecasting over
+      extended horizons. While SutraNets consider long horizons (e.g., <span class="math inline">\(H &gt; 300\)</span>),
+      those are limited to the
+      MNIST dataset <span class="citation" data-cites="lecun_mnist_1998">(<a href="#ref-lecun_mnist_1998"
+          role="doc-biblioref">LeCun et al.
+          1998</a>)</span>, which is not a standard benchmark in time series
+      forecasting. In contrast, RATD <span class="citation" data-cites="liu_retrieval-augmented_2024">(<a
+          href="#ref-liu_retrieval-augmented_2024" role="doc-biblioref">Liu et al.
+          2024</a>)</span> is evaluated under a more classical LTSF setting,
+      comparing performance against established point forecasting models, such
+      as iTransformer, Informer, PatchTST, TimesNet, and DLinear <span class="citation"
+        data-cites="liu_itransformer_2023 zhou_informer_2021 nie_time_2022 wu_timesnet_2022 zeng_are_2023">(<a
+          href="#ref-liu_itransformer_2023" role="doc-biblioref">Liu et al.
+          2023</a>; <a href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et
+          al. 2021</a>; <a href="#ref-nie_time_2022" role="doc-biblioref">Nie et
+          al. 2022</a>; <a href="#ref-wu_timesnet_2022" role="doc-biblioref">Wu et
+          al. 2022</a>; <a href="#ref-zeng_are_2023" role="doc-biblioref">Zeng et
+          al. 2023</a>)</span>, as well as probabilistic models like CSDI and
+      D<span class="math inline">\(^3\)</span>VAE <span class="citation"
+        data-cites="tashiro_csdi_2021 li_generative_2022">(<a href="#ref-tashiro_csdi_2021" role="doc-biblioref">Tashiro
+          et al.
+          2021</a>; <a href="#ref-li_generative_2022" role="doc-biblioref">Y. Li
+          et al. 2022</a>)</span>. However, point LTSF models in this evaluation
+      are not adapted nor interpreted within a probabilistic framework. From a
+      different standpoint, several model-agnostic approaches have been
+      proposed to derive probabilistic forecasts from point forecasting
+      methods. VQ-TR <span class="citation" data-cites="rasul_vq-tr_2023">(<a href="#ref-rasul_vq-tr_2023"
+          role="doc-biblioref">Rasul et al.
+          2023</a>)</span>, for example, is evaluated in a probabilistic setting
+      alongside transformer-based methods that were originally proposed for
+      point LTSF, e.g. Informer, Autoformer and PatchTST <span class="citation"
+        data-cites="zhou_informer_2021 wu_autoformer_2021 nie_time_2022">(<a href="#ref-zhou_informer_2021"
+          role="doc-biblioref">Zhou et al.
+          2021</a>; <a href="#ref-wu_autoformer_2021" role="doc-biblioref">Wu et
+          al. 2021</a>; <a href="#ref-nie_time_2022" role="doc-biblioref">Nie et
+          al. 2022</a>)</span>. To enable probabilistic outputs, <span class="citation"
+        data-cites="rasul_vq-tr_2023">Rasul et al. (<a href="#ref-rasul_vq-tr_2023"
+          role="doc-biblioref">2023</a>)</span>
+      modify deterministic TSF architectures to either implement a parametric
+      distributional forecasting approach with a negative binomial or
+      Student-t distribution or implement an IQN head. However, the
+      forecasting horizons considered are relatively short and not directly
+      comparable to common LTSF settings. TMDM <span class="citation" data-cites="li_transformer-modulated_2023">(<a
+          href="#ref-li_transformer-modulated_2023" role="doc-biblioref">Li et al.
+          2023</a>)</span> presents a plug-and-play framework compatible with
+      arbitrary point forecasting models. Its core idea is to leverage the
+      strength of LTSF models in estimating the conditional mean, using this
+      to guide the generation of full predictive distributions via diffusion.
+      TMDM integrates architectures such as Informer, Autoformer or NSformer
+      <span class="citation" data-cites="zhou_informer_2021 wu_autoformer_2021 liu_non-stationary_2022">(<a
+          href="#ref-zhou_informer_2021" role="doc-biblioref">Zhou et al.
+          2021</a>; <a href="#ref-wu_autoformer_2021" role="doc-biblioref">Wu et
+          al. 2021</a>; <a href="#ref-liu_non-stationary_2022" role="doc-biblioref">Liu et al. 2022</a>)</span> as
+      backbones, but also
+      limits forecasting to horizons no greater than 196 steps. Finally,
+      ProbCast <span class="citation" data-cites="koochali_if_2021">(<a href="#ref-koochali_if_2021"
+          role="doc-biblioref">Koochali et al.
+          2021</a>)</span> introduces a GAN-based framework for transforming point
+      forecasting models into probabilistic ones. However, their evaluation
+      also does not address extended forecasting horizons and is restricted to
+      a simple RNN-based backbone.<br />
+    </p>
+    <p>To summarize, in the domain of probabilistic TSF, the diversity of
+      forecasting setups, e.g. with respect to prediction horizons (see Table
+      <a href="#tab:prob_tsf" data-reference-type="ref" data-reference="tab:prob_tsf">[tab:prob_tsf]</a>), makes it
+      challenging
+      to establish consistent benchmarks or perform definitive model
+      comparisons across studies. Furthermore, we do not define a clear
+      state-of-the-art for probabilistic forecasting as we have for point
+      LTSF, since the studies tend to be more isolated and less directly
+      comparable. In addition to this, as discussed, only a limited number of
+      studies have explored probabilistic methods within the LTSF setting
+      <span class="citation"
+        data-cites="alcaraz_diffusion-based_2022 bergsma_sutranets_2023 liu_retrieval-augmented_2024">(<a
+          href="#ref-alcaraz_diffusion-based_2022" role="doc-biblioref">Alcaraz
+          and Strodthoff 2022</a>; <a href="#ref-bergsma_sutranets_2023" role="doc-biblioref">Bergsma et al. 2023</a>;
+        <a href="#ref-liu_retrieval-augmented_2024" role="doc-biblioref">Liu et al.
+          2024</a>)</span>. Likewise, only a few works have attempted extending
+      point LTSF architectures to support probabilistic outputs <span class="citation"
+        data-cites="rasul_vq-tr_2023 li_transformer-modulated_2023 koochali_if_2021">(<a href="#ref-rasul_vq-tr_2023"
+          role="doc-biblioref">Rasul et al. 2023</a>;
+        <a href="#ref-li_transformer-modulated_2023" role="doc-biblioref">Li et
+          al. 2023</a>; <a href="#ref-koochali_if_2021" role="doc-biblioref">Koochali et al. 2021</a>)</span>. Hence, in
+      this
+      work we aim to bridge this gap by evaluating point LTSF methods in a
+      probabilistic setting, focusing on longer forecasting horizons than
+      prior studies and assessing them using probabilistic metrics. In doing
+      so, we also analyze the behavior of IMS and DMS strategies more in
+      depth, identifying cases where DMS methods fail to yield reliable
+      probabilistic forecasts. To properly train and evaluate probabilistic
+      methods, suitable evaluation metrics are necessary, which is the subject
+      of the following and final section of the related work.
+    </p>
+    <div class="center">
+      <p><span id="tab:prob_tsf" data-label="tab:prob_tsf"></span></p>
+    </div>
+    <table>
+      <tbody>
+        <tr>
+          <td style="text-align: left;"><strong>Model</strong></td>
+          <td style="text-align: center;"><strong>Venue</strong></td>
+          <td style="text-align: center;"><strong>IMS/DMS</strong></td>
+          <td style="text-align: left;"><strong>Backbone</strong></td>
+          <td style="text-align: center;"><strong>CI/CD</strong></td>
+          <td style="text-align: center;"><strong>H</strong></td>
+          <td style="text-align: left;"><strong>Prob. Method</strong></td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">MQ-RNN/MQ-CNN <span class="citation" data-cites="wen_multi-horizon_2018">(<a
+                href="#ref-wen_multi-horizon_2018" role="doc-biblioref">Wen et al.
+                2018</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’17</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN/ RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">52</td>
+          <td style="text-align: left;">Quantiles</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">DeepState <span class="citation" data-cites="rangapuram_deep_2018">(<a
+                href="#ref-rangapuram_deep_2018" role="doc-biblioref">Rangapuram et al. 2018</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’18</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">SSM/ RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">168</td>
+          <td style="text-align: left;">Prob. Latent Variable</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">GP-Copula <span class="citation" data-cites="salinas_high-dimensional_2019">(<a
+                href="#ref-salinas_high-dimensional_2019" role="doc-biblioref">Salinas
+                et al. 2019</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’19</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Distributional &amp; Copula</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">GMQ <span class="citation" data-cites="wen_deep_2019">(<a
+                href="#ref-wen_deep_2019" role="doc-biblioref">Wen and Torkkola 2019</a>)</span></td>
+          <td style="text-align: center;">ICML’19</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">CNN/ RNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">IQN &amp; Copula</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">SQF-RNN <span class="citation" data-cites="gasthaus_probabilistic_2019">(<a
+                href="#ref-gasthaus_probabilistic_2019" role="doc-biblioref">Gasthaus et
+                al. 2019</a>)</span></td>
+          <td style="text-align: center;">AISTATS’19</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">60</td>
+          <td style="text-align: left;">Quantile Function</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">DeepTCN <span class="citation" data-cites="chen_probabilistic_2019">(<a
+                href="#ref-chen_probabilistic_2019" role="doc-biblioref">Chen et al.
+                2019</a>)</span></td>
+          <td style="text-align: center;">MileTS’19</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">31</td>
+          <td style="text-align: left;">Distributional/ Quantiles</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">AST <span class="citation" data-cites="wu_adversarial_2020">(<a
+                href="#ref-wu_adversarial_2020" role="doc-biblioref">S. Wu et al. 2020</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’20</td>
+          <td style="text-align: center;">IMS/DMS</td>
+          <td style="text-align: left;">Transformer(E-D)</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">168</td>
+          <td style="text-align: left;">GAN</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">DeepAR <span class="citation" data-cites="salinas_deepar_2020">(<a
+                href="#ref-salinas_deepar_2020" role="doc-biblioref">Salinas et al. 2020</a>)</span></td>
+          <td style="text-align: center;">IJF’20</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">52</td>
+          <td style="text-align: left;">Distributional</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">ProTran <span class="citation" data-cites="tang_probabilistic_2021">(<a
+                href="#ref-tang_probabilistic_2021" role="doc-biblioref">Tang and
+                Matteson 2021</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’21</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">SSM/Transformer(E)</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Prob. Latent Variable</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">CSDI <span class="citation" data-cites="tashiro_csdi_2021">(<a
+                href="#ref-tashiro_csdi_2021" role="doc-biblioref">Tashiro et al. 2021</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’21</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer(E)</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">24</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">TimeGrad <span class="citation" data-cites="rasul_autoregressive_2021">(<a
+                href="#ref-rasul_autoregressive_2021" role="doc-biblioref">Rasul et al.
+                2021</a>)</span></td>
+          <td style="text-align: center;">ICML’21</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">IQN-RNN <span class="citation" data-cites="gouttes_probabilistic_2021">(<a
+                href="#ref-gouttes_probabilistic_2021" role="doc-biblioref">Gouttes et
+                al. 2021</a>)</span></td>
+          <td style="text-align: center;">ICML’21</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">IQN</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">LSTM-Real-NVP/ Transformer-MAF <span class="citation"
+              data-cites="rasul_multivariate_2020">(<a href="#ref-rasul_multivariate_2020" role="doc-biblioref">Rasul et
+                al.
+                2020</a>)</span></td>
+          <td style="text-align: center;">ICLR’21</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN/ Transformer(E-D)</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Flow</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">VSMHN <span class="citation" data-cites="li_synergetic_2021">(<a
+                href="#ref-li_synergetic_2021" role="doc-biblioref">Li et al. 2021</a>)</span></td>
+          <td style="text-align: center;">AAAI’21</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">24</td>
+          <td style="text-align: left;">VAE</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">TLAE <span class="citation" data-cites="nguyen_temporal_2021">(<a
+                href="#ref-nguyen_temporal_2021" role="doc-biblioref">Nguyen and Quanz 2021</a>)</span></td>
+          <td style="text-align: center;">AAAI’21</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">AE/RNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">24</td>
+          <td style="text-align: left;">VAE</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">ProbCast <span class="citation" data-cites="koochali_if_2021">(<a
+                href="#ref-koochali_if_2021" role="doc-biblioref">Koochali et al. 2021</a>)</span></td>
+          <td style="text-align: center;">Eng. Proc.’21</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">24</td>
+          <td style="text-align: left;">GAN</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">TFT <span class="citation" data-cites="lim_temporal_2021">(<a
+                href="#ref-lim_temporal_2021" role="doc-biblioref">Lim et al. 2021</a>)</span></td>
+          <td style="text-align: center;">IJF’21</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Quantiles</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">D<span class="math inline">\(^3\)</span>VAE <span class="citation"
+              data-cites="li_generative_2022">(<a href="#ref-li_generative_2022" role="doc-biblioref">Y. Li et al.
+                2022</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’22</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">64</td>
+          <td style="text-align: left;">Diffusion &amp; VAE</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">C2FAR <span class="citation" data-cites="bergsma_c2far_2022">(<a
+                href="#ref-bergsma_c2far_2022" role="doc-biblioref">Bergsma et al. 2022</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’22</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">48</td>
+          <td style="text-align: left;">Distributional</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">TACTiS <span class="citation" data-cites="drouin_tactis_2022">(<a
+                href="#ref-drouin_tactis_2022" role="doc-biblioref">Drouin et al. 2022</a>)</span></td>
+          <td style="text-align: center;">ICML’22</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">Transformer(E)</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">72</td>
+          <td style="text-align: left;">Flow &amp; Copula</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">EMSSM <span class="citation" data-cites="sun_memory_2022">(<a
+                href="#ref-sun_memory_2022" role="doc-biblioref">Sun et al. 2022</a>)</span></td>
+          <td style="text-align: center;">IJCAI’22</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">SSM &amp; RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Flow &amp; Prob. Latent Variables</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">MQF<span class="math inline">\(^2\)</span>
+            <span class="citation" data-cites="kan_multivariate_2022">(<a href="#ref-kan_multivariate_2022"
+                role="doc-biblioref">Kan et al.
+                2022</a>)</span>
+          </td>
+          <td style="text-align: center;">AISTATS’22</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">RNN &amp; PICNN <span class="citation" data-cites="amos_input_2017">(<a
+                href="#ref-amos_input_2017" role="doc-biblioref">Amos et al. 2017</a>)</span></td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">24</td>
+          <td style="text-align: left;">Quantile Function</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">ISQF <span class="citation" data-cites="park_learning_2022">(<a
+                href="#ref-park_learning_2022" role="doc-biblioref">Park et al. 2022</a>)</span></td>
+          <td style="text-align: center;">AISTATS’22</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Quantile Function</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">DNLSSM <span class="citation" data-cites="du_probabilistic_2023">(<a
+                href="#ref-du_probabilistic_2023" role="doc-biblioref">Du et al. 2023</a>)</span></td>
+          <td style="text-align: center;">CAAI’22</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN &amp; SSM</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">196</td>
+          <td style="text-align: left;">Prob. Latent Variable</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">GQFormer <span class="citation" data-cites="jawed_gqformer_2022">(<a
+                href="#ref-jawed_gqformer_2022" role="doc-biblioref">Jawed and Schmidt-Thieme 2022</a>)</span></td>
+          <td style="text-align: center;">IEEE Big Data’22</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer(E)</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">168</td>
+          <td style="text-align: left;">IQN</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">VQ-AR <span class="citation" data-cites="rasul_vq-ar_2022">(<a
+                href="#ref-rasul_vq-ar_2022" role="doc-biblioref">Rasul et al. 2022</a>)</span></td>
+          <td style="text-align: center;">-</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Distributional</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">TSDiff <span class="citation" data-cites="kollovieh_predict_2023">(<a
+                href="#ref-kollovieh_predict_2023" role="doc-biblioref">Kollovieh et al.
+                2023</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">SSM</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">48</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">SutraNets <span class="citation" data-cites="bergsma_sutranets_2023">(<a
+                href="#ref-bergsma_sutranets_2023" role="doc-biblioref">Bergsma et al.
+                2023</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’23</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">392</td>
+          <td style="text-align: left;">Distributional</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">DSDP-GP <span class="citation" data-cites="bilos_modeling_2023">(<a
+                href="#ref-bilos_modeling_2023" role="doc-biblioref">Biloš et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICML’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">RNN</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">mr-diff <span class="citation" data-cites="shen_multi-resolution_2023">(<a
+                href="#ref-shen_multi-resolution_2023" role="doc-biblioref">Shen et al.
+                2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">MLP</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">24</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">SSSD <span class="citation" data-cites="alcaraz_diffusion-based_2022">(<a
+                href="#ref-alcaraz_diffusion-based_2022" role="doc-biblioref">Alcaraz
+                and Strodthoff 2022</a>)</span></td>
+          <td style="text-align: center;">TMLR’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">SSM</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">672</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">pTSE <span class="citation" data-cites="zhou_ptse_2023">(<a
+                href="#ref-zhou_ptse_2023" role="doc-biblioref">Zhou et al. 2023</a>)</span></td>
+          <td style="text-align: center;">IJCAI’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Ensemble</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">24</td>
+          <td style="text-align: left;">HMM</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">BiTCN <span class="citation" data-cites="sprangers_parameter-efficient_2023">(<a
+                href="#ref-sprangers_parameter-efficient_2023" role="doc-biblioref">Sprangers et al. 2023</a>)</span>
+          </td>
+          <td style="text-align: center;">IJF’23</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">CNN</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Distributional</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">PDTrans <span class="citation" data-cites="tong_probabilistic_2022">(<a
+                href="#ref-tong_probabilistic_2022" role="doc-biblioref">Tong et al.
+                2022</a>)</span></td>
+          <td style="text-align: center;">SDM’23</td>
+          <td style="text-align: center;">IMS &amp; DMS</td>
+          <td style="text-align: left;">Transformer(E-D)</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">168</td>
+          <td style="text-align: left;">Prob. Latent Variable</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">RATD <span class="citation" data-cites="liu_retrieval-augmented_2024">(<a
+                href="#ref-liu_retrieval-augmented_2024" role="doc-biblioref">Liu et al.
+                2024</a>)</span></td>
+          <td style="text-align: center;">NeurIPS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer(E)/RAG/ DiffWave</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">336</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">D<span class="math inline">\(^3\)</span>M
+            <span class="citation" data-cites="yan_probabilistic_2024">(<a href="#ref-yan_probabilistic_2024"
+                role="doc-biblioref">Yan et al.
+                2024</a>)</span>
+          </td>
+          <td style="text-align: center;">ICML’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">SSM &amp; WaveNet (CNN)</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Diffusion &amp; Flow</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">TACTiS-2 <span class="citation" data-cites="ashok_tactis-2_2023">(<a
+                href="#ref-ashok_tactis-2_2023" role="doc-biblioref">Ashok et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">Transformer(E)</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">72</td>
+          <td style="text-align: left;">Flow &amp; Copula</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">TMDM <span class="citation" data-cites="li_transformer-modulated_2023">(<a
+                href="#ref-li_transformer-modulated_2023" role="doc-biblioref">Li et al.
+                2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer(E)</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">192</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">VQ-TR <span class="citation" data-cites="rasul_vq-tr_2023">(<a
+                href="#ref-rasul_vq-tr_2023" role="doc-biblioref">Rasul et al. 2023</a>)</span></td>
+          <td style="text-align: center;">ICLR’24</td>
+          <td style="text-align: center;">IMS</td>
+          <td style="text-align: left;">Transformer (E-D)</td>
+          <td style="text-align: center;">CI</td>
+          <td style="text-align: center;">48</td>
+          <td style="text-align: left;">Distributional</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">LDT <span class="citation" data-cites="feng_latent_2024">(<a
+                href="#ref-feng_latent_2024" role="doc-biblioref">Feng, Miao, Zhang, et al. 2024</a>)</span></td>
+          <td style="text-align: center;">AAAI’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer(E-D)-AE</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">48</td>
+          <td style="text-align: left;">Diffusion</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">MANF <span class="citation" data-cites="feng_multi-scale_2024">(<a
+                href="#ref-feng_multi-scale_2024" role="doc-biblioref">Feng, Miao, Xu, et al. 2024</a>)</span></td>
+          <td style="text-align: center;">IEEE TKDE’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">Transformer(E)</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">30</td>
+          <td style="text-align: left;">Flow</td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">GPF-WI <span class="citation" data-cites="wang_generative_2024">(<a
+                href="#ref-wang_generative_2024" role="doc-biblioref">Wang et al. 2024</a>)</span></td>
+          <td style="text-align: center;">CISS’24</td>
+          <td style="text-align: center;">DMS</td>
+          <td style="text-align: left;">AE</td>
+          <td style="text-align: center;">CD</td>
+          <td style="text-align: center;">24</td>
+          <td style="text-align: left;">VAE</td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="refs" class="references csl-bib-body hanging-indent" role="list">
+      <div id="ref-alcaraz_diffusion-based_2022" class="csl-entry" role="listitem">
+        Alcaraz, Juan Lopez, and Nils Strodthoff. 2022. <span>“Diffusion-Based
+          <span>Time</span> <span>Series</span> <span>Imputation</span> and
+          <span>Forecasting</span> with <span>Structured</span> <span>State</span>
+          <span>Space</span> <span>Models</span>.”</span> <em>Transactions on
+          Machine Learning Research</em>, December. <a
+          href="https://openreview.net/forum?id=hHiIbk7ApW">https://openreview.net/forum?id=hHiIbk7ApW</a>.
+      </div>
+      <div id="ref-alexandrov_gluonts_2020" class="csl-entry" role="listitem">
+        Alexandrov, Alexander, Konstantinos Benidis, Michael Bohlke-Schneider,
+        et al. 2020. <span>“<span>GluonTS</span>: <span>Probabilistic</span> and
+          <span>Neural</span> <span>Time</span> <span>Series</span>
+          <span>Modeling</span> in <span>Python</span>.”</span> <em>Journal of
+          Machine Learning Research</em> 21 (116): 1–6. <a
+          href="http://jmlr.org/papers/v21/19-820.html">http://jmlr.org/papers/v21/19-820.html</a>.
+      </div>
+      <div id="ref-amos_input_2017" class="csl-entry" role="listitem">
+        Amos, Brandon, Lei Xu, and J. Zico Kolter. 2017. <span>“Input
+          <span>Convex</span> <span>Neural</span> <span>Networks</span>.”</span>
+        <em>Proceedings of the 34th <span>International</span>
+          <span>Conference</span> on <span>Machine</span>
+          <span>Learning</span></em>, July, 146–55. <a
+          href="https://proceedings.mlr.press/v70/amos17b.html">https://proceedings.mlr.press/v70/amos17b.html</a>.
+      </div>
+      <div id="ref-ashok_tactis-2_2023" class="csl-entry" role="listitem">
+        Ashok, Arjun, Étienne Marcotte, Valentina Zantedeschi, Nicolas Chapados,
+        and Alexandre Drouin. 2023. <span>“<span>TACTiS</span>-2:
+          <span>Better</span>, <span>Faster</span>, <span>Simpler</span>
+          <span>Attentional</span> <span>Copulas</span> for
+          <span>Multivariate</span> <span>Time</span> <span>Series</span>.”</span>
+        <em>Proceedings of the <span>Twelfth</span> <span>International</span>
+          <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=xtOydkE1Ku">https://openreview.net/forum?id=xtOydkE1Ku</a>.
+      </div>
+      <div id="ref-benidis_deep_2022" class="csl-entry" role="listitem">
+        Benidis, Konstantinos, Syama Sundar Rangapuram, Valentin Flunkert, et
+        al. 2022. <span>“Deep <span>Learning</span> for <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>: <span>Tutorial</span> and
+          <span>Literature</span> <span>Survey</span>.”</span> <em>ACM Computing
+          Surveys</em> 55 (6). <a href="https://doi.org/10.1145/3533382">https://doi.org/10.1145/3533382</a>.
+      </div>
+      <div id="ref-bergsma_sutranets_2023" class="csl-entry" role="listitem">
+        Bergsma, Shane, Tim Zeyl, and Lei Guo. 2023.
+        <span>“<span>SutraNets</span>: <span>Sub</span>-Series
+          <span>Autoregressive</span> <span>Networks</span> for
+          <span>Long</span>-<span>Sequence</span>, <span>Probabilistic</span>
+          <span>Forecasting</span>.”</span> In <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em>, edited by A. Oh, T. Naumann, A. Globerson, K.
+        Saenko, M. Hardt, and S. Levine, vol. 36, 36. Curran Associates, Inc. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2023/file/6171c9e600432a42688ad61a525951bf-Paper-Conference.pdf">https://proceedings.neurips.cc/paper_files/paper/2023/file/6171c9e600432a42688ad61a525951bf-Paper-Conference.pdf</a>.
+      </div>
+      <div id="ref-bergsma_c2far_2022" class="csl-entry" role="listitem">
+        Bergsma, Shane, Tim Zeyl, Javad Rahimipour Anaraki, and Lei Guo. 2022.
+        <span>“<span>C2FAR</span>: <span>Coarse</span>-to-<span>Fine</span>
+          <span>Autoregressive</span> <span>Networks</span> for
+          <span>Precise</span> <span>Probabilistic</span>
+          <span>Forecasting</span>.”</span> In <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em>, edited by S. Koyejo, S. Mohamed, A. Agarwal,
+        D. Belgrave, K. Cho, and A. Oh, vol. 35, 35. Curran Associates, Inc. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2022/file/899511e37a8e01e1bd6f6f1d377cc250-Paper-Conference.pdf">https://proceedings.neurips.cc/paper_files/paper/2022/file/899511e37a8e01e1bd6f6f1d377cc250-Paper-Conference.pdf</a>.
+      </div>
+      <div id="ref-de_bezenac_normalizing_2020" class="csl-entry" role="listitem">
+        Bézenac, Emmanuel de, Syama Sundar Rangapuram, Konstantinos Benidis, et
+        al. 2020. <span>“Normalizing <span>Kalman</span> <span>Filters</span>
+          for <span>Multivariate</span> <span>Time</span> <span>Series</span>
+          <span>Analysis</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 33: 2995–3007. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2020/hash/1f47cef5e38c952f94c5d61726027439-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2020/hash/1f47cef5e38c952f94c5d61726027439-Abstract.html</a>.
+      </div>
+      <div id="ref-bilos_modeling_2023" class="csl-entry" role="listitem">
+        Biloš, Marin, Kashif Rasul, Anderson Schneider, Yuriy Nevmyvaka, and
+        Stephan Günnemann. 2023. <span>“Modeling Temporal Data as Continuous
+          Functions with Stochastic Process Diffusion.”</span> <em>Proceedings of
+          the 40th <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em> (Honolulu, Hawaii, USA),
+        <span>ICML</span>’23, vol. 202 (July): 2452–70.
+      </div>
+      <div id="ref-box_distribution_1970" class="csl-entry" role="listitem">
+        Box, G. E. P., and David A. Pierce. 1970. <span>“Distribution of
+          <span>Residual</span> <span>Autocorrelations</span> in
+          <span>Autoregressive</span>-<span>Integrated</span> <span>Moving</span>
+          <span>Average</span> <span>Time</span> <span>Series</span>
+          <span>Models</span>.”</span> <em>Journal of the American Statistical
+          Association</em> 65 (332): 1509–26. <a
+          href="https://doi.org/10.1080/01621459.1970.10481180">https://doi.org/10.1080/01621459.1970.10481180</a>.
+      </div>
+      <div id="ref-bracher_evaluating_2021" class="csl-entry" role="listitem">
+        Bracher, Johannes, Evan L. Ray, Tilmann Gneiting, and Nicholas G. Reich.
+        2021. <span>“Evaluating Epidemic Forecasts in an Interval
+          Format.”</span> <em>PLOS Computational Biology</em> 17 (2): e1008618. <a
+          href="https://doi.org/10.1371/journal.pcbi.1008618">https://doi.org/10.1371/journal.pcbi.1008618</a>.
+      </div>
+      <div id="ref-chen_probabilistic_2019" class="csl-entry" role="listitem">
+        Chen, Yitian, Yanfei Kang, Yixiong Chen, and Zizhuo Wang. 2019.
+        <span>“Probabilistic Forecasting with Temporal Convolutional Neural
+          Network.”</span> <em><span>MileTS</span> ’19: 5th <span>KDD</span>
+          <span>Workshop</span> on <span>Mining</span> and <span>Learning</span>
+          from <span>Time</span> <span>Series</span></em> (Anchorage, Alaska,
+        USA), August, 11. https://doi.org/<a
+          href="https://doi.org/10.1145/1122445.1122456">https://doi.org/10.1145/1122445.1122456</a>.
+      </div>
+      <div id="ref-dabney_implicit_2018" class="csl-entry" role="listitem">
+        Dabney, Will, Georg Ostrovski, David Silver, and Remi Munos. 2018.
+        <span>“Implicit <span>Quantile</span> <span>Networks</span> for
+          <span>Distributional</span> <span>Reinforcement</span>
+          <span>Learning</span>.”</span> <em>Proceedings of the 35th
+          <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em>, July, 1096–105. <a
+          href="https://proceedings.mlr.press/v80/dabney18a.html">https://proceedings.mlr.press/v80/dabney18a.html</a>.
+      </div>
+      <div id="ref-deisenroth_robust_2012" class="csl-entry" role="listitem">
+        Deisenroth, Marc Peter, Ryan Darby Turner, Marco F. Huber, Uwe D.
+        Hanebeck, and Carl Edward Rasmussen. 2012. <span>“Robust
+          <span>Filtering</span> and <span>Smoothing</span> with
+          <span>Gaussian</span> <span>Processes</span>.”</span> <em>IEEE
+          Transactions on Automatic Control</em> 57 (7): 1865–71. <a
+          href="https://doi.org/10.1109/TAC.2011.2179426">https://doi.org/10.1109/TAC.2011.2179426</a>.
+      </div>
+      <div id="ref-dhariwal_diffusion_2021" class="csl-entry" role="listitem">
+        Dhariwal, Prafulla, and Alexander Nichol. 2021. <span>“Diffusion
+          <span>Models</span> <span>Beat</span> <span>GANs</span> on
+          <span>Image</span> <span>Synthesis</span>.”</span> <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 34: 8780–94. <a
+          href="https://proceedings.neurips.cc/paper/2021/hash/49ad23d1ec9fa4bd8d77d02681df5cfa-Abstract.html">https://proceedings.neurips.cc/paper/2021/hash/49ad23d1ec9fa4bd8d77d02681df5cfa-Abstract.html</a>.
+      </div>
+      <div id="ref-dinh_density_2017" class="csl-entry" role="listitem">
+        Dinh, Laurent, Jascha Sohl-Dickstein, and Samy Bengio. 2017.
+        <span>“Density Estimation Using <span>Real</span>
+          <span>NVP</span>.”</span> <em>Proceedings of the 5th
+          <span>International</span> <span>Conference</span> on
+          <span>Learning</span> <span>Representations</span> (<span>ICLR</span>
+          2017)</em>, February. <a
+          href="https://openreview.net/forum?id=HkpbnH9lx">https://openreview.net/forum?id=HkpbnH9lx</a>.
+      </div>
+      <div id="ref-doerr_probabilistic_2018" class="csl-entry" role="listitem">
+        Doerr, Andreas, Christian Daniel, Martin Schiegg, et al. 2018.
+        <span>“Probabilistic <span>Recurrent</span>
+          <span>State</span>-<span>Space</span> <span>Models</span>.”</span>
+        <em>Proceedings of the 35th <span>International</span>
+          <span>Conference</span> on <span>Machine</span>
+          <span>Learning</span></em>, July, 1280–89. <a
+          href="https://proceedings.mlr.press/v80/doerr18a.html">https://proceedings.mlr.press/v80/doerr18a.html</a>.
+      </div>
+      <div id="ref-donahue_adversarial_2018" class="csl-entry" role="listitem">
+        Donahue, Chris, Julian McAuley, and Miller Puckette. 2018.
+        <span>“Adversarial <span>Audio</span> <span>Synthesis</span>.”</span>
+        <em>Proceedings of the 7th <span>International</span>
+          <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span> (<span>ICLR</span> 2019)</em>, September.
+        <a href="https://openreview.net/forum?id=ByMVTsR5KQ">https://openreview.net/forum?id=ByMVTsR5KQ</a>.
+      </div>
+      <div id="ref-drouin_tactis_2022" class="csl-entry" role="listitem">
+        Drouin, Alexandre, Étienne Marcotte, and Nicolas Chapados. 2022.
+        <span>“<span>TACTiS</span>:
+          <span>Transformer</span>-<span>Attentional</span> <span>Copulas</span>
+          for <span>Time</span> <span>Series</span>.”</span> <em>Proceedings of
+          the 39th <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em>, June, 5447–93. <a
+          href="https://proceedings.mlr.press/v162/drouin22a.html">https://proceedings.mlr.press/v162/drouin22a.html</a>.
+      </div>
+      <div id="ref-du_probabilistic_2023" class="csl-entry" role="listitem">
+        Du, Heming, Shouguo Du, and Wen Li. 2023. <span>“Probabilistic Time
+          Series Forecasting with Deep Non-Linear State Space Models.”</span>
+        <em>CAAI Transactions on Intelligence Technology</em> 8 (1): 3–13. <a
+          href="https://doi.org/10.1049/cit2.12085">https://doi.org/10.1049/cit2.12085</a>.
+      </div>
+      <div id="ref-du_implicit_2019" class="csl-entry" role="listitem">
+        Du, Yilun, and Igor Mordatch. 2019. <span>“Implicit
+          <span>Generation</span> and <span>Modeling</span> with
+          <span>Energy</span> <span>Based</span> <span>Models</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 32. <a
+          href="https://proceedings.neurips.cc/paper/2019/hash/378a063b8fdb1db941e34f4bde584c7d-Abstract.html">https://proceedings.neurips.cc/paper/2019/hash/378a063b8fdb1db941e34f4bde584c7d-Abstract.html</a>.
+      </div>
+      <div id="ref-durbin_time_2012" class="csl-entry" role="listitem">
+        Durbin, James, and Siem Jan Koopman. 2012. <em>Time <span>Series</span>
+          <span>Analysis</span> by <span>State</span> <span>Space</span>
+          <span>Methods</span></em>. 2nd ed. Oxford University Press. <a
+          href="https://doi.org/10.1093/acprof:oso/9780199641178.001.0001">https://doi.org/10.1093/acprof:oso/9780199641178.001.0001</a>.
+      </div>
+      <div id="ref-feng_multi-scale_2024" class="csl-entry" role="listitem">
+        Feng, Shibo, Chunyan Miao, Ke Xu, et al. 2024.
+        <span>“Multi-<span>Scale</span> <span>Attention</span> <span>Flow</span>
+          for <span>Probabilistic</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>IEEE Transactions on Knowledge and
+          Data Engineering</em> 36 (5): 2056–68. <a
+          href="https://doi.org/10.1109/TKDE.2023.3319672">https://doi.org/10.1109/TKDE.2023.3319672</a>.
+      </div>
+      <div id="ref-feng_latent_2024" class="csl-entry" role="listitem">
+        Feng, Shibo, Chunyan Miao, Zhong Zhang, and Peilin Zhao. 2024.
+        <span>“Latent <span>Diffusion</span> <span>Transformer</span> for
+          <span>Probabilistic</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 38 (March): 11979–87. <a
+          href="https://doi.org/10.1609/aaai.v38i11.29085">https://doi.org/10.1609/aaai.v38i11.29085</a>.
+      </div>
+      <div id="ref-gasthaus_probabilistic_2019" class="csl-entry" role="listitem">
+        Gasthaus, Jan, Konstantinos Benidis, Yuyang Wang, et al. 2019.
+        <span>“Probabilistic <span>Forecasting</span> with <span>Spline</span>
+          <span>Quantile</span> <span>Function</span> <span>RNNs</span>.”</span>
+        <em>Proceedings of the <span>Twenty</span>-<span>Second</span>
+          <span>International</span> <span>Conference</span> on
+          <span>Artificial</span> <span>Intelligence</span> and
+          <span>Statistics</span></em>, April, 1901–10. <a
+          href="https://proceedings.mlr.press/v89/gasthaus19a.html">https://proceedings.mlr.press/v89/gasthaus19a.html</a>.
+      </div>
+      <div id="ref-gneiting_probabilistic_2014" class="csl-entry" role="listitem">
+        Gneiting, Tilmann, and Matthias Katzfuss. 2014. <span>“Probabilistic
+          <span>Forecasting</span>.”</span> <em>Annual Review of Statistics and
+          Its Application</em> 1 (1): 125–51. <a
+          href="https://doi.org/10.1146/annurev-statistics-062713-085831">https://doi.org/10.1146/annurev-statistics-062713-085831</a>.
+      </div>
+      <div id="ref-gneiting_model_2023" class="csl-entry" role="listitem">
+        Gneiting, Tilmann, Daniel Wolffram, Johannes Resin, et al. 2023.
+        <span>“Model <span>Diagnostics</span> and <span>Forecast</span>
+          <span>Evaluation</span> for <span>Quantiles</span>.”</span> <em>Annual
+          Review of Statistics and Its Application</em> 10 (1): 597–621. <a
+          href="https://doi.org/10.1146/annurev-statistics-032921-020240">https://doi.org/10.1146/annurev-statistics-032921-020240</a>.
+      </div>
+      <div id="ref-goodfellow_generative_2014" class="csl-entry" role="listitem">
+        Goodfellow, Ian J., Jean Pouget-Abadie, Mehdi Mirza, et al. 2014.
+        <span>“Generative <span>Adversarial</span> <span>Nets</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 27. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2014/hash/f033ed80deb0234979a61f95710dbe25-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2014/hash/f033ed80deb0234979a61f95710dbe25-Abstract.html</a>.
+      </div>
+      <div id="ref-gouttes_probabilistic_2021" class="csl-entry" role="listitem">
+        Gouttes, Adèle, Kashif Rasul, Mateusz Koren, Johannes Stephan, and
+        Tofigh Naghibi. 2021. <span>“Probabilistic <span>Time</span>
+          <span>Series</span> <span>Forecasting</span> with <span>Implicit</span>
+          <span>Quantile</span> <span>Networks</span>.”</span> <em>Proceedings of
+          the <span>Time</span> <span>Series</span> <span>Workshop</span> at 38th
+          <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em>.
+      </div>
+      <div id="ref-graikos_diffusion_2022" class="csl-entry" role="listitem">
+        Graikos, Alexandros, Nikolay Malkin, Nebojsa Jojic, and Dimitris
+        Samaras. 2022. <span>“Diffusion <span>Models</span> as
+          <span>Plug</span>-and-<span>Play</span> <span>Priors</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 35 (December):
+        14715–28. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/5e6cec2a9520708381fe520246018e8b-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2022/hash/5e6cec2a9520708381fe520246018e8b-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-groser_copulae_2022" class="csl-entry" role="listitem">
+        Größer, Joshua, and Ostap Okhrin. 2022. <span>“Copulae: <span>An</span>
+          Overview and Recent Developments.”</span> <em>WIREs Computational
+          Statistics</em> 14 (3): e1557. <a
+          href="https://doi.org/10.1002/wics.1557">https://doi.org/10.1002/wics.1557</a>.
+      </div>
+      <div id="ref-harsha_prescriptive_2021" class="csl-entry" role="listitem">
+        Harsha, Pavithra, Ramesh Natarajan, and Dharmashankar Subramanian. 2021.
+        <span>“A <span>Prescriptive</span>
+          <span>Machine</span>-<span>Learning</span> <span>Framework</span> to the
+          <span>Price</span>-<span>Setting</span> <span>Newsvendor</span>
+          <span>Problem</span>.”</span> <em>INFORMS Journal on Optimization</em> 3
+        (3): 227–53. <a href="https://doi.org/10.1287/ijoo.2019.0046">https://doi.org/10.1287/ijoo.2019.0046</a>.
+      </div>
+      <div id="ref-ho_denoising_2020" class="csl-entry" role="listitem">
+        Ho, Jonathan, Ajay Jain, and Pieter Abbeel. 2020. <span>“Denoising
+          <span>Diffusion</span> <span>Probabilistic</span>
+          <span>Models</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 33: 6840–51. <a
+          href="https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html">https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html</a>.
+      </div>
+      <div id="ref-hochreiter_long_1997" class="csl-entry" role="listitem">
+        Hochreiter, Sepp, and Jürgen Schmidhuber. 1997. <span>“Long
+          <span>Short</span>-<span>Term</span> <span>Memory</span>.”</span>
+        <em>Neural Computing</em> 9 (8): 1735–80. <a
+          href="https://doi.org/10.1162/neco.1997.9.8.1735">https://doi.org/10.1162/neco.1997.9.8.1735</a>.
+      </div>
+      <div id="ref-horn_chapter_2012" class="csl-entry" role="listitem">
+        Horn, Roger A., and Charles R. Johnson. 2012. <span>“Chapter 7:
+          <span>Positive</span> <span>Definite</span> and
+          <span>Semidefinite</span> <span>Matrices</span>.”</span> In <em>Matrix
+          <span>Analysis</span></em>, 2nd ed. Cambridge University Press.
+      </div>
+      <div id="ref-huang_convex_2020" class="csl-entry" role="listitem">
+        Huang, Chin-Wei, Ricky T. Q. Chen, Christos Tsirigotis, and Aaron
+        Courville. 2020. <span>“Convex <span>Potential</span>
+          <span>Flows</span>: <span>Universal</span> <span>Probability</span>
+          <span>Distributions</span> with <span>Optimal</span>
+          <span>Transport</span> and <span>Convex</span>
+          <span>Optimization</span>.”</span> <em>Proceedings of the 8th
+          <span>International</span> <span>Conference</span> on
+          <span>Learning</span> <span>Representations</span> (<span>ICLR</span>
+          2020)</em>, October. <a
+          href="https://openreview.net/forum?id=te7PVH1sPxJ">https://openreview.net/forum?id=te7PVH1sPxJ</a>.
+      </div>
+      <div id="ref-huang_neural_2018" class="csl-entry" role="listitem">
+        Huang, Chin-Wei, David Krueger, Alexandre Lacoste, and Aaron Courville.
+        2018. <span>“Neural <span>Autoregressive</span>
+          <span>Flows</span>.”</span> <em>Proceedings of the 35th
+          <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em>, July, 2078–87. <a
+          href="https://proceedings.mlr.press/v80/huang18d.html">https://proceedings.mlr.press/v80/huang18d.html</a>.
+      </div>
+      <div id="ref-hyndman_state_2002" class="csl-entry" role="listitem">
+        Hyndman, Rob J, Anne B Koehler, Ralph D Snyder, and Simone Grose. 2002.
+        <span>“A State Space Framework for Automatic Forecasting Using
+          Exponential Smoothing Methods.”</span> <em>International Journal of
+          Forecasting</em> 18 (3): 439–54. <a
+          href="https://doi.org/10.1016/S0169-2070(01)00110-8">https://doi.org/10.1016/S0169-2070(01)00110-8</a>.
+      </div>
+      <div id="ref-hyndman_forecasting_2008" class="csl-entry" role="listitem">
+        Hyndman, Robin John, Anne B Koehler, J Keith Ord, and Ralph David
+        Snyder. 2008. <em>Forecasting with <span>Exponential</span>
+          <span>Smoothing</span>: <span>The</span> <span>State</span>
+          <span>Space</span> <span>Approach</span></em>. Springer.
+      </div>
+      <div id="ref-hyvarinen_estimation_2005" class="csl-entry" role="listitem">
+        Hyvärinen, Aapo. 2005. <span>“Estimation of
+          <span>Non</span>-<span>Normalized</span> <span>Statistical</span>
+          <span>Models</span> by <span>Score</span> <span>Matching</span>.”</span>
+        <em>Journal of Machine Learning Research</em> 6 (24): 695–709. <a
+          href="http://jmlr.org/papers/v6/hyvarinen05a.html">http://jmlr.org/papers/v6/hyvarinen05a.html</a>.
+      </div>
+      <div id="ref-jawed_gqformer_2022" class="csl-entry" role="listitem">
+        Jawed, Shayan, and Lars Schmidt-Thieme. 2022.
+        <span>“<span>GQFormer</span>: <span>A</span>
+          <span>Multi</span>-<span>Quantile</span> <span>Generative</span>
+          <span>Transformer</span> for <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>2022 <span>IEEE</span>
+          <span>International</span> <span>Conference</span> on <span>Big</span>
+          <span>Data</span> (<span>Big</span> <span>Data</span>)</em>, December,
+        992–1001. <a
+          href="https://doi.org/10.1109/BigData55660.2022.10020927">https://doi.org/10.1109/BigData55660.2022.10020927</a>.
+      </div>
+      <div id="ref-jeon_gt-gan_2022" class="csl-entry" role="listitem">
+        Jeon, Jinsung, Jeonghak Kim, Haryong Song, Seunghyeon Cho, and Noseong
+        Park. 2022. <span>“<span>GT</span>-<span>GAN</span>:
+          <span>General</span> <span>Purpose</span> <span>Time</span>
+          <span>Series</span> <span>Synthesis</span> with <span>Generative</span>
+          <span>Adversarial</span> <span>Networks</span>.”</span> <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 35 (December): 36999–7010. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/f03ce573aa8bce26f77b76f1cb9ee979-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2022/hash/f03ce573aa8bce26f77b76f1cb9ee979-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-jiang_transgan_2021" class="csl-entry" role="listitem">
+        Jiang, Yifan, Shiyu Chang, and Zhangyang Wang. 2021.
+        <span>“<span>TransGAN</span>: <span>Two</span> <span>Pure</span>
+          <span>Transformers</span> <span>Can</span> <span>Make</span>
+          <span>One</span> <span>Strong</span> <span>GAN</span>, and
+          <span>That</span> <span>Can</span> <span>Scale</span>
+          <span>Up</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 34: 14745–58. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2021/hash/7c220a2091c26a7f5e9f1cfb099511e3-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2021/hash/7c220a2091c26a7f5e9f1cfb099511e3-Abstract.html</a>.
+      </div>
+      <div id="ref-julier_unscented_2004" class="csl-entry" role="listitem">
+        Julier, S. J., and J. K. Uhlmann. 2004. <span>“Unscented Filtering and
+          Nonlinear Estimation.”</span> <em>Proceedings of the IEEE</em> 92 (3):
+        401–22. <a href="https://doi.org/10.1109/JPROC.2003.823141">https://doi.org/10.1109/JPROC.2003.823141</a>.
+      </div>
+      <div id="ref-kalman_new_1960" class="csl-entry" role="listitem">
+        Kalman, R. E. 1960. <span>“A <span>New</span> <span>Approach</span> to
+          <span>Linear</span> <span>Filtering</span> and <span>Prediction</span>
+          <span>Problems</span>.”</span> <em>Journal of Basic Engineering</em> 82
+        (1): 35–45. <a href="https://doi.org/10.1115/1.3662552">https://doi.org/10.1115/1.3662552</a>.
+      </div>
+      <div id="ref-kan_multivariate_2022" class="csl-entry" role="listitem">
+        Kan, Kelvin, François-Xavier Aubet, Tim Januschowski, et al. 2022.
+        <span>“Multivariate <span>Quantile</span> <span>Function</span>
+          <span>Forecaster</span>.”</span> <em>Proceedings of <span>The</span>
+          25th <span>International</span> <span>Conference</span> on
+          <span>Artificial</span> <span>Intelligence</span> and
+          <span>Statistics</span></em>, May, 10603–21. <a
+          href="https://proceedings.mlr.press/v151/kan22a.html">https://proceedings.mlr.press/v151/kan22a.html</a>.
+      </div>
+      <div id="ref-kingma_auto-encoding_2014" class="csl-entry" role="listitem">
+        Kingma, Diederik P., and Max Welling. 2014.
+        <span>“Auto-<span>Encoding</span> <span>Variational</span>
+          <span>Bayes</span>.”</span> In <em>Proceedings of the
+          <span>Second</span> <span>International</span> <span>Conference</span>
+          on <span>Learning</span> <span>Representations</span></em>, edited by
+        Yoshua Bengio and Yann LeCun. Banff, AB, Canada. <a
+          href="http://arxiv.org/abs/1312.6114">http://arxiv.org/abs/1312.6114</a>.
+      </div>
+      <div id="ref-ko_learning_2011" class="csl-entry" role="listitem">
+        Ko, Jonathan, and Dieter Fox. 2011. <span>“Learning
+          <span>GP</span>-<span>BayesFilters</span> via <span>Gaussian</span>
+          Process Latent Variable Models.”</span> <em>Autonomous Robots</em> 30
+        (1): 3–23. <a href="https://doi.org/10.1007/s10514-010-9213-0">https://doi.org/10.1007/s10514-010-9213-0</a>.
+      </div>
+      <div id="ref-koenker_quantile_2005" class="csl-entry" role="listitem">
+        Koenker, Roger. 2005. <em>Quantile <span>Regression</span></em>.
+        Cambridge University Press.
+      </div>
+      <div id="ref-koenker_regression_1978" class="csl-entry" role="listitem">
+        Koenker, Roger, and Gilbert Bassett. 1978. <span>“Regression
+          <span>Quantiles</span>.”</span> <em>Econometrica</em> 46 (1): 33–50. <a
+          href="https://doi.org/10.2307/1913643">https://doi.org/10.2307/1913643</a>.
+      </div>
+      <div id="ref-kollovieh_predict_2023" class="csl-entry" role="listitem">
+        Kollovieh, Marcel, Abdul Fatir Ansari, Michael Bohlke-Schneider, Jasper
+        Zschiegner, Hao Wang, and Yuyang (Bernie) Wang. 2023. <span>“Predict,
+          <span>Refine</span>, <span>Synthesize</span>:
+          <span>Self</span>-<span>Guiding</span> <span>Diffusion</span>
+          <span>Models</span> for <span>Probabilistic</span> <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>.”</span> <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 36 (December): 28341–64. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2023/hash/5a1a10c2c2c9b9af1514687bc24b8f3d-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2023/hash/5a1a10c2c2c9b9af1514687bc24b8f3d-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-kong_diffwave_2020" class="csl-entry" role="listitem">
+        Kong, Zhifeng, Wei Ping, Jiaji Huang, Kexin Zhao, and Bryan Catanzaro.
+        2020. <span>“<span>DiffWave</span>: <span>A</span>
+          <span>Versatile</span> <span>Diffusion</span> <span>Model</span> for
+          <span>Audio</span> <span>Synthesis</span>.”</span> <em>Proceedings of
+          the <span>Ninth</span> <span>International</span>
+          <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=a-xFK8Ymz5J">https://openreview.net/forum?id=a-xFK8Ymz5J</a>.
+      </div>
+      <div id="ref-koochali_if_2021" class="csl-entry" role="listitem">
+        Koochali, Alireza, Andreas Dengel, and Sheraz Ahmed. 2021. <span>“If
+          <span>You</span> <span>Like</span> <span>It</span>, <span>GAN</span>
+          <span>It</span>—<span>Probabilistic</span> <span>Multivariate</span>
+          <span>Times</span> <span>Series</span> <span>Forecast</span> with
+          <span>GAN</span>.”</span> <em>Engineering Proceedings</em> 5 (1). <a
+          href="https://doi.org/10.3390/engproc2021005040">https://doi.org/10.3390/engproc2021005040</a>.
+      </div>
+      <div id="ref-lecun_tutorial_2006" class="csl-entry" role="listitem">
+        LeCun, Yann, Sumit Chopra, Raia Hadsell, Marc’Aurelio Ranzato, and Fu
+        Jie Huang. 2006. <span>“A <span>Tutorial</span> on
+          <span>Energy</span>-<span>Based</span> <span>Learning</span>.”</span>
+        <em>Predicting Structured Data</em>, August.
+      </div>
+      <div id="ref-lecun_mnist_1998" class="csl-entry" role="listitem">
+        LeCun, Yann, Corinna Cortes, and Christopher JC Burges. 1998. <em>The
+          <span>MNIST</span> <span>Database</span> of <span>Handwritten</span>
+          <span>Digits</span></em>. <a href="http://yann.lecun.com/exdb/mnist/">http://yann.lecun.com/exdb/mnist/</a>.
+      </div>
+      <div id="ref-li_synergetic_2021" class="csl-entry" role="listitem">
+        Li, Longyuan, Jihai Zhang, Junchi Yan, et al. 2021. <span>“Synergetic
+          <span>Learning</span> of <span>Heterogeneous</span>
+          <span>Temporal</span> <span>Sequences</span> for
+          <span>Multi</span>-<span>Horizon</span> <span>Probabilistic</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 35 (May): 8420–28. <a
+          href="https://doi.org/10.1609/aaai.v35i10.17023">https://doi.org/10.1609/aaai.v35i10.17023</a>.
+      </div>
+      <div id="ref-li_diffusion-lm_2022" class="csl-entry" role="listitem">
+        Li, Xiang, John Thickstun, Ishaan Gulrajani, Percy S. Liang, and
+        Tatsunori B. Hashimoto. 2022. <span>“Diffusion-<span>LM</span>
+          <span>Improves</span> <span>Controllable</span> <span>Text</span>
+          <span>Generation</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 35 (December): 4328–43. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/1be5bc25d50895ee656b8c2d9eb89d6a-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2022/hash/1be5bc25d50895ee656b8c2d9eb89d6a-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-li_generative_2022" class="csl-entry" role="listitem">
+        Li, Yan, Xinjiang Lu, Yaqing Wang, and Dejing Dou. 2022.
+        <span>“Generative <span>Time</span> <span>Series</span>
+          <span>Forecasting</span> with <span>Diffusion</span>,
+          <span>Denoise</span>, and <span>Disentanglement</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 35 (December):
+        23009–22. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/91a85f3fb8f570e6be52b333b5ab017a-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2022/hash/91a85f3fb8f570e6be52b333b5ab017a-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-li_transformer-modulated_2023" class="csl-entry" role="listitem">
+        Li, Yuxin, Wenchao Chen, Xinyue Hu, Bo Chen, Baolin Sun, and Mingyuan
+        Zhou. 2023. <span>“Transformer-<span>Modulated</span>
+          <span>Diffusion</span> <span>Models</span> for
+          <span>Probabilistic</span> <span>Multivariate</span> <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of
+          the <span>Ninth</span> the <span>Twelfth</span>
+          <span>International</span> <span>Conference</span> on
+          <span>Learning</span> <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=qae04YACHs">https://openreview.net/forum?id=qae04YACHs</a>.
+      </div>
+      <div id="ref-lim_temporal_2021" class="csl-entry" role="listitem">
+        Lim, Bryan, Sercan Ö. Arık, Nicolas Loeff, and Tomas Pfister. 2021.
+        <span>“Temporal <span>Fusion</span> <span>Transformers</span> for
+          Interpretable Multi-Horizon Time Series Forecasting.”</span>
+        <em>International Journal of Forecasting</em> 37 (4): 1748–64. <a
+          href="https://doi.org/10.1016/j.ijforecast.2021.03.012">https://doi.org/10.1016/j.ijforecast.2021.03.012</a>.
+      </div>
+      <div id="ref-lin_segrnn_2023" class="csl-entry" role="listitem">
+        Lin, Shengsheng, Weiwei Lin, Wentai Wu, Feiyu Zhao, Ruichao Mo, and
+        Haotong Zhang. 2023. <em><span>SegRNN</span>: <span>Segment</span>
+          <span>Recurrent</span> <span>Neural</span> <span>Network</span> for
+          <span>Long</span>-<span>Term</span> <span>Time</span>
+          <span>Series</span> <span>Forecasting</span></em>. arXiv. <a
+          href="https://doi.org/10.48550/arXiv.2308.11200">https://doi.org/10.48550/arXiv.2308.11200</a>.
+      </div>
+      <div id="ref-liu_retrieval-augmented_2024" class="csl-entry" role="listitem">
+        Liu, Jingwei, Ling Yang, Hongyan Li, and Shenda Hong. 2024.
+        <span>“Retrieval-<span>Augmented</span> <span>Diffusion</span>
+          <span>Models</span> for <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 37 (December): 2766–86. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/053ee34c0971568bfa5c773015c10502-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/053ee34c0971568bfa5c773015c10502-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-liu_itransformer_2023" class="csl-entry" role="listitem">
+        Liu, Yong, Tengge Hu, Haoran Zhang, et al. 2023. <span>“<span class="nocase">iTransformer</span>:
+          <span>Inverted</span>
+          <span>Transformers</span> <span>Are</span> <span>Effective</span> for
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of the <span>Twelfth</span> <span>International</span>
+          <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=JePfAI8fah">https://openreview.net/forum?id=JePfAI8fah</a>.
+      </div>
+      <div id="ref-liu_non-stationary_2022" class="csl-entry" role="listitem">
+        Liu, Yong, Haixu Wu, Jianmin Wang, and Mingsheng Long. 2022.
+        <span>“Non-Stationary <span>Transformers</span>: <span>Exploring</span>
+          the <span>Stationarity</span> in <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 35 (December): 9881–93. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/4054556fcaa934b0bf76da52cf4f92cb-Abstract-Conference.html">https://proceedings.neurips.cc/paper_files/paper/2022/hash/4054556fcaa934b0bf76da52cf4f92cb-Abstract-Conference.html</a>.
+      </div>
+      <div id="ref-luo_energy-calibrated_2025" class="csl-entry" role="listitem">
+        Luo, Yihong, Siya Qiu, Xingjian Tao, Yujun Cai, and Jing Tang. 2025.
+        <span>“Energy-<span>Calibrated</span> <span>VAE</span>
+          with <span>Test</span> <span>Time</span> <span>Free</span>
+          <span>Lunch</span>.”</span> In <em>Computer <span>Vision</span> –
+          <span>ECCV</span> 2024</em>, edited by Aleš Leonardis, Elisa Ricci,
+        Stefan Roth, Olga Russakovsky, Torsten Sattler, and Gül Varol. Springer
+        Nature Switzerland. <a
+          href="https://doi.org/10.1007/978-3-031-73013-9_19">https://doi.org/10.1007/978-3-031-73013-9_19</a>.
+      </div>
+      <div id="ref-mirza_conditional_2014" class="csl-entry" role="listitem">
+        Mirza, Mehdi, and Simon Osindero. 2014. <em>Conditional
+          <span>Generative</span> <span>Adversarial</span> <span>Nets</span></em>.
+        arXiv. <a href="https://doi.org/10.48550/arXiv.1411.1784">https://doi.org/10.48550/arXiv.1411.1784</a>.
+      </div>
+      <div id="ref-mukherjee_ar-mdn_2018" class="csl-entry" role="listitem">
+        Mukherjee, Srayanta, Devashish Shankar, Atin Ghosh, et al. 2018.
+        <span>“<span>AR</span>-<span>MDN</span>: <span>Associative</span> and
+          <span>Recurrent</span> <span>Mixture</span> <span>Density</span>
+          <span>Networks</span> for <span class="nocase">eRetail</span>
+          <span>Demand</span> <span>Forecasting</span>.”</span> <em>Proceedings of
+          the VLDB Endowment</em> 11 (5).
+      </div>
+      <div id="ref-neal_mcmc_2011" class="csl-entry" role="listitem">
+        Neal, Radford M. 2011. <span>“<span>MCMC</span> <span>Using</span>
+          <span>Hamiltonian</span> <span>Dynamics</span>.”</span> In <em>Handbook
+          of <span>Markov</span> <span>Chain</span> <span>Monte</span>
+          <span>Carlo</span></em>. Chapman; Hall/CRC.
+      </div>
+      <div id="ref-nguyen_temporal_2021" class="csl-entry" role="listitem">
+        Nguyen, Nam, and Brian Quanz. 2021. <span>“Temporal <span>Latent</span>
+          <span>Auto</span>-<span>Encoder</span>: <span>A</span>
+          <span>Method</span> for <span>Probabilistic</span>
+          <span>Multivariate</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 35 (May): 9117–25. <a
+          href="https://doi.org/10.1609/aaai.v35i10.17101">https://doi.org/10.1609/aaai.v35i10.17101</a>.
+      </div>
+      <div id="ref-nie_time_2022" class="csl-entry" role="listitem">
+        Nie, Yuqi, Nam H. Nguyen, Phanwadee Sinthong, and Jayant Kalagnanam.
+        2022. <span>“A <span>Time</span> <span>Series</span> Is
+          <span>Worth</span> 64 <span>Words</span>: <span>Long</span>-Term
+          <span>Forecasting</span> with <span>Transformers</span>.”</span>
+        <em>Proceedings of the <span>Eleventh</span> <span>International</span>
+          <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, September. <a
+          href="https://openreview.net/forum?id=Jbdc0vTOcol">https://openreview.net/forum?id=Jbdc0vTOcol</a>.
+      </div>
+      <div id="ref-nikitin_tsgm_2024" class="csl-entry" role="listitem">
+        Nikitin, Alexander, Letizia Iannucci, and Samuel Kaski. 2024.
+        <span>“<span>TSGM</span>: <span>A</span> <span>Flexible</span>
+          <span>Framework</span> for <span>Generative</span> <span>Modeling</span>
+          of <span>Synthetic</span> <span>Time</span> <span>Series</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 37 (December):
+        129042–61. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/e92bb8c76d1aa420171f51495ce56eaf-Abstract-Datasets_and_Benchmarks_Track.html">https://proceedings.neurips.cc/paper_files/paper/2024/hash/e92bb8c76d1aa420171f51495ce56eaf-Abstract-Datasets_and_Benchmarks_Track.html</a>.
+      </div>
+      <div id="ref-nix_estimating_1994" class="csl-entry" role="listitem">
+        Nix, D. A., and A. S. Weigend. 1994. <span>“Estimating the Mean and
+          Variance of the Target Probability Distribution.”</span> <em>Proceedings
+          of 1994 <span>IEEE</span> <span>International</span>
+          <span>Conference</span> on <span>Neural</span> <span>Networks</span>
+          (<span>ICNN</span>’94)</em> 1 (June): 55–60 vol.1. <a
+          href="https://doi.org/10.1109/ICNN.1994.374138">https://doi.org/10.1109/ICNN.1994.374138</a>.
+      </div>
+      <div id="ref-papamakarios_normalizing_2021" class="csl-entry" role="listitem">
+        Papamakarios, George, Eric Nalisnick, Danilo Jimenez Rezende, Shakir
+        Mohamed, and Balaji Lakshminarayanan. 2021. <span>“Normalizing
+          <span>Flows</span> for <span>Probabilistic</span> <span>Modeling</span>
+          and <span>Inference</span>.”</span> <em>Journal of Machine Learning
+          Research</em> 22 (57): 1–64. <a
+          href="http://jmlr.org/papers/v22/19-1028.html">http://jmlr.org/papers/v22/19-1028.html</a>.
+      </div>
+      <div id="ref-papamakarios_masked_2017" class="csl-entry" role="listitem">
+        Papamakarios, George, Theo Pavlakou, and Iain Murray. 2017.
+        <span>“Masked <span>Autoregressive</span> <span>Flow</span> for
+          <span>Density</span> <span>Estimation</span>.”</span> <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 30. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2017/hash/6c1da886822c67822bcf3679d04369fa-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2017/hash/6c1da886822c67822bcf3679d04369fa-Abstract.html</a>.
+      </div>
+      <div id="ref-park_learning_2022" class="csl-entry" role="listitem">
+        Park, Youngsuk, Danielle Maddix, François-Xavier Aubet, Kelvin Kan, Jan
+        Gasthaus, and Yuyang Wang. 2022. <span>“Learning <span>Quantile</span>
+          <span>Functions</span> Without <span>Quantile</span>
+          <span>Crossing</span> for <span>Distribution</span>-Free
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of <span>The</span> 25th <span>International</span>
+          <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span> and <span>Statistics</span></em>, May,
+        8127–50. <a
+          href="https://proceedings.mlr.press/v151/park22a.html">https://proceedings.mlr.press/v151/park22a.html</a>.
+      </div>
+      <div id="ref-pourahmadi_covariance_2011" class="csl-entry" role="listitem">
+        Pourahmadi, Mohsen. 2011. <span>“Covariance <span>Estimation</span>:
+          <span>The</span> <span>GLM</span> and <span>Regularization</span>
+          <span>Perspectives</span>.”</span> <em>Statistical Science</em> 26 (3):
+        369–87. <a href="https://doi.org/10.1214/11-STS358">https://doi.org/10.1214/11-STS358</a>.
+      </div>
+      <div id="ref-rangapuram_deep_2018" class="csl-entry" role="listitem">
+        Rangapuram, Syama Sundar, Matthias W Seeger, Jan Gasthaus, Lorenzo
+        Stella, Yuyang Wang, and Tim Januschowski. 2018. <span>“Deep
+          <span>State</span> <span>Space</span> <span>Models</span> for
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Advances in <span>Neural</span> <span>Information</span>
+          <span>Processing</span> <span>Systems</span></em> 31. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2018/hash/5cf68969fb67aa6082363a6d4e6468e2-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2018/hash/5cf68969fb67aa6082363a6d4e6468e2-Abstract.html</a>.
+      </div>
+      <div id="ref-rasul_vq-tr_2023" class="csl-entry" role="listitem">
+        Rasul, Kashif, Andrew Bennett, Pablo Vicente, et al. 2023.
+        <span>“<span>VQ</span>-<span>TR</span>: <span>Vector</span>
+          <span>Quantized</span> <span>Attention</span> for <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>.”</span> <em>Proceedings of
+          the <span>Twelfth</span> <span>International</span>
+          <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=IxpTsFS7mh">https://openreview.net/forum?id=IxpTsFS7mh</a>.
+      </div>
+      <div id="ref-rasul_vq-ar_2022" class="csl-entry" role="listitem">
+        Rasul, Kashif, Young-Jin Park, Max Nihlén Ramström, and Kyung-Min Kim.
+        2022. <em><span>VQ</span>-<span>AR</span>: <span>Vector</span>
+          <span>Quantized</span> <span>Autoregressive</span>
+          <span>Probabilistic</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span></em>. arXiv. <a
+          href="https://doi.org/10.48550/arXiv.2205.15894">https://doi.org/10.48550/arXiv.2205.15894</a>.
+      </div>
+      <div id="ref-rasul_autoregressive_2021" class="csl-entry" role="listitem">
+        Rasul, Kashif, Calvin Seward, Ingmar Schuster, and Roland Vollgraf.
+        2021. <span>“Autoregressive <span>Denoising</span>
+          <span>Diffusion</span> <span>Models</span> for <span>Multivariate</span>
+          <span>Probabilistic</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the 38th
+          <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em>, July, 8857–68. <a
+          href="https://proceedings.mlr.press/v139/rasul21a.html">https://proceedings.mlr.press/v139/rasul21a.html</a>.
+      </div>
+      <div id="ref-rasul_multivariate_2020" class="csl-entry" role="listitem">
+        Rasul, Kashif, Abdul-Saboor Sheikh, Ingmar Schuster, Urs M. Bergmann,
+        and Roland Vollgraf. 2020. <span>“Multivariate
+          <span>Probabilistic</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span> via <span>Conditioned</span>
+          <span>Normalizing</span> <span>Flows</span>.”</span> <em>Proceedings of
+          the <span>Ninth</span> <span>International</span>
+          <span>Conference</span> on <span>Learning</span>
+          <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=WiGQBFuVRv">https://openreview.net/forum?id=WiGQBFuVRv</a>.
+      </div>
+      <div id="ref-ray_ensemble_2020" class="csl-entry" role="listitem">
+        Ray, Evan L, Nutcha Wattanachit, Jarad Niemi, et al. 2020.
+        <span>“Ensemble Forecasts of Coronavirus Disease 2019
+          (<span>COVID</span>-19) in the <span>US</span>.”</span>
+        <em>MedRXiv</em>, 2020–08.
+      </div>
+      <div id="ref-rezende_stochastic_2014" class="csl-entry" role="listitem">
+        Rezende, Danilo Jimenez, Shakir Mohamed, and Daan Wierstra. 2014.
+        <span>“Stochastic <span>Backpropagation</span> and
+          <span>Approximate</span> <span>Inference</span> in <span>Deep</span>
+          <span>Generative</span> <span>Models</span>.”</span> <em>Proceedings of
+          the 31st <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em>, June, 1278–86. <a
+          href="https://proceedings.mlr.press/v32/rezende14.html">https://proceedings.mlr.press/v32/rezende14.html</a>.
+      </div>
+      <div id="ref-roweis_unifying_1999" class="csl-entry" role="listitem">
+        Roweis, Sam, and Zoubin Ghahramani. 1999. <span>“A <span>Unifying</span>
+          <span>Review</span> of <span>Linear</span> <span>Gaussian</span>
+          <span>Models</span>.”</span> <em>Neural Computation</em> 11 (2): 305–45.
+        <a href="https://doi.org/10.1162/089976699300016674">https://doi.org/10.1162/089976699300016674</a>.
+      </div>
+      <div id="ref-salinas_high-dimensional_2019" class="csl-entry" role="listitem">
+        Salinas, David, Michael Bohlke-Schneider, Laurent Callot, Roberto
+        Medico, and Jan Gasthaus. 2019. <span>“High-Dimensional Multivariate
+          Forecasting with Low-Rank <span>Gaussian</span> <span>Copula</span>
+          <span>Processes</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 32. <a
+          href="https://proceedings.neurips.cc/paper/2019/hash/0b105cf1504c4e241fcc6d519ea962fb-Abstract.html">https://proceedings.neurips.cc/paper/2019/hash/0b105cf1504c4e241fcc6d519ea962fb-Abstract.html</a>.
+      </div>
+      <div id="ref-salinas_deepar_2020" class="csl-entry" role="listitem">
+        Salinas, David, Valentin Flunkert, Jan Gasthaus, and Tim Januschowski.
+        2020. <span>“<span>DeepAR</span>: <span>Probabilistic</span> Forecasting
+          with Autoregressive Recurrent Networks.”</span> <em>International
+          Journal of Forecasting</em> 36 (3): 1181–91. <a
+          href="https://doi.org/10.1016/j.ijforecast.2019.07.001">https://doi.org/10.1016/j.ijforecast.2019.07.001</a>.
+      </div>
+      <div id="ref-seeger_bayesian_2016" class="csl-entry" role="listitem">
+        Seeger, Matthias W, David Salinas, and Valentin Flunkert. 2016.
+        <span>“Bayesian <span>Intermittent</span> <span>Demand</span>
+          <span>Forecasting</span> for <span>Large</span>
+          <span>Inventories</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 29. <a
+          href="https://papers.nips.cc/paper/2016/hash/03255088ed63354a54e0e5ed957e9008-Abstract.html">https://papers.nips.cc/paper/2016/hash/03255088ed63354a54e0e5ed957e9008-Abstract.html</a>.
+      </div>
+      <div id="ref-shen_multi-resolution_2023" class="csl-entry" role="listitem">
+        Shen, Lifeng, Weiyu Chen, and James Kwok. 2023.
+        <span>“Multi-<span>Resolution</span> <span>Diffusion</span>
+          <span>Models</span> for <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Twelfth</span> <span>International</span> <span>Conference</span>
+          on <span>Learning</span> <span>Representations</span></em>, October. <a
+          href="https://openreview.net/forum?id=mmjnr0G8ZY">https://openreview.net/forum?id=mmjnr0G8ZY</a>.
+      </div>
+      <div id="ref-shen_non-autoregressive_2023" class="csl-entry" role="listitem">
+        Shen, Lifeng, and James Kwok. 2023. <span>“Non-Autoregressive
+          <span>Conditional</span> <span>Diffusion</span> <span>Models</span> for
+          <span>Time</span> <span>Series</span> <span>Prediction</span>.”</span>
+        <em>Proceedings of the 40th <span>International</span>
+          <span>Conference</span> on <span>Machine</span>
+          <span>Learning</span></em>, July, 31016–29. <a
+          href="https://proceedings.mlr.press/v202/shen23d.html">https://proceedings.mlr.press/v202/shen23d.html</a>.
+      </div>
+      <div id="ref-sklar_fonctions_1959" class="csl-entry" role="listitem">
+        Sklar, M. 1959. <span>“Fonctions de Répartition à n Dimensions Et Leurs
+          Marges.”</span> <em>Annales de l’<span>ISUP</span></em> 8: 229–31.
+      </div>
+      <div id="ref-sohl-dickstein_deep_2015" class="csl-entry" role="listitem">
+        Sohl-Dickstein, Jascha, Eric Weiss, Niru Maheswaranathan, and Surya
+        Ganguli. 2015. <span>“Deep <span>Unsupervised</span>
+          <span>Learning</span> Using <span>Nonequilibrium</span>
+          <span>Thermodynamics</span>.”</span> <em>Proceedings of the 32nd
+          <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em>, June, 2256–65. <a
+          href="https://proceedings.mlr.press/v37/sohl-dickstein15.html">https://proceedings.mlr.press/v37/sohl-dickstein15.html</a>.
+      </div>
+      <div id="ref-sohn_learning_2015" class="csl-entry" role="listitem">
+        Sohn, Kihyuk, Honglak Lee, and Xinchen Yan. 2015. <span>“Learning
+          <span>Structured</span> <span>Output</span> <span>Representation</span>
+          Using <span>Deep</span> <span>Conditional</span> <span>Generative</span>
+          <span>Models</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 28. <a
+          href="https://proceedings.neurips.cc/paper/2015/hash/8d55a249e6baa5c06772297520da2051-Abstract.html">https://proceedings.neurips.cc/paper/2015/hash/8d55a249e6baa5c06772297520da2051-Abstract.html</a>.
+      </div>
+      <div id="ref-song_maximum_2021" class="csl-entry" role="listitem">
+        Song, Yang, Conor Durkan, Iain Murray, and Stefano Ermon. 2021.
+        <span>“Maximum <span>Likelihood</span> <span>Training</span> of
+          <span>Score</span>-<span>Based</span> <span>Diffusion</span>
+          <span>Models</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 34: 1415–28. <a
+          href="https://proceedings.neurips.cc/paper/2021/hash/0a9fdbb17feb6ccb7ec405cfb85222c4-Abstract.html">https://proceedings.neurips.cc/paper/2021/hash/0a9fdbb17feb6ccb7ec405cfb85222c4-Abstract.html</a>.
+      </div>
+      <div id="ref-sprangers_parameter-efficient_2023" class="csl-entry" role="listitem">
+        Sprangers, Olivier, Sebastian Schelter, and Maarten de Rijke. 2023.
+        <span>“Parameter-Efficient Deep Probabilistic Forecasting.”</span>
+        <em>International Journal of Forecasting</em> 39 (1): 332–45. <a
+          href="https://doi.org/10.1016/j.ijforecast.2021.11.011">https://doi.org/10.1016/j.ijforecast.2021.11.011</a>.
+      </div>
+      <div id="ref-sun_memory_2022" class="csl-entry" role="listitem">
+        Sun, Yinbo, Lintao Ma, Yu Liu, et al. 2022. <span>“Memory
+          <span>Augmented</span> <span>State</span> <span>Space</span>
+          <span>Model</span> for <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Thirty</span>-<span>First</span> <span>International</span>
+          <span>Joint</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 4 (July): 3451–57. <a
+          href="https://doi.org/10.24963/ijcai.2022/479">https://doi.org/10.24963/ijcai.2022/479</a>.
+      </div>
+      <div id="ref-tabak_family_2013" class="csl-entry" role="listitem">
+        Tabak, E. G., and Cristina V. Turner. 2013. <span>“A <span>Family</span>
+          of <span>Nonparametric</span> <span>Density</span>
+          <span>Estimation</span> <span>Algorithms</span>.”</span>
+        <em>Communications on Pure and Applied Mathematics</em> 66 (2): 145–64.
+        <a href="https://doi.org/10.1002/cpa.21423">https://doi.org/10.1002/cpa.21423</a>.
+      </div>
+      <div id="ref-taieb_review_2012" class="csl-entry" role="listitem">
+        Taieb, Souhaib Ben, Gianluca Bontempi, Amir F. Atiya, and Antti
+        Sorjamaa. 2012. <span>“A Review and Comparison of Strategies for
+          Multi-Step Ahead Time Series Forecasting Based on the <span>NN5</span>
+          Forecasting Competition.”</span> <em>Expert Systems with
+          Applications</em> 39 (8): 7067–83. <a
+          href="https://doi.org/10.1016/j.eswa.2012.01.039">https://doi.org/10.1016/j.eswa.2012.01.039</a>.
+      </div>
+      <div id="ref-tang_probabilistic_2021" class="csl-entry" role="listitem">
+        Tang, Binh, and David S Matteson. 2021. <span>“Probabilistic
+          <span>Transformer</span> <span>For</span> <span>Time</span>
+          <span>Series</span> <span>Analysis</span>.”</span> <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 34: 23592–608. <a
+          href="https://proceedings.neurips.cc/paper/2021/hash/c68bd9055776bf38d8fc43c0ed283678-Abstract.html">https://proceedings.neurips.cc/paper/2021/hash/c68bd9055776bf38d8fc43c0ed283678-Abstract.html</a>.
+      </div>
+      <div id="ref-tarima_use_2020" class="csl-entry" role="listitem">
+        Tarima, Sergey, and Zhanna Zenkova. 2020. <span>“Use of
+          <span>Uncertain</span> <span>Additional</span> <span>Information</span>
+          in <span>Newsvendor</span> <span>Models</span>.”</span> <em>2020 5th
+          <span>International</span> <span>Conference</span> on
+          <span>Logistics</span> <span>Operations</span> <span>Management</span>
+          (<span>GOL</span>)</em>, October, 1–6. <a
+          href="https://doi.org/10.1109/GOL49479.2020.9314751">https://doi.org/10.1109/GOL49479.2020.9314751</a>.
+      </div>
+      <div id="ref-tashiro_csdi_2021" class="csl-entry" role="listitem">
+        Tashiro, Yusuke, Jiaming Song, Yang Song, and Stefano Ermon. 2021.
+        <span>“<span>CSDI</span>: <span>Conditional</span>
+          <span>Score</span>-Based <span>Diffusion</span> <span>Models</span> for
+          <span>Probabilistic</span> <span>Time</span> <span>Series</span>
+          <span>Imputation</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 34: 24804–16. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2021/hash/cfe8504bda37b575c70ee1a8276f3486-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2021/hash/cfe8504bda37b575c70ee1a8276f3486-Abstract.html</a>.
+      </div>
+      <div id="ref-theis_note_2016" class="csl-entry" role="listitem">
+        Theis, L., A. van den Oord, and M. Bethge. 2016. <span>“A Note on the
+          Evaluation of Generative Models.”</span> <em>Proceedings of the
+          <span>Fourth</span> <span>International</span> <span>Conference</span>
+          on <span>Learning</span> <span>Representations</span></em>, May, 1–10.
+        <a href="http://www.iclr.cc/doku.php?id=iclr2016:main">http://www.iclr.cc/doku.php?id=iclr2016:main</a>.
+      </div>
+      <div id="ref-tong_probabilistic_2022" class="csl-entry" role="listitem">
+        Tong, Junlong, Liping Xie, and Kanjian Zhang. 2022. <span>“Probabilistic
+          <span>Decomposition</span> <span>Transformer</span> for
+          <span>Time</span> <span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of the 2023 <span>SIAM</span> <span>International</span>
+          <span>Conference</span> on <span>Data</span> <span>Mining</span>
+          (<span>SDM</span>)</em>, 478–86. <a
+          href="https://epubs.siam.org/doi/abs/10.1137/1.9781611977653.ch54">https://epubs.siam.org/doi/abs/10.1137/1.9781611977653.ch54</a>.
+      </div>
+      <div id="ref-uria_rnade_2013" class="csl-entry" role="listitem">
+        Uria, Benigno, Iain Murray, and Hugo Larochelle. 2013.
+        <span>“<span>RNADE</span>: <span>The</span> Real-Valued Neural
+          Autoregressive Density-Estimator.”</span> <em>Advances in
+          <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 26. <a
+          href="https://proceedings.neurips.cc/paper/2013/hash/53adaf494dc89ef7196d73636eb2451b-Abstract.html">https://proceedings.neurips.cc/paper/2013/hash/53adaf494dc89ef7196d73636eb2451b-Abstract.html</a>.
+      </div>
+      <div id="ref-vahdat_nvae_2020" class="csl-entry" role="listitem">
+        Vahdat, Arash, and Jan Kautz. 2020. <span>“<span>NVAE</span>:
+          <span>A</span> <span>Deep</span> <span>Hierarchical</span>
+          <span>Variational</span> <span>Autoencoder</span>.”</span> <em>Advances
+          in <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 33: 19667–79. <a
+          href="https://proceedings.neurips.cc/paper/2020/hash/e3b21256183cf7c2c7a66be163579d37-Abstract.html">https://proceedings.neurips.cc/paper/2020/hash/e3b21256183cf7c2c7a66be163579d37-Abstract.html</a>.
+      </div>
+      <div id="ref-van_den_oord_neural_2017" class="csl-entry" role="listitem">
+        Van den Oord, Aaron, Oriol Vinyals, and Koray Kavukcuoglu. 2017.
+        <span>“Neural <span>Discrete</span> <span>Representation</span>
+          <span>Learning</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 30. <a
+          href="https://proceedings.neurips.cc/paper/2017/hash/7a98af17e63a0ac09ce2e96d03992fbc-Abstract.html">https://proceedings.neurips.cc/paper/2017/hash/7a98af17e63a0ac09ce2e96d03992fbc-Abstract.html</a>.
+      </div>
+      <div id="ref-wan_direct_2017" class="csl-entry" role="listitem">
+        Wan, Can, Jin Lin, Jianhui Wang, Yonghua Song, and Zhao Yang Dong. 2017.
+        <span>“Direct <span>Quantile</span> <span>Regression</span> for
+          <span>Nonparametric</span> <span>Probabilistic</span>
+          <span>Forecasting</span> of <span>Wind</span> <span>Power</span>
+          <span>Generation</span>.”</span> <em>IEEE Transactions on Power
+          Systems</em> 32 (4): 2767–78. <a
+          href="https://doi.org/10.1109/TPWRS.2016.2625101">https://doi.org/10.1109/TPWRS.2016.2625101</a>.
+      </div>
+      <div id="ref-wang_generative_2024" class="csl-entry" role="listitem">
+        Wang, Xinyi, Lang Tong, and Qing Zhao. 2024. <span>“Generative
+          <span>Probabilistic</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span> and <span>Applications</span> in
+          <span>Grid</span> <span>Operations</span>.”</span> <em>2024 58th
+          <span>Annual</span> <span>Conference</span> on <span>Information</span>
+          <span>Sciences</span> and <span>Systems</span> (<span>CISS</span>)</em>,
+        1–6. <a
+          href="https://doi.org/10.1109/CISS59072.2024.10480214">https://doi.org/10.1109/CISS59072.2024.10480214</a>.
+      </div>
+      <div id="ref-welling_bayesian_2011" class="csl-entry" role="listitem">
+        Welling, Max, and Yee Whye Teh. 2011. <span>“Bayesian Learning via
+          Stochastic Gradient Langevin Dynamics.”</span> <em>Proceedings of the
+          28th <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em> (Madison, WI, USA),
+        <span>ICML</span>’11, June, 681–88.
+      </div>
+      <div id="ref-wen_deep_2019" class="csl-entry" role="listitem">
+        Wen, Ruofeng, and Kari Torkkola. 2019. <span>“Deep
+          <span>Generative</span> <span>Quantile</span>-<span>Copula</span>
+          <span>Models</span> for <span>Probabilistic</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Time</span> <span>Series</span> <span>Workshop</span> at 36th
+          <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em> (Long Beach,
+        California), July.
+      </div>
+      <div id="ref-wen_multi-horizon_2018" class="csl-entry" role="listitem">
+        Wen, Ruofeng, Kari Torkkola, Balakrishnan Narayanaswamy, and Dhruv
+        Madeka. 2018. <span>“A <span>Multi</span>-<span>Horizon</span>
+          <span>Quantile</span> <span>Recurrent</span>
+          <span>Forecaster</span>.”</span> <em>Time <span>Series</span>
+          <span>Workshop</span> at 31st <span>Conference</span> on
+          <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> (Long Beach, California).
+      </div>
+      <div id="ref-wilson_copula_2010" class="csl-entry" role="listitem">
+        Wilson, Andrew G, and Zoubin Ghahramani. 2010. <span>“Copula
+          <span>Processes</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 23. <a
+          href="https://papers.nips.cc/paper_files/paper/2010/hash/fc8001f834f6a5f0561080d134d53d29-Abstract.html">https://papers.nips.cc/paper_files/paper/2010/hash/fc8001f834f6a5f0561080d134d53d29-Abstract.html</a>.
+      </div>
+      <div id="ref-wu_timesnet_2022" class="csl-entry" role="listitem">
+        Wu, Haixu, Tengge Hu, Yong Liu, Hang Zhou, Jianmin Wang, and Mingsheng
+        Long. 2022. <span>“<span>TimesNet</span>: <span>Temporal</span>
+          <span>2D</span>-<span>Variation</span> <span>Modeling</span> for
+          <span>General</span> <span>Time</span> <span>Series</span>
+          <span>Analysis</span>.”</span> <em>Proceedings of the
+          <span>Eleventh</span> <span>International</span> <span>Conference</span>
+          on <span>Learning</span> <span>Representations</span></em>, September.
+        <a href="https://openreview.net/forum?id=ju_Uqw384Oq">https://openreview.net/forum?id=ju_Uqw384Oq</a>.
+      </div>
+      <div id="ref-wu_autoformer_2021" class="csl-entry" role="listitem">
+        Wu, Haixu, Jiehui Xu, Jianmin Wang, and Mingsheng Long. 2021.
+        <span>“Autoformer: <span>Decomposition</span> <span>Transformers</span>
+          with <span>Auto</span>-<span>Correlation</span> for
+          <span>Long</span>-<span>Term</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> In <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em>, edited by M. Ranzato, A. Beygelzimer, Y.
+        Dauphin, P. S. Liang, and J. Wortman Vaughan, vol. 34, 34. Curran
+        Associates, Inc. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2021/file/bcc0d400288793e8bdcd7c19a8ac0c2b-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2021/file/bcc0d400288793e8bdcd7c19a8ac0c2b-Paper.pdf</a>.
+      </div>
+      <div id="ref-wu_adversarial_2020" class="csl-entry" role="listitem">
+        Wu, Sifan, Xi Xiao, Qianggang Ding, Peilin Zhao, Ying Wei, and Junzhou
+        Huang. 2020. <span>“Adversarial <span>Sparse</span>
+          <span>Transformer</span> for <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 33: 17105–15. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2020/hash/c6b8c8d762da15fa8dbbdfb6baf9e260-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2020/hash/c6b8c8d762da15fa8dbbdfb6baf9e260-Abstract.html</a>.
+      </div>
+      <div id="ref-wu_high-dimensional_2020" class="csl-entry" role="listitem">
+        Wu, Yilei, Yingli Qin, and Mu Zhu. 2020. <span>“High-Dimensional
+          Covariance Matrix Estimation Using a Low-Rank and Diagonal
+          Decomposition.”</span> <em>Canadian Journal of Statistics</em> 48 (2):
+        308–37. <a href="https://doi.org/10.1002/cjs.11532">https://doi.org/10.1002/cjs.11532</a>.
+      </div>
+      <div id="ref-yan_probabilistic_2024" class="csl-entry" role="listitem">
+        Yan, Tijin, Hengheng Gong, He Yongping, Yufeng Zhan, and Yuanqing Xia.
+        2024. <span>“Probabilistic <span>Time</span> <span>Series</span>
+          <span>Modeling</span> with <span>Decomposable</span>
+          <span>Denoising</span> <span>Diffusion</span>
+          <span>Model</span>.”</span> <em>Proceedings of the 41st
+          <span>International</span> <span>Conference</span> on
+          <span>Machine</span> <span>Learning</span></em>, July, 55759–77. <a
+          href="https://proceedings.mlr.press/v235/yan24b.html">https://proceedings.mlr.press/v235/yan24b.html</a>.
+      </div>
+      <div id="ref-yang_survey_2024" class="csl-entry" role="listitem">
+        Yang, Yiyuan, Ming Jin, Haomin Wen, et al. 2024. <em>A
+          <span>Survey</span> on <span>Diffusion</span> <span>Models</span> for
+          <span>Time</span> <span>Series</span> and
+          <span>Spatio</span>-<span>Temporal</span> <span>Data</span></em>. arXiv.
+        <a href="https://doi.org/10.48550/arXiv.2404.18886">https://doi.org/10.48550/arXiv.2404.18886</a>.
+      </div>
+      <div id="ref-yegin_generative_2024" class="csl-entry" role="listitem">
+        Yeğin, Melike Nur, and Mehmet Fatih Amasyalı. 2024. <span>“Generative
+          Diffusion Models: <span>A</span> Survey of Current Theoretical
+          Developments.”</span> <em>Neurocomputing</em> 608 (December): 128373. <a
+          href="https://doi.org/10.1016/j.neucom.2024.128373">https://doi.org/10.1016/j.neucom.2024.128373</a>.
+      </div>
+      <div id="ref-yoon_time-series_2019" class="csl-entry" role="listitem">
+        Yoon, Jinsung, Daniel Jarrett, and Mihaela van der Schaar. 2019.
+        <span>“Time-Series <span>Generative</span> <span>Adversarial</span>
+          <span>Networks</span>.”</span> <em>Advances in <span>Neural</span>
+          <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em> 32. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2019/hash/c9efe5f26cd17ba6216bbe2a7d26d490-Abstract.html">https://proceedings.neurips.cc/paper_files/paper/2019/hash/c9efe5f26cd17ba6216bbe2a7d26d490-Abstract.html</a>.
+      </div>
+      <div id="ref-zeng_are_2023" class="csl-entry" role="listitem">
+        Zeng, Ailing, Muxi Chen, Lei Zhang, and Qiang Xu. 2023. <span>“Are
+          <span>Transformers</span> <span>Effective</span> for <span>Time</span>
+          <span>Series</span> <span>Forecasting</span>?”</span> <em>Proceedings of
+          the <span>AAAI</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 37 (June): 11121–28. <a
+          href="https://doi.org/10.1609/aaai.v37i9.26317">https://doi.org/10.1609/aaai.v37i9.26317</a>.
+      </div>
+      <div id="ref-zhang_probts_2024" class="csl-entry" role="listitem">
+        Zhang, Jiawen, Xumeng Wen, Zhenwei Zhang, Shun Zheng, Jia Li, and Jiang
+        Bian. 2024. <span>“<span>ProbTS</span>: <span>Benchmarking</span>
+          <span>Point</span> and <span>Distributional</span>
+          <span>Forecasting</span> Across <span>Diverse</span>
+          <span>Prediction</span> <span>Horizons</span>.”</span> In <em>Advances
+          in <span>Neural</span> <span>Information</span> <span>Processing</span>
+          <span>Systems</span></em>, edited by A. Globerson, L. Mackey, D.
+        Belgrave, et al., vol. 37, 37. Curran Associates, Inc. <a
+          href="https://proceedings.neurips.cc/paper_files/paper/2024/file/55f2a27b1ac39dbfdd0fc83742dc87d7-Paper-Datasets_and_Benchmarks_Track.pdf">https://proceedings.neurips.cc/paper_files/paper/2024/file/55f2a27b1ac39dbfdd0fc83742dc87d7-Paper-Datasets_and_Benchmarks_Track.pdf</a>.
+      </div>
+      <div id="ref-zhou_informer_2021" class="csl-entry" role="listitem">
+        Zhou, Haoyi, Shanghang Zhang, Jieqi Peng, et al. 2021. <span>“Informer:
+          <span>Beyond</span> <span>Efficient</span> <span>Transformer</span> for
+          <span>Long</span> <span>Sequence</span>
+          <span>Time</span>-<span>Series</span> <span>Forecasting</span>.”</span>
+        <em>Proceedings of the <span>AAAI</span> <span>Conference</span> on
+          <span>Artificial</span> <span>Intelligence</span></em> 35 (May):
+        11106–15. <a href="https://doi.org/10.1609/aaai.v35i12.17325">https://doi.org/10.1609/aaai.v35i12.17325</a>.
+      </div>
+      <div id="ref-zhou_ptse_2023" class="csl-entry" role="listitem">
+        Zhou, Yunyi, Zhixuan Chu, Yijia Ruan, Ge Jin, Yuchen Huang, and Sheng
+        Li. 2023. <span>“<span class="nocase">pTSE</span>: <span>A</span>
+          <span>Multi</span>-Model <span>Ensemble</span> <span>Method</span> for
+          <span>Probabilistic</span> <span>Time</span> <span>Series</span>
+          <span>Forecasting</span>.”</span> <em>Proceedings of the
+          <span>Thirty</span>-<span>Second</span> <span>International</span>
+          <span>Joint</span> <span>Conference</span> on <span>Artificial</span>
+          <span>Intelligence</span></em> 4 (August): 4684–92. <a
+          href="https://doi.org/10.24963/ijcai.2023/521">https://doi.org/10.24963/ijcai.2023/521</a>.
+      </div>
+    </div>
+  </main>
+  <script src="../js/sidebar.js"></script>
+  <script src="../scripts.js"></script>
+</body>
+
+</html>
