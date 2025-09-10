@@ -1,30 +1,32 @@
 // -------------------- Contact Form --------------------
 const contactForm = document.getElementById('contact-form');
-contactForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const responseEl = document.getElementById('form-response');
-    const formData = new FormData(this);
+if (contactForm) {
+    contactForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const responseEl = document.getElementById('form-response');
+        const formData = new FormData(this);
 
-    try {
-        const response = await fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: { 'Accept': 'application/json' }
-        });
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            });
 
-        if (response.ok) {
-            responseEl.textContent = "Thank you! Your message has been sent.";
-            responseEl.classList.add('show');   // Add class to fade in
-            this.reset();
-        } else {
-            responseEl.textContent = "Oops! Something went wrong.";
+            if (response.ok) {
+                responseEl.textContent = "Thank you! Your message has been sent.";
+                responseEl.classList.add('show');   // Add class to fade in
+                this.reset();
+            } else {
+                responseEl.textContent = "Oops! Something went wrong.";
+                responseEl.classList.add('show');
+            }
+        } catch (err) {
+            responseEl.textContent = "Network error!";
             responseEl.classList.add('show');
         }
-    } catch (err) {
-        responseEl.textContent = "Network error!";
-        responseEl.classList.add('show');
-    }
-});
+    });
+}
 
 // -------------------- Dynamic Blog List --------------------
 async function loadBlogPosts() {
