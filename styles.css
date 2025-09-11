@@ -1500,6 +1500,21 @@ nav a.active::before {
 /* ===========================
    RESPONSIVE DESIGN
    =========================== */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: navy;
+    /* 🔵 change to navy */
+    position: fixed;
+    top: 0rem;
+    left: -0.2rem;
+    z-index: 3000;
+    /* above sidebar */
+}
+
 @media (max-width: 1024px) {
     .sidebar {
         width: 250px;
@@ -1558,7 +1573,7 @@ nav a.active::before {
         background: none;
         border: none;
         font-size: 2rem;
-        color: white;
+        color: navy;
         cursor: pointer;
         margin: 1rem;
     }
@@ -1647,21 +1662,6 @@ nav a.active::before {
         width: auto;
         max-width: none;
     }
-}
-
-.menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: navy;
-    /* 🔵 change to navy */
-    position: fixed;
-    top: 0rem;
-    left: -0.2rem;
-    z-index: 3000;
-    /* above sidebar */
 }
 
 @media (max-width: 480px) {
