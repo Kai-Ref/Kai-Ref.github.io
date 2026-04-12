@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Master's Thesis: Probabilistic LTSF",
+    "description": "Explored IMS vs. DMS trade-offs in probabilistic long-term and short-term time series forecasting. Combined probabilistic and point LTSF methods, demonstrating strong performance with quantile-based techniques.",
+    "image": "/data/ltsf.png",
+    "technologies": ["IMS vs DMS", "Probabilistic LTSF", "PyTorch"],
+    "date": "2025",
+    "status": "completed",
+    "github": "https://github.com/Kai-Ref/Probabilistic_LTSF",
+    "demo": null
+  },
+  {
+    "title": "Explainable Deep Fake Detection",
+    "description": "Integrated B-Cos networks into XceptionNet for deepfake detection and proposed the Mask Pointing Game for evaluating explanation quality in interpretable AI.",
+    "image": "/data/xai.jpg",
+    "technologies": ["Python", "Computer Vision", "B-Cos Networks", "Explainable AI", "PyTorch"],
+    "date": "2024",
+    "status": "completed",
+    "github": "https://github.com/nilsbecker0711/Interpretable-Deep-Fake-Detection",
+    "demo": null
+  },
+  {
+    "title": "STADS Datathon (Winner)",
+    "description": "Designed a data-driven simulation for targeted vaccination campaigns with interactive dashboards.",
+    "image": "/data/datathon.jpg",
+    "technologies": ["Data Analysis", "Simulation", "Dashboards", "Reinforcement Learning", "LLM"],
+    "date": "2025",
+    "status": "completed",
+    "github": "https://github.com/tubbers7/STADS_Datathon2025",
+    "demo": null
+  },
+  {
+    "title": "Flight Price Prediction",
+    "description": "Modeled flight prices using XGBoost, RandomForest, and SVMs.",
+    "image": "/data/fpr.jpg",
+    "technologies": ["Machine Learning", "Scikit-Learn", "XGBoost", "RandomForest", "SVM"],
+    "date": "2023",
+    "status": "completed",
+    "github": "https://github.com/arschrei/dm-project-23",
+    "demo": null
+  },
+  {
+    "title": "Football Data Integration",
+    "description": "Integrated football data from multiple sources using web scraping and schema matching in Java.",
+    "image": "/data/wdi.jpg",
+    "technologies": ["Java", "Web Scraping", "Web Data Integration", "Entity Matching"],
+    "date": "2023",
+    "status": "completed",
+    "github": "https://github.com/Kai-Ref/Web-Data-Integration",
+    "demo": null
+  },
+  {
+    "title": "Bachelor's Thesis: DeepAR for Infectious Disease Forecasting",
+    "description": "Applied DeepAR for probabilistic influenza forecasting, outperforming traditional and neural baselines in accuracy and uncertainty quantification.",
+    "image": "/data/deepar.png",
+    "technologies": ["Influenza Forecasting", "DeepAR", "Probabilistic Time Series Forecasting"],
+    "date": "2023",
+    "status": "completed",
+    "github": "https://github.com/Kai-Ref/DeepAR_InfluenzaForecast",
+    "demo": null
+  },
+  {
+    "title": "Regression Feature Selection",
+    "description": "Compared LASSO and Ridge for feature selection in regression tasks.",
+    "image": "/data/lr.avif",
+    "technologies": ["Python", "R", "Statistics"],
+    "date": "2022",
+    "status": "completed",
+    "github": "https://github.com/Kai-Ref/Feature-Selection-in-Regression-Tasks",
+    "demo": null
+  },
+  {
+    "title": "Football Transfermarkt Webscraping",
+    "description": "Scraped football player and team data.",
+    "image": "/data/tm.png",
+    "technologies": ["Python", "Web Scraping"],
+    "date": "2023",
+    "status": "completed",
+    "github": "https://github.com/Kai-Ref/footy",
+    "demo": null
+  }
+]

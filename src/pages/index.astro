@@ -1,0 +1,26 @@
+---
+// src/pages/index.astro
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import TopNav from '../components/layout/TopNav.astro';
+import ScrollHero from '../components/home/ScrollHero.tsx';
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Kai Reffert",
+  "url": "https://kai-ref.github.io/",
+  "jobTitle": "Data Scientist & AI Innovator",
+  "sameAs": ["https://www.linkedin.com/in/kai-reffert", "https://github.com/kai-ref"],
+  "description": "M.Sc. Data Science student and AI enthusiast, passionate about probabilistic machine learning, time series analysis and computer vision."
+};
+---
+
+<BaseLayout
+  title="Kai Reffert | Data Science & AI Enthusiast"
+  description="Hi, I'm Kai Reffert — M.Sc. Data Science student and AI innovator passionate about time series, probabilistic deep learning and computer vision."
+  canonicalURL="https://kai-ref.github.io/"
+  structuredData={structuredData}
+>
+  <TopNav />
+  <ScrollHero client:load />
+</BaseLayout>

@@ -1,0 +1,57 @@
+---
+// src/pages/blog/index.astro
+import BaseLayout from '../../components/layout/BaseLayout.astro';
+import TopNav from '../../components/layout/TopNav.astro';
+import BlogCard from '../../components/blog/BlogCard.astro';
+
+const posts = [
+  {
+    slug: 'ltsf',
+    title: 'Long-Term Time Series Forecasting',
+    description: 'Literature review of recent SOTA LTSF research.',
+    pubDate: new Date('2025-07-14'),
+    heroImage: '/img/posts/LTSF.jpg',
+    tags: ['LTSF', 'Literature Review'],
+    readTime: '15 min read',
+  },
+  {
+    slug: 'ptsf',
+    title: 'Probabilistic Time Series Forecasting',
+    description: 'Literature review of recent SOTA Probabilistic TSF research.',
+    pubDate: new Date('2025-07-14'),
+    heroImage: '/img/posts/ptsf.png',
+    tags: ['Probabilistic TSF', 'Literature Review'],
+    readTime: '15 min read',
+  },
+].sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
+---
+
+<BaseLayout
+  title="Blog | Kai Reffert"
+  description="Kai Reffert's blog on data science, machine learning, and time series forecasting."
+>
+  <TopNav />
+
+  <main class="main-content pt-24 flex-1 min-h-screen bg-bg-secondary" aria-label="Blog listing">
+    <header class="content-header py-20 px-8 text-center bg-surface-container-low">
+      <h1 class="font-headline text-3xl md:text-5xl font-light tracking-tighter text-on-surface mb-4">Blog</h1>
+      <p class="font-label text-lg tracking-widest uppercase text-on-surface-variant mt-4">Thoughts on data science, machine learning, and time series</p>
+    </header>
+
+    <section class="py-12 px-8">
+      <div class="content-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {posts.map((post) => (
+          <BlogCard
+            title={post.title}
+            description={post.description}
+            pubDate={post.pubDate}
+            heroImage={post.heroImage}
+            tags={post.tags}
+            readTime={post.readTime}
+            slug={post.slug}
+          />
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

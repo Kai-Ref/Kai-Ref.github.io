@@ -1,0 +1,33 @@
+---
+// src/components/blog/TableOfContents.astro
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+interface Props {
+  headings: Heading[];
+}
+const { headings } = Astro.props;
+// Filter to h2 and h4 only
+const filtered = headings.filter((h) => h.depth === 2 || h.depth === 4);
+---
+
+{filtered.length > 0 && (
+  <nav aria-label="Table of contents" class="toc sticky top-8 bg-white rounded-card p-6 shadow-light">
+    <h2 class="text-base font-semibold text-text-primary mb-4">Contents</h2>
+    <ol class="list-none space-y-2">
+      {filtered.map((heading) => (
+        <li style={heading.depth === 4 ? 'margin-left: 1rem;' : ''}>
+          <a
+            href={`#${heading.slug}`}
+            class="text-sm text-text-secondary hover:text-primary transition-colors no-underline block leading-snug"
+            style="min-width:unset; min-height:unset;"
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}

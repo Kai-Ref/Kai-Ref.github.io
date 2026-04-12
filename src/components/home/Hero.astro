@@ -1,0 +1,65 @@
+---
+// src/components/home/Hero.astro
+import AnimatedCanvas from './AnimatedCanvas.tsx';
+import ProfileSlideshow from './ProfileSlideshow.tsx';
+---
+
+<section
+  class="hero-section relative flex flex-col items-center justify-center min-h-screen px-8 py-16 overflow-hidden"
+  style="background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);"
+>
+  <AnimatedCanvas client:load className="pointer-events-none" />
+
+  <div class="hero-content relative z-10 max-w-3xl mx-auto text-center w-full">
+    <div class="hero-fade-in">
+      <div class="flex justify-center mb-6">
+        <ProfileSlideshow client:load />
+      </div>
+
+      <h1 class="text-5xl font-bold text-white mb-4">
+        Hi, I'm <span class="text-white underline decoration-white/50">Kai Reffert</span>
+      </h1>
+
+      <p class="hero-subtitle text-2xl text-white/90 font-medium mb-4 hero-fade-in" style="animation-delay: 0.2s;">
+        M.Sc. Data Science Student &amp; <span class="text-white font-bold">AI Innovator</span>
+      </p>
+      <p class="hero-description text-white/80 text-lg mb-8 max-w-xl mx-auto hero-fade-in" style="animation-delay: 0.4s;">
+        Passionate about Machine Learning, Artificial Intelligence and Time Series analysis.
+        Currently pursuing my Master's in Data Science with a focus on machine learning,
+        artificial intelligence, time series analysis, graph analysis and computer vision.
+      </p>
+
+      <div class="hero-actions flex gap-4 flex-wrap justify-center hero-fade-in" style="animation-delay: 0.6s;">
+        <a
+          href="/portfolio"
+          class="cta-button inline-block px-8 py-3 rounded-card font-semibold text-white no-underline transition-all duration-300 hover:-translate-y-1 hover:shadow-heavy"
+          style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); backdrop-filter: blur(10px); min-width: unset; min-height: unset;"
+        >
+          View Experience
+        </a>
+        <a
+          href="/contact"
+          class="cta-button inline-block px-8 py-3 rounded-card font-semibold no-underline transition-all duration-300 hover:-translate-y-1 hover:shadow-heavy"
+          style="background: white; color: var(--secondary-color); min-width: unset; min-height: unset;"
+        >
+          Get in Touch
+        </a>
+      </div>
+
+      <div class="hero-stats flex gap-12 mt-12 justify-center hero-fade-in" style="animation-delay: 0.8s;">
+        {[
+          { number: '2+', label: 'Years Experience' },
+          { number: '2', label: 'Degrees' },
+          { number: '8+', label: 'Projects' },
+        ].map(({ number, label }) => (
+          <div class="stat-item text-center">
+            <span class="stat-number block text-4xl font-bold text-white">{number}</span>
+            <span class="stat-label block text-sm text-white/80 mt-1">{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+

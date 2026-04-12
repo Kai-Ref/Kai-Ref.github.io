@@ -1,0 +1,36 @@
+{
+  "name": "kai-ref-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "deploy": "npm run build && npx gh-pages -d dist"
+  },
+  "type": "module",
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.14",
+    "@astrojs/react": "^5.0.3",
+    "@astrojs/tailwind": "^5.1.5",
+    "astro": "^5.18.1",
+    "d3": "^7.9.0",
+    "framer-motion": "^12.38.0",
+    "gh-pages": "^6.3.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-katex": "^7.0.1",
+    "rehype-slug": "^6.0.0",
+    "remark-math": "^6.0.0",
+    "tailwindcss": "^3.4.19"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  }
+}

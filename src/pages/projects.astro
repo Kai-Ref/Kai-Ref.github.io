@@ -1,0 +1,45 @@
+---
+// src/pages/projects.astro
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import TopNav from '../components/layout/TopNav.astro';
+import ProjectCard from '../components/projects/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+// The collection is a single JSON file that is an array, so allProjects[0].data is the array
+const projects = (allProjects[0].data as any[]).sort(
+  (a: any, b: any) => Number(b.date) - Number(a.date)
+);
+---
+
+<BaseLayout
+  title="Projects | Kai Reffert"
+  description="Explore Kai Reffert's data science and machine learning projects."
+>
+  <TopNav />
+
+  <main class="main-content pt-24 flex-1 min-h-screen bg-bg-secondary" aria-label="Projects page">
+    <header class="content-header py-20 px-8 text-center bg-surface-container-low">
+      <h1 class="font-headline text-3xl md:text-5xl font-light tracking-tighter text-on-surface mb-4">Projects</h1>
+      <p class="font-label text-lg tracking-widest uppercase text-on-surface-variant mt-4">A collection of my work in data science and machine learning</p>
+    </header>
+
+    <section class="py-12 px-8" aria-labelledby="projects-heading">
+      <h2 id="projects-heading" class="sr-only">All projects</h2>
+      <div class="content-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {projects.map((project: any) => (
+          <ProjectCard
+            title={project.title}
+            description={project.description}
+            image={project.image}
+            technologies={project.technologies}
+            date={project.date}
+            status={project.status}
+            github={project.github}
+            demo={project.demo}
+          />
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

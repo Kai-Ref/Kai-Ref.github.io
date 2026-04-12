@@ -1,0 +1,168 @@
+---
+// src/components/layout/TopNav.astro
+const navLinks = [
+  { href: '/',          label: 'Home' },
+  { href: '/about',     label: 'About' },
+  { href: '/portfolio', label: 'Experience' },
+  { href: '/projects',  label: 'Projects' },
+  { href: '/blog',      label: 'Blog' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<nav
+  id="topnav"
+  data-path={currentPath}
+  class="fixed top-0 w-full z-50"
+  style="transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;"
+  aria-label="Site navigation"
+>
+  <div class="flex justify-between items-baseline px-4 py-5 md:px-12 md:py-8 max-w-screen-2xl mx-auto">
+
+    <!-- Brand mark -->
+    <a
+      href="/"
+      class="font-headline text-2xl font-light tracking-tighter text-on-surface no-underline"
+      style="min-width: unset; min-height: unset;"
+      aria-label="Home — Kai Reffert"
+    >
+      Kai Reffert
+    </a>
+
+    <!-- Desktop nav links -->
+    <div class="hidden md:flex items-center gap-12">
+      {navLinks.map(({ href, label }) => {
+        const isActive =
+          href === '/'
+            ? currentPath === '/' || currentPath === '/index'
+            : currentPath.startsWith(href);
+        return (
+          <a
+            href={href}
+            class:list={[
+              'font-headline text-lg tracking-tight italic no-underline transition-colors duration-300',
+              isActive
+                ? 'text-secondary font-medium'
+                : 'text-on-surface-variant font-light hover:text-secondary',
+            ]}
+            aria-current={isActive ? 'page' : undefined}
+            style="min-width: unset; min-height: unset;"
+          >
+            {label}
+          </a>
+        );
+      })}
+    </div>
+
+    <!-- Connect CTA -->
+    <a
+      href="/contact"
+      class="hidden md:inline-block font-headline text-lg tracking-tight italic text-secondary no-underline transition-colors duration-300 hover:text-on-surface"
+      style="min-width: unset; min-height: unset;"
+    >
+      Connect
+    </a>
+
+    <!-- Mobile hamburger -->
+    <button
+      id="mobile-menu-toggle"
+      class="md:hidden text-on-surface bg-transparent border-0 cursor-pointer p-2"
+      aria-label="Toggle navigation menu"
+      aria-expanded="false"
+    >
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </div>
+
+  <!-- Mobile dropdown — always has solid bg so it's readable regardless of nav transparency -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden bg-surface border-t border-outline-variant/20 px-4 pb-6 md:px-12 md:pb-8"
+  >
+    {navLinks.map(({ href, label }) => {
+      const isActive =
+        href === '/'
+          ? currentPath === '/' || currentPath === '/index'
+          : currentPath.startsWith(href);
+      return (
+        <a
+          href={href}
+          class:list={[
+            'block font-headline text-lg italic py-3 no-underline transition-colors duration-300',
+            isActive
+              ? 'text-secondary font-medium'
+              : 'text-on-surface-variant font-light hover:text-secondary',
+          ]}
+          style="min-width: unset; min-height: unset;"
+        >
+          {label}
+        </a>
+      );
+    })}
+    <!-- Connect — standalone CTA in mobile menu -->
+    <a
+      href="/contact"
+      class="block font-headline text-lg italic py-3 no-underline text-secondary font-medium transition-colors duration-300 hover:text-on-surface"
+      style="min-width: unset; min-height: unset;"
+    >
+      Connect
+    </a>
+  </div>
+</nav>
+
+<script>
+  const nav = document.getElementById('topnav') as HTMLElement | null;
+  const toggle = document.getElementById('mobile-menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  // Publish real nav height as --nav-h on :root (used by PortfolioMap)
+  function publishNavHeight() {
+    if (!nav) return;
+    document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+  }
+  publishNavHeight();
+  const ro = new ResizeObserver(publishNavHeight);
+  if (nav) ro.observe(nav);
+
+  function applyFrosted() {
+    if (!nav) return;
+    nav.style.background = 'rgba(249,249,249,0.88)';
+    nav.style.backdropFilter = 'blur(20px)';
+    (nav.style as any).webkitBackdropFilter = 'blur(20px)';
+    nav.style.boxShadow = '0 2px 40px rgba(26,28,28,0.06)';
+  }
+
+  function applyTransparent() {
+    if (!nav) return;
+    nav.style.background = 'transparent';
+    nav.style.backdropFilter = 'none';
+    (nav.style as any).webkitBackdropFilter = 'none';
+    nav.style.boxShadow = 'none';
+  }
+
+  const isHome = nav?.dataset.path === '/';
+
+  if (isHome) {
+    // Homepage: transparent at top, frosted glass after 20px scroll
+    function updateNavBg() {
+      if (window.scrollY > 20) {
+        applyFrosted();
+      } else {
+        applyTransparent();
+      }
+    }
+    updateNavBg();
+    window.addEventListener('scroll', updateNavBg, { passive: true });
+  } else {
+    // All other pages: always frosted glass immediately
+    applyFrosted();
+  }
+
+  // Mobile hamburger toggle
+  toggle?.addEventListener('click', () => {
+    const isOpen = !menu?.classList.contains('hidden');
+    menu?.classList.toggle('hidden', isOpen);
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+  });
+</script>

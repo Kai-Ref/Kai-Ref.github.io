@@ -1,0 +1,51 @@
+---
+// src/pages/contact.astro
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import TopNav from '../components/layout/TopNav.astro';
+import ContactForm from '../components/contact/ContactForm.tsx';
+---
+
+<BaseLayout
+  title="Contact | Kai Reffert"
+  description="Get in touch with Kai Reffert."
+>
+  <TopNav />
+
+  <main class="main-content pt-24 flex-1 min-h-screen bg-bg-secondary" aria-label="Contact page">
+    <section class="section contact py-16 px-8" aria-labelledby="contact-heading">
+      <h1 id="contact-heading" class="text-2xl md:text-4xl font-bold text-text-primary mb-10">Get In Touch</h1>
+      <div class="contact-grid grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+
+        <div class="contact-form-wrapper bg-white rounded-card p-8 shadow-light">
+          <ContactForm client:load />
+        </div>
+
+        <aside class="contact-info" aria-label="Contact information">
+          <h2 class="text-2xl font-semibold text-text-primary mb-6">Contact Info</h2>
+          <div class="space-y-4">
+            {[
+              { href: 'mailto:kai.reffert@gmail.com', icon: '✉️', label: 'Email', value: 'kai.reffert@gmail.com' },
+              { href: 'https://www.linkedin.com/in/kai-reffert', icon: '💼', label: 'LinkedIn', value: 'linkedin.com/in/kai-reffert', external: true },
+              { href: 'https://github.com/kai-ref', icon: '💻', label: 'GitHub', value: 'github.com/kai-ref', external: true },
+            ].map(({ href, icon, label, value, external }) => (
+              <a
+                href={href}
+                target={external ? '_blank' : undefined}
+                rel={external ? 'noopener noreferrer' : undefined}
+                class="flex items-center gap-4 p-4 bg-white rounded-card shadow-light text-text-primary no-underline transition-all duration-300 hover:-translate-y-[2px] hover:shadow-medium hover:text-primary"
+                aria-label={`${label}: ${value}`}
+              >
+                <span class="text-2xl">{icon}</span>
+                <div>
+                  <div class="font-medium">{label}</div>
+                  <div class="text-sm text-text-secondary">{value}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </aside>
+
+      </div>
+    </section>
+  </main>
+</BaseLayout>

@@ -1,0 +1,17 @@
+---
+// src/pages/portfolio.astro
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import TopNav from '../components/layout/TopNav.astro';
+import PortfolioMap from '../components/portfolio/map/PortfolioMap';
+---
+
+<BaseLayout
+  title="Experience | Kai Reffert"
+  description="Kai Reffert's professional and educational timeline."
+>
+  <TopNav />
+
+  <main class="main-content flex-1 min-h-screen" aria-label="Portfolio map timeline">
+    <PortfolioMap client:load />
+  </main>
+</BaseLayout>

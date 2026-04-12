@@ -1,0 +1,85 @@
+---
+// src/pages/about.astro
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import TopNav from '../components/layout/TopNav.astro';
+import PhotoGrid from '../components/about/PhotoGrid.tsx';
+---
+
+<BaseLayout
+  title="Kai Reffert - About"
+  description="Learn about Kai Reffert — data scientist, ML engineer, and time series enthusiast."
+>
+  <TopNav />
+
+  <main class="main-content pt-24 flex-1 min-h-screen bg-bg-secondary" aria-label="About page">
+
+    <section class="section about py-20 px-8" aria-labelledby="about-heading">
+      <div class="max-w-6xl mx-auto">
+
+        <!-- Intro: centered, wider text -->
+        <div class="text-center mb-14">
+          <h2 id="about-heading" class="text-4xl font-bold text-text-primary mb-8">About Me</h2>
+          <p class="text-text-secondary text-lg leading-relaxed max-w-3xl mx-auto">
+            Hi, I'm Kai 👋 — a data scientist who wants to make a real, tangible impact. I believe action beats
+            perfection: experimenting, iterating and learning by doing are at the core of how I operate and approach
+            problems. I dive into messy datasets, uncover hidden patterns and build solutions that actually move things
+            forward. Beyond the numbers, I'm fueled by curiosity, creativity and the drive to turn ideas into reality.
+            When I'm not coding or analyzing data, you'll probably find me hiking through nature, cooking up something
+            new in the kitchen, playing sports or enjoying a great glass of wine from vineyards based in my home region, Pfalz.
+          </p>
+        </div>
+
+        <!-- Cards: forced 3-column at md+ -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              icon: '🎓',
+              title: 'Education',
+              body: `At the moment, I'm completing my Master's in Data Science at the University of Mannheim, with an exciting exchange semester at the University of Adelaide. During this Master's I got the chance to be part of multiple hands-on projects in domains such as Computer Vision, XAI and Time Series Forecasting.`,
+            },
+            {
+              icon: '💼',
+              title: 'Experience',
+              body: `At <strong>ICIS</strong>, I built real-time price classification models that improved electricity price forecasts by 5%. At <strong>SIT</strong>, I was part of the MaLeFiz project and developed fraud detection systems for monetary transactions using graph-based ML and showcased our work via an interactive demo website.`,
+            },
+            {
+              icon: '🔬',
+              title: 'Research Interests',
+              body: `I'm fascinated by time series — forecasting the future from the smallest hints in the past. But I don't stop there: I've also worked on research projects in financial fraud detection, explainable AI and computer vision. My first paper was published at the <a href="https://skill.gi.de/programm-3#c107367" class="text-primary hover:underline">SKILL24 conference</a>.`,
+            },
+          ].map(({ icon, title, body }) => (
+            <article
+              class="about-card bg-white rounded-card p-6 shadow-light border-l-4 transition-all duration-300 hover:-translate-y-[3px] hover:shadow-medium"
+              style="border-left-color: var(--primary-color);"
+            >
+              <h3 class="text-xl font-semibold text-text-primary mb-3">{icon} {title}</h3>
+              <p class="text-text-secondary leading-relaxed" set:html={body} />
+            </article>
+          ))}
+        </div>
+
+      </div>
+    </section>
+
+    <section class="personal-section py-16 px-8 bg-white" aria-labelledby="hobbies-heading">
+      <div class="max-w-6xl mx-auto">
+        <h3 id="hobbies-heading" class="text-2xl font-semibold text-text-primary mb-6 text-center">🌍 Hobbies &amp; Personal Life</h3>
+        <div class="hobbies-list flex flex-wrap gap-4 mb-8 justify-center">
+          {[
+            { src: 'https://images.emojiterra.com/google/noto-emoji/unicode-16.0/color/1024px/26f0.png', alt: 'Hiking', label: 'Hiking & Travel' },
+            { src: 'https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f35d.gif', alt: 'Cooking', label: 'Cooking' },
+            { src: 'https://images.emojiterra.com/google/noto-emoji/animated-emoji/26bd.gif', alt: 'Sports', label: 'Sports' },
+            { src: 'https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f377.gif', alt: 'Wine', label: 'Wine' },
+          ].map(({ src, alt, label }) => (
+            <span class="flex items-center gap-2 bg-bg-secondary px-4 py-2 rounded-full text-text-primary font-medium">
+              <img src={src} alt={alt} width="24" height="24" class="w-6 h-6 object-contain" />
+              {label}
+            </span>
+          ))}
+        </div>
+        <PhotoGrid client:visible />
+      </div>
+    </section>
+
+  </main>
+</BaseLayout>

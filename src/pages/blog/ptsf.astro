@@ -1,0 +1,108 @@
+---
+// src/pages/blog/ptsf.astro
+import BaseLayout from '../../components/layout/BaseLayout.astro';
+import TopNav from '../../components/layout/TopNav.astro';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const htmlBody = readFileSync(resolve('src/data/ptsf-body.html'), 'utf-8');
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Probabilistic Time Series Forecasting",
+  "author": { "@type": "Person", "name": "Kai Reffert" },
+  "datePublished": "2025-07-14",
+  "description": "Literature review of recent SOTA Probabilistic TSF research.",
+};
+---
+
+<BaseLayout
+  title="Probabilistic Time Series Forecasting | Kai Reffert"
+  description="Literature review of recent SOTA Probabilistic TSF research."
+  ogType="article"
+  structuredData={structuredData}
+>
+  <TopNav />
+
+  <main class="main-content pt-24 flex-1 min-h-screen bg-bg-secondary" aria-label="Blog post">
+    <div class="w-full" style="max-height: 400px; overflow: hidden;">
+      <img
+        src="/img/posts/ptsf.png"
+        alt="Probabilistic Time Series Forecasting"
+        width="1200"
+        height="400"
+        class="w-full object-cover"
+      />
+    </div>
+
+    <div class="max-w-screen-xl mx-auto px-8 py-12">
+      <article class="main-article prose prose-lg max-w-none">
+        <header class="mb-10">
+          <h1 class="font-headline text-4xl font-light tracking-tighter text-on-surface mb-4">Probabilistic Time Series Forecasting</h1>
+          <div class="flex flex-wrap items-center gap-4 text-on-surface-variant text-sm">
+            <time datetime="2025-07-14">July 14, 2025</time>
+            <span>15 min read</span>
+            <span class="px-2 py-1 rounded-full text-xs font-medium bg-surface-container text-on-surface-variant">Probabilistic TSF</span>
+            <span class="px-2 py-1 rounded-full text-xs font-medium bg-surface-container text-on-surface-variant">Literature Review</span>
+          </div>
+        </header>
+        <div set:html={htmlBody} />
+      </article>
+    </div>
+  </main>
+</BaseLayout>
+
+<style is:global>
+  .main-article h2, .main-article h3, .main-article h4 {
+    color: var(--text-primary);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-family: 'Newsreader', serif;
+    font-weight: 400;
+  }
+  .main-article p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+  }
+  .main-article a {
+    color: #ae3100;
+    text-decoration: underline;
+  }
+  .main-article code {
+    background: var(--bg-tertiary);
+    padding: 0.2em 0.4em;
+    border-radius: 0px;
+    font-size: 0.9em;
+  }
+  .main-article blockquote {
+    border-left: 4px solid #ae3100;
+    padding-left: 1.5rem;
+    margin-left: 0;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+  .main-article table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    display: block;
+  }
+  .main-article th, .main-article td {
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
+  .main-article th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+  }
+  .katex-display {
+    overflow-x: auto;
+    padding: 1rem 0;
+  }
+  .citation { font-size: 0.9em; }
+  .math.inline { font-style: normal; }
+</style>
