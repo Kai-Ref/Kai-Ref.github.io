@@ -43,7 +43,7 @@ export default function PortfolioMap() {
   const chapter      = CHAPTERS[chapterIndex] ?? CHAPTERS[0];
 
   // ── Input handling ───────────────────────────────────────────────────────
-  useSwipeScroll(outerRef);
+  useSwipeScroll(outerRef, chapterIndex);
   useKeyboardScroll(outerRef);
 
   const isMobile = vpWidth > 0 && vpWidth < MOBILE_BP;
