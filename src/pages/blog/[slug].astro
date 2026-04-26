@@ -1,0 +1,889 @@
+---
+// src/pages/blog/[slug].astro
+import BaseLayout from '../../components/layout/BaseLayout.astro';
+import TopNav from '../../components/layout/TopNav.astro';
+import TableOfContents from '../../components/blog/TableOfContents.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+
+const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const currentIndex = allPosts.findIndex((entry) => entry.id === post.id);
+const previousPost = currentIndex >= 0 ? allPosts[currentIndex + 1] : undefined;
+const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined;
+
+const relatedPosts = allPosts
+  .filter((entry) => entry.id !== post.id)
+  .map((entry) => {
+    const overlap = entry.data.tags.filter((tag) => post.data.tags.includes(tag)).length;
+    return { entry, overlap };
+  })
+  .sort((a, b) => b.overlap - a.overlap || b.entry.data.pubDate.valueOf() - a.entry.data.pubDate.valueOf())
+  .slice(0, 3)
+  .map(({ entry }) => entry);
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  author: { '@type': 'Person', name: 'Kai Reffert' },
+  datePublished: post.data.pubDate instanceof Date
+    ? post.data.pubDate.toISOString().slice(0, 10)
+    : String(post.data.pubDate),
+  description: post.data.description,
+};
+
+const displayDate = post.data.pubDate instanceof Date
+  ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : String(post.data.pubDate);
+
+const authorInitials = 'KR';
+
+// Estimate reading progress breakpoints
+const estimatedWords = 1500; // rough fallback; ideally computed from content
+---
+
+<BaseLayout
+  title={`${post.data.title} | Kai Reffert`}
+  description={post.data.description}
+  ogType="article"
+  structuredData={structuredData}
+>
+  <TopNav />
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+
+  <main class="main-content blog-reading-page pt-24 flex-1 min-h-screen" aria-label="Blog post">
+
+    <!-- Hero Image (full-bleed, no clipping on content above fold) -->
+    {post.data.heroImage && (
+      <div class="hero-wrap" role="img" aria-label={post.data.title}>
+        <img
+          src={post.data.heroImage}
+          alt=""
+          width="1600"
+          height="560"
+          class="hero-image"
+          loading="eager"
+          decoding="async"
+        />
+        <div class="hero-fade" aria-hidden="true"></div>
+      </div>
+    )}
+
+    <div class="page-shell">
+      <div class="article-layout">
+
+        <!-- Main article column -->
+        <article class="main-article article-shell" itemscope itemtype="https://schema.org/Article">
+
+          <!-- Header block -->
+          <header class="article-header">
+            <div class="article-kicker-row">
+              <span class="article-kicker">Essay</span>
+              {post.data.readTime && (
+                <span class="article-read-time">{post.data.readTime}</span>
+              )}
+            </div>
+
+            <h1 class="article-title" itemprop="headline">{post.data.title}</h1>
+            <p class="article-dek">{post.data.description}</p>
+
+            <div class="article-byline" aria-label="Post metadata">
+              <span class="author-avatar" aria-hidden="true">{authorInitials}</span>
+              <div class="byline-copy">
+                <p class="byline-author" itemprop="author">Kai Reffert</p>
+                <time
+                  class="byline-date"
+                  datetime={post.data.pubDate instanceof Date ? post.data.pubDate.toISOString().slice(0, 10) : String(post.data.pubDate)}
+                  itemprop="datePublished"
+                >
+                  {displayDate}
+                </time>
+              </div>
+            </div>
+
+            {post.data.tags.length > 0 && (
+              <div class="article-tags" role="list" aria-label="Tags">
+                {post.data.tags.map((tag) => (
+                  <span class="article-tag" role="listitem">{tag}</span>
+                ))}
+              </div>
+            )}
+
+            <div class="article-rule" aria-hidden="true"></div>
+          </header>
+
+          <!-- Body -->
+          <div class="article-body" itemprop="articleBody">
+            <Content />
+          </div>
+
+          <!-- Post navigation -->
+          {(previousPost || nextPost) && (
+            <nav class="post-nav" aria-label="Continue reading">
+              <h2 class="section-eyebrow">Continue Reading</h2>
+              <div class="post-nav-grid">
+                {previousPost ? (
+                  <a class="post-nav-card" href={`/blog/${previousPost.id}`} rel="prev">
+                    <span class="nav-card-label">← Previous</span>
+                    <span class="nav-card-title">{previousPost.data.title}</span>
+                  </a>
+                ) : <div />}
+                {nextPost ? (
+                  <a class="post-nav-card post-nav-card--next" href={`/blog/${nextPost.id}`} rel="next">
+                    <span class="nav-card-label">Next →</span>
+                    <span class="nav-card-title">{nextPost.data.title}</span>
+                  </a>
+                ) : <div />}
+              </div>
+            </nav>
+          )}
+
+          <!-- Related posts -->
+          {relatedPosts.length > 0 && (
+            <section class="related-posts" aria-label="Related posts">
+              <h2 class="section-eyebrow">Related Posts</h2>
+              <div class="related-grid">
+                {relatedPosts.map((related) => (
+                  <a class="related-card" href={`/blog/${related.id}`}>
+                    <time class="related-date">
+                      {related.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </time>
+                    <h3 class="related-title">{related.data.title}</h3>
+                    <p class="related-desc">{related.data.description}</p>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+
+        </article>
+
+        <!-- Sidebar -->
+        <aside class="article-sidebar" aria-label="On this page">
+          <div class="sidebar-sticky">
+            <TableOfContents headings={headings} />
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style is:global>
+  /* ─── Reading progress bar ─── */
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, #ae3100 0%, #c94a0e 60%, #3f2a20 100%);
+    z-index: 60;
+    transition: transform 0.05s linear;
+  }
+
+  /* ─── Page background ─── */
+  .blog-reading-page {
+    background:
+      radial-gradient(ellipse 140% 80% at 50% -15%, rgba(174, 49, 0, 0.07), transparent 60%),
+      linear-gradient(180deg, #f5f1eb 0%, #f4f2ef 40%, #f6f6f5 100%);
+  }
+
+  /* ─── Hero ─── */
+  .hero-wrap {
+    position: relative;
+    width: 100%;
+    max-height: 480px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(26, 28, 28, 0.08);
+  }
+
+  .hero-image {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Gradient fade so hero bleeds into page bg */
+  .hero-fade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 40%,
+      rgba(245, 241, 235, 0.6) 80%,
+      rgba(245, 241, 235, 1) 100%
+    );
+  }
+
+  /* ─── Page shell ─── */
+  .page-shell {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 6rem;
+  }
+
+  /* ─── Two-column layout ─── */
+  .article-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 17rem;
+    gap: 3rem;
+    align-items: stretch;
+  }
+
+  /* ─── Article shell card ─── */
+  .article-shell {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(26, 28, 28, 0.09);
+    box-shadow:
+      0 1px 3px rgba(26, 28, 28, 0.04),
+      0 12px 40px rgba(26, 28, 28, 0.07);
+    border-radius: 2px;
+    padding: clamp(2rem, 3.5vw, 3.5rem);
+    backdrop-filter: blur(4px);
+  }
+
+  /* ─── Sidebar ─── */
+  .article-sidebar {
+    align-self: stretch;
+    min-height: 100%;
+  }
+
+  .sidebar-sticky {
+    position: sticky;
+    top: 7.25rem;
+    max-height: calc(100vh - 8.25rem);
+    overflow-y: auto;
+  }
+
+  /* ─── Article header ─── */
+  .article-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .article-kicker-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .article-kicker {
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #ae3100;
+  }
+
+  .article-read-time {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: rgba(26, 28, 28, 0.45);
+    text-transform: uppercase;
+  }
+
+  .article-title {
+    font-family: 'Newsreader', serif;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.07;
+    font-weight: 350;
+    letter-spacing: -0.02em;
+    color: #1a1c1c;
+    margin-bottom: 1.1rem;
+    text-wrap: balance;
+  }
+
+  .article-dek {
+    font-family: 'Manrope', sans-serif;
+    font-size: clamp(1.05rem, 1.6vw, 1.22rem);
+    line-height: 1.65;
+    color: rgba(26, 28, 28, 0.7);
+    max-width: 58ch;
+    margin-bottom: 1.5rem;
+  }
+
+  .article-byline {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .author-avatar {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+    background: linear-gradient(135deg, #ae3100 0%, #5d1c00 100%);
+    box-shadow: 0 3px 12px rgba(93, 28, 0, 0.3);
+    flex-shrink: 0;
+  }
+
+  .byline-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .byline-author {
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1a1c1c;
+    margin: 0;
+  }
+
+  .byline-date {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(26, 28, 28, 0.45);
+  }
+
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .article-tag {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: rgba(26, 28, 28, 0.55);
+    border: 1px solid rgba(26, 28, 28, 0.18);
+    padding: 0.2rem 0.5rem;
+    border-radius: 1px;
+  }
+
+  /* Full-width gradient rule below header */
+  .article-rule {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, #ae3100 0%, rgba(26, 28, 28, 0.12) 60%, transparent 100%);
+    margin-bottom: 0.25rem;
+  }
+
+  /* ─── Body typography ─── */
+  .article-body {
+    color: #1a1c1c;
+  }
+
+  .article-body > :first-child {
+    margin-top: 0;
+  }
+
+  /* Drop cap on the opening paragraph */
+  .article-body > p:first-of-type::first-letter {
+    float: left;
+    font-family: 'Newsreader', serif;
+    font-size: 3.6em;
+    line-height: 0.84;
+    padding-right: 0.09em;
+    margin-top: 0.08em;
+    color: #ae3100;
+    font-weight: 500;
+  }
+
+  .article-body p,
+  .article-body li {
+    font-family: 'Newsreader', serif;
+    font-size: clamp(1.1rem, 1.3vw, 1.28rem);
+    line-height: 1.9;
+    letter-spacing: 0.012em;
+    color: #1a1c1c;
+  }
+
+  .article-body p {
+    margin-top: 0;
+    margin-bottom: 1.35rem;
+  }
+
+  .article-body h2,
+  .article-body h3,
+  .article-body h4 {
+    font-family: 'Newsreader', serif;
+    font-weight: 450;
+    letter-spacing: -0.015em;
+    line-height: 1.18;
+    color: #1a1c1c;
+    margin-bottom: 0.9rem;
+  }
+
+  .article-body h2 {
+    font-size: clamp(1.55rem, 2.2vw, 2.1rem);
+    margin-top: 3.2rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid rgba(26, 28, 28, 0.1);
+  }
+
+  .article-body h3 {
+    font-size: clamp(1.28rem, 1.7vw, 1.6rem);
+    margin-top: 2.4rem;
+  }
+
+  .article-body h4 {
+    font-size: clamp(1.1rem, 1.4vw, 1.3rem);
+    margin-top: 1.8rem;
+  }
+
+  /* Anchor offset for TOC jumps under fixed top nav */
+  .article-body h2,
+  .article-body h3 {
+    scroll-margin-top: 6.9rem;
+  }
+
+  /* Keep first section heading a bit tighter */
+  .article-body h2:first-of-type {
+    scroll-margin-top: 5.9rem;
+  }
+
+  .article-body ul,
+  .article-body ol {
+    margin: 0.6rem 0 1.6rem 0.5rem;
+    padding-left: 1.4rem;
+  }
+
+  .article-body ul { list-style: disc; }
+  .article-body ol { list-style: decimal; }
+
+  .article-body li {
+    margin: 0.4rem 0;
+  }
+
+  .article-body li::marker {
+    color: #ae3100;
+    font-size: 0.8em;
+  }
+
+  .article-body li > p {
+    margin-bottom: 0.3rem;
+  }
+
+  .article-body a {
+    color: #ae3100;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+  }
+
+  .article-body a:hover {
+    color: #7f2400;
+  }
+
+  .article-body a[href^='#ref-'] {
+    min-width: unset;
+    min-height: unset;
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8em;
+    text-decoration: none;
+    line-height: 1;
+    border: 1px solid rgba(174, 49, 0, 0.28);
+    padding: 0.06rem 0.28rem;
+    margin: 0 0.08rem;
+    color: #7a2a0e;
+    background: rgba(174, 49, 0, 0.06);
+    border-radius: 2px;
+    vertical-align: baseline;
+  }
+
+  .article-body a[href^='#ref-']:hover {
+    color: #ae3100;
+    border-color: rgba(174, 49, 0, 0.45);
+    background: rgba(174, 49, 0, 0.1);
+  }
+
+  .article-body code {
+    background: rgba(26, 28, 28, 0.07);
+    padding: 0.15em 0.36em;
+    border-radius: 2px;
+    font-size: 0.83em;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  .article-body pre {
+    margin: 1.8rem 0;
+    background: #181716;
+    color: #f4f0eb;
+    padding: 1.2rem 1.4rem;
+    overflow-x: auto;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .article-body pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  /* Pull-quote style blockquotes */
+  .article-body blockquote {
+    position: relative;
+    border-left: 2px solid rgba(174, 49, 0, 0.75);
+    padding: 0.1rem 0 0.1rem 1.2rem;
+    margin: 2rem 0;
+  }
+
+  .article-body blockquote::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #ae3100 0%, rgba(174,49,0,0.25) 100%);
+  }
+
+  .article-body blockquote p {
+    font-family: 'Manrope', sans-serif;
+    font-size: clamp(1.1rem, 1.4vw, 1.32rem);
+    line-height: 1.68;
+    color: rgba(26, 28, 28, 0.8);
+    font-style: normal;
+    letter-spacing: 0;
+  }
+
+  .article-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0 2rem;
+    overflow-x: auto;
+    display: block;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .article-body th,
+  .article-body td {
+    border: 1px solid rgba(26, 28, 28, 0.14);
+    padding: 0.7rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .article-body th {
+    background: rgba(26, 28, 28, 0.04);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    color: rgba(26, 28, 28, 0.7);
+    text-transform: uppercase;
+  }
+
+  .article-body tr:nth-child(even) td {
+    background: rgba(26, 28, 28, 0.015);
+  }
+
+  .article-body hr {
+    border: none;
+    border-top: 1px solid rgba(26, 28, 28, 0.15);
+    margin: 2.5rem 0;
+  }
+
+  .article-body figure {
+    margin: 2.2rem 0;
+  }
+
+  .article-body figcaption {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: rgba(26, 28, 28, 0.45);
+    margin-top: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .article-body img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid rgba(26, 28, 28, 0.08);
+    border-radius: 1px;
+  }
+
+  /* KaTeX math */
+  .katex-display {
+    overflow-x: auto;
+    padding: 1.2rem 0;
+    margin: 0.5rem 0;
+  }
+
+  /* References section */
+  .article-body h2#references,
+  .article-body h2#bibliography {
+    margin-top: 3.5rem;
+  }
+
+  .article-body h2#references + ol,
+  .article-body h2#references + ul,
+  .article-body h2#bibliography + ol,
+  .article-body h2#bibliography + ul {
+    margin-left: 0;
+    padding-left: 0;
+    list-style: none;
+    counter-reset: refs;
+  }
+
+  .article-body h2#references + ol li,
+  .article-body h2#references + ul li,
+  .article-body h2#bibliography + ol li,
+  .article-body h2#bibliography + ul li {
+    position: relative;
+    padding: 0.65rem 0.9rem 0.65rem 2.4rem;
+    border: 1px solid rgba(26, 28, 28, 0.1);
+    background: rgba(255, 255, 255, 0.6);
+    margin: 0.35rem 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .article-body h2#references + ol li::before,
+  .article-body h2#references + ul li::before,
+  .article-body h2#bibliography + ol li::before,
+  .article-body h2#bibliography + ul li::before {
+    counter-increment: refs;
+    content: counter(refs);
+    position: absolute;
+    top: 0.75rem;
+    left: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    color: #ae3100;
+  }
+
+  .article-body .references {
+    margin-top: 0.85rem;
+    display: grid;
+    gap: 0.62rem;
+    counter-reset: cslref;
+  }
+
+  .article-body .references .csl-entry {
+    position: relative;
+    padding: 0.78rem 0.92rem 0.72rem 2.5rem;
+    border: 1px solid rgba(26, 28, 28, 0.12);
+    background: rgba(255, 255, 255, 0.72);
+    margin: 0;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.56;
+    overflow-wrap: anywhere;
+    scroll-margin-top: 7.3rem;
+  }
+
+  .article-body .references .csl-entry::before {
+    counter-increment: cslref;
+    content: "[" counter(cslref) "]";
+    position: absolute;
+    top: 0.78rem;
+    left: 0.78rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    color: #ae3100;
+  }
+
+  /* ─── Section eyebrow ─── */
+  .section-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #ae3100;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    margin-top: 0;
+  }
+
+  /* ─── Post nav ─── */
+  .post-nav {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(26, 28, 28, 0.12);
+  }
+
+  .post-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .post-nav-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(26, 28, 28, 0.13);
+    background: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  }
+
+  .post-nav-card--next {
+    text-align: right;
+  }
+
+  .post-nav-card:hover {
+    border-color: rgba(174, 49, 0, 0.4);
+    box-shadow: 0 6px 18px rgba(26, 28, 28, 0.07);
+    transform: translateY(-2px);
+  }
+
+  .nav-card-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(26, 28, 28, 0.4);
+  }
+
+  .nav-card-title {
+    font-family: 'Newsreader', serif;
+    font-size: 1.05rem;
+    line-height: 1.35;
+    color: #1a1c1c;
+  }
+
+  /* ─── Related posts ─── */
+  .related-posts {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(26, 28, 28, 0.12);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem;
+    border: 1px solid rgba(26, 28, 28, 0.13);
+    background: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  }
+
+  .related-card:hover {
+    border-color: rgba(174, 49, 0, 0.35);
+    box-shadow: 0 6px 18px rgba(26, 28, 28, 0.07);
+    transform: translateY(-2px);
+  }
+
+  .related-date {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(26, 28, 28, 0.4);
+  }
+
+  .related-title {
+    font-family: 'Newsreader', serif;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    color: #1a1c1c;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .related-desc {
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: rgba(26, 28, 28, 0.55);
+    margin: 0;
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 1100px) {
+    .article-layout {
+      grid-template-columns: 1fr;
+    }
+    .article-shell {
+      max-width: 72rem;
+      margin: 0 auto;
+    }
+    .article-sidebar {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .page-shell {
+      padding: 1.5rem 1rem 4rem;
+    }
+    .article-shell {
+      padding: 1.4rem 1.1rem 2rem;
+    }
+    .post-nav-grid,
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+    .article-body > p:first-of-type::first-letter {
+      font-size: 2.8em;
+    }
+  }
+
+  /* ─── Utilities ─── */
+  .math.inline {
+    font-style: normal;
+  }
+</style>
+
+<script is:inline>
+  // Reading progress
+  const progressEl = document.getElementById('reading-progress');
+  const article = document.querySelector('.article-body');
+
+  const updateProgress = () => {
+    if (!progressEl || !article) return;
+    const rect = article.getBoundingClientRect();
+    const total = rect.height - window.innerHeight;
+    const scrolled = -rect.top;
+    const progress = total > 0 ? Math.min(Math.max(scrolled / total, 0), 1) : 0;
+    progressEl.style.transform = `scaleX(${progress})`;
+  };
+
+  updateProgress();
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+</script>

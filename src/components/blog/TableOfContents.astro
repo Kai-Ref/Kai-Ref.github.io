@@ -9,20 +9,19 @@ interface Props {
   headings: Heading[];
 }
 const { headings } = Astro.props;
-// Filter to h2 and h4 only
-const filtered = headings.filter((h) => h.depth === 2 || h.depth === 4);
+const filtered = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 {filtered.length > 0 && (
-  <nav aria-label="Table of contents" class="toc sticky top-8 bg-white rounded-card p-6 shadow-light">
-    <h2 class="text-base font-semibold text-text-primary mb-4">Contents</h2>
-    <ol class="list-none space-y-2">
+  <nav aria-label="Table of contents" class="toc">
+    <p class="toc-label">Contents</p>
+    <ol class="toc-list" role="list">
       {filtered.map((heading) => (
-        <li style={heading.depth === 4 ? 'margin-left: 1rem;' : ''}>
+        <li class={heading.depth === 3 ? 'toc-item toc-item-nested' : 'toc-item'}>
           <a
             href={`#${heading.slug}`}
-            class="text-sm text-text-secondary hover:text-primary transition-colors no-underline block leading-snug"
-            style="min-width:unset; min-height:unset;"
+            class="toc-link"
+            style="min-width:unset; min-height:unset"
           >
             {heading.text}
           </a>
@@ -31,3 +30,48 @@ const filtered = headings.filter((h) => h.depth === 2 || h.depth === 4);
     </ol>
   </nav>
 )}
+
+<style>
+  .toc {
+    border-left: 1px solid rgba(26, 28, 28, 0.12);
+    padding-left: 1rem;
+  }
+  .toc-label {
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.7rem;
+    color: #ae3100;
+    margin-bottom: 0.8rem;
+  }
+  .toc-list {
+    list-style: none;
+    display: grid;
+    gap: 0.42rem;
+  }
+  .toc-item {
+    margin: 0;
+  }
+  .toc-item-nested {
+    padding-left: 0.9rem;
+  }
+  .toc-link {
+    min-height: unset;
+    min-width: unset;
+    display: block;
+    text-decoration: none;
+    color: rgba(26, 28, 28, 0.7);
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+  }
+  .toc-link:hover {
+    color: #ae3100;
+  }
+  @media (max-width: 1023px) {
+    .toc {
+      display: none;
+    }
+  }
+</style>

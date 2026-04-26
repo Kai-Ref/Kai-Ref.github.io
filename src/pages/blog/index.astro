@@ -3,27 +3,20 @@
 import BaseLayout from '../../components/layout/BaseLayout.astro';
 import TopNav from '../../components/layout/TopNav.astro';
 import BlogCard from '../../components/blog/BlogCard.astro';
+import { getCollection } from 'astro:content';
 
-const posts = [
-  {
-    slug: 'ltsf',
-    title: 'Long-Term Time Series Forecasting',
-    description: 'Literature review of recent SOTA LTSF research.',
-    pubDate: new Date('2025-07-14'),
-    heroImage: '/img/posts/LTSF.jpg',
-    tags: ['LTSF', 'Literature Review'],
-    readTime: '15 min read',
-  },
-  {
-    slug: 'ptsf',
-    title: 'Probabilistic Time Series Forecasting',
-    description: 'Literature review of recent SOTA Probabilistic TSF research.',
-    pubDate: new Date('2025-07-14'),
-    heroImage: '/img/posts/ptsf.png',
-    tags: ['Probabilistic TSF', 'Literature Review'],
-    readTime: '15 min read',
-  },
-].sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
+const entries = await getCollection('blog', ({ data }) => !data.draft);
+const posts = entries
+  .map((entry) => ({
+    slug: entry.id,
+    title: entry.data.title,
+    description: entry.data.description,
+    pubDate: entry.data.pubDate,
+    heroImage: entry.data.heroImage,
+    tags: entry.data.tags,
+    readTime: entry.data.readTime,
+  }))
+  .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 ---
 
 <BaseLayout

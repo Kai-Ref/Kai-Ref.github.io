@@ -1,0 +1,14 @@
+---
+title: "{{TITLE}}"
+format: gfm
+---
+
+## Introduction
+
+Write your post in Quarto markdown. Citations use the same key format, for example `[@example2024]`.
+
+## Main Section
+
+Use regular markdown and place assets in `assets/images/`.
+
+![Example](assets/images/hero.jpg)

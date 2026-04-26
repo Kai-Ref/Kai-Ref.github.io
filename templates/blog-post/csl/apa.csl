@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" default-locale="en-US">
+  <info>
+    <title>Fallback APA-like CSL</title>
+    <id>https://kai-ref.github.io/csl/fallback-apa</id>
+    <updated>2026-04-26T00:00:00+00:00</updated>
+  </info>
+  <citation>
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=", ">
+        <names variable="author">
+          <name and="symbol" initialize-with="."/>
+        </names>
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </group>
+    </layout>
+  </citation>
+  <bibliography>
+    <layout suffix=".">
+      <group delimiter=". ">
+        <names variable="author">
+          <name and="text" initialize-with="."/>
+        </names>
+        <text variable="title"/>
+        <text variable="container-title"/>
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </group>
+    </layout>
+  </bibliography>
+</style>

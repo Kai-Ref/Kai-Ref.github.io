@@ -1,0 +1,11 @@
+slug: your-post-slug
+title: {{TITLE}}
+description: Short description for blog listing and SEO.
+pubDate: 2026-04-26
+readTime: 10 min read
+heroImage: hero.jpg
+sourceFormatHint: md
+draft: true
+tags:
+  - Research
+  - Notes
