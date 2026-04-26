@@ -46,7 +46,7 @@ Then I looked at the actual trajectories.
 
 When you sample from a probabilistic DMS model, you’re asking it to generate plausible futures. This is, after all, the point: not just a single prediction, but a distribution over what might happen. And this is where the architecture’s hidden assumption turns destructive.
 
-DMS models are trained to predict each future time step independently ([Taieb and Hyndman 2012](#ref-taieb_recursive_2012)). Given an input context, the model produces a joint output over the full horizon, but with no explicit modeling of how step $`t+2`$ should relate to step $`t+1`$ given that both are uncertain. For point forecasts this is fine—you’re predicting means, and means aggregate cleanly. But when you sample:
+DMS models are trained to predict each future time step independently ([Taieb and Hyndman 2012](#ref-taieb_recursive_2012)). Given an input context, the model produces a joint output over the full horizon, but with no explicit modeling of how step t+2 should relate to step t+1 given that both are uncertain. For point forecasts this is fine—you’re predicting means, and means aggregate cleanly. But when you sample:
 
 ``` math
 \hat{x}_{t+1} \sim p(x_{t+1}), \quad \hat{x}_{t+2} \sim p(x_{t+2}), \quad \ldots, \quad \hat{x}_{t+H} \sim p(x_{t+H})
