@@ -121,7 +121,7 @@ The tension my thesis documents isn’t new—the DMS vs. IMS tradeoff has been
 
 What those metrics don’t tell you is whether the uncertainty is *meaningful*. If you deploy a probabilistic DMS model to generate 100 sample scenarios for a planning problem, you’ll get 100 trajectories that each have the right marginal distribution at every step—but that are individually implausible as paths through time. The ensemble might have the right “cloud” shape, but no individual sample reflects a world that could actually happen.
 
-IMS models produce samples where this isn’t a problem by construction. The conditioning structure ensures that each trajectory is internally coherent: if step $`t+1`$ is high, step $`t+2`$ knows that and conditions on it. The cost is performance—error accumulation over long horizons is a real penalty—but the samples mean something.
+IMS models produce samples where this isn’t a problem by construction. The conditioning structure ensures that each trajectory is internally coherent: if step t+1 is high, step t+2 knows that and conditions on it. The cost is performance—error accumulation over long horizons is a real penalty—but the samples mean something.
 
 The right choice depends on what you need from your probabilistic forecast. If you need marginal distributions at specific horizons for decision support, DMS with a quantile head will serve you well. If you need samples that represent coherent possible futures—for simulation, for risk assessment, for anything that treats the trajectory as a whole—you need to be much more careful. Standard metrics will not warn you when you’re in trouble.
 
