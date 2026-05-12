@@ -1,3 +1,6 @@
 node_modules/
 .env
 opencode.json
+.astro/
+dist/
+.DS_Store
