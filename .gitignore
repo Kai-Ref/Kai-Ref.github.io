@@ -4,3 +4,11 @@ opencode.json
 .astro/
 dist/
 .DS_Store
+
+# Legacy blog source/archive files kept locally only.
+posts/thesis.tex
+posts/thesis1.tex
+posts/posts.css
+posts/chicago-author-date.csl
+posts/LTSF.jpg
+posts/ptsf.png
