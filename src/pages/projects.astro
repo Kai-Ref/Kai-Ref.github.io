@@ -10,11 +10,19 @@ const allProjects = await getCollection('projects');
 const projects = (allProjects[0].data as any[]).sort(
   (a: any, b: any) => Number(b.date) - Number(a.date)
 );
+
+const canonicalURL = 'https://kai-ref.github.io/projects/';
+const breadcrumbs = [
+  { name: 'Home', url: 'https://kai-ref.github.io/' },
+  { name: 'Projects', url: canonicalURL },
+];
 ---
 
 <BaseLayout
   title="Projects | Kai Reffert"
   description="Explore Kai Reffert's data science and machine learning projects."
+  canonicalURL={canonicalURL}
+  breadcrumbs={breadcrumbs}
 >
   <TopNav />
 

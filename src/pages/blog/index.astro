@@ -8,7 +8,7 @@ import { getCollection } from 'astro:content';
 const entries = await getCollection('blog', ({ data }) => !data.draft);
 const posts = entries
   .map((entry) => ({
-    slug: entry.id,
+    slug: entry.id.replace(/\.mdx?$/, ''),
     title: entry.data.title,
     description: entry.data.description,
     pubDate: entry.data.pubDate,
@@ -17,11 +17,19 @@ const posts = entries
     readTime: entry.data.readTime,
   }))
   .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
+
+const canonicalURL = 'https://kai-ref.github.io/blog/';
+const breadcrumbs = [
+  { name: 'Home', url: 'https://kai-ref.github.io/' },
+  { name: 'Blog', url: canonicalURL },
+];
 ---
 
 <BaseLayout
   title="Blog | Kai Reffert"
   description="Kai Reffert's blog on data science, machine learning, and time series forecasting."
+  canonicalURL={canonicalURL}
+  breadcrumbs={breadcrumbs}
 >
   <TopNav />
 

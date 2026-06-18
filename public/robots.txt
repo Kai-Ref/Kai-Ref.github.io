@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://kai-ref.github.io/sitemap.xml
+Sitemap: https://kai-ref.github.io/sitemap-index.xml

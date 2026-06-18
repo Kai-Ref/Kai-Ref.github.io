@@ -3,11 +3,19 @@
 import BaseLayout from '../components/layout/BaseLayout.astro';
 import TopNav from '../components/layout/TopNav.astro';
 import PortfolioMap from '../components/portfolio/map/PortfolioMap';
+
+const canonicalURL = 'https://kai-ref.github.io/portfolio/';
+const breadcrumbs = [
+  { name: 'Home', url: 'https://kai-ref.github.io/' },
+  { name: 'Experience', url: canonicalURL },
+];
 ---
 
 <BaseLayout
   title="Experience | Kai Reffert"
   description="Kai Reffert's professional and educational timeline."
+  canonicalURL={canonicalURL}
+  breadcrumbs={breadcrumbs}
 >
   <TopNav />
 

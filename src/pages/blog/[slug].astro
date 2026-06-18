@@ -8,7 +8,7 @@ import { getCollection } from 'astro:content';
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map((post) => ({
-    params: { slug: post.id },
+    params: { slug: post.id.replace(/\.mdx?$/, '') },
     props: { post },
   }));
 }
@@ -32,16 +32,31 @@ const relatedPosts = allPosts
   .slice(0, 3)
   .map(({ entry }) => entry);
 
+const postSlug = post.id.replace(/\.mdx?$/, '');
+
 const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: post.data.title,
   author: { '@type': 'Person', name: 'Kai Reffert' },
+  publisher: { '@type': 'Person', name: 'Kai Reffert' },
   datePublished: post.data.pubDate instanceof Date
     ? post.data.pubDate.toISOString().slice(0, 10)
     : String(post.data.pubDate),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate) instanceof Date
+    ? (post.data.updatedDate ?? post.data.pubDate).toISOString().slice(0, 10)
+    : String(post.data.updatedDate ?? post.data.pubDate),
   description: post.data.description,
+  mainEntityOfPage: `https://kai-ref.github.io/blog/${postSlug}/`,
+  ...(post.data.heroImage ? { image: `https://kai-ref.github.io${post.data.heroImage}` } : {}),
 };
+
+const canonicalURL = `https://kai-ref.github.io/blog/${postSlug}/`;
+const breadcrumbs = [
+  { name: 'Home', url: 'https://kai-ref.github.io/' },
+  { name: 'Blog', url: 'https://kai-ref.github.io/blog/' },
+  { name: post.data.title, url: canonicalURL },
+];
 
 const displayDate = post.data.pubDate instanceof Date
   ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -57,6 +72,8 @@ const estimatedWords = 1500; // rough fallback; ideally computed from content
   title={`${post.data.title} | Kai Reffert`}
   description={post.data.description}
   ogType="article"
+  canonicalURL={canonicalURL}
+  breadcrumbs={breadcrumbs}
   structuredData={structuredData}
 >
   <TopNav />
@@ -134,13 +151,13 @@ const estimatedWords = 1500; // rough fallback; ideally computed from content
               <h2 class="section-eyebrow">Continue Reading</h2>
               <div class="post-nav-grid">
                 {previousPost ? (
-                  <a class="post-nav-card" href={`/blog/${previousPost.id}`} rel="prev">
+                  <a class="post-nav-card" href={`/blog/${previousPost.id.replace(/\.mdx?$/, '')}`} rel="prev">
                     <span class="nav-card-label">← Previous</span>
                     <span class="nav-card-title">{previousPost.data.title}</span>
                   </a>
                 ) : <div />}
                 {nextPost ? (
-                  <a class="post-nav-card post-nav-card--next" href={`/blog/${nextPost.id}`} rel="next">
+                  <a class="post-nav-card post-nav-card--next" href={`/blog/${nextPost.id.replace(/\.mdx?$/, '')}`} rel="next">
                     <span class="nav-card-label">Next →</span>
                     <span class="nav-card-title">{nextPost.data.title}</span>
                   </a>
@@ -155,7 +172,7 @@ const estimatedWords = 1500; // rough fallback; ideally computed from content
               <h2 class="section-eyebrow">Related Posts</h2>
               <div class="related-grid">
                 {relatedPosts.map((related) => (
-                  <a class="related-card" href={`/blog/${related.id}`}>
+                  <a class="related-card" href={`/blog/${related.id.replace(/\.mdx?$/, '')}`}>
                     <time class="related-date">
                       {related.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </time>

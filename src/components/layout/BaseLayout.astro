@@ -9,6 +9,7 @@ interface Props {
   canonicalURL?: string;
   ogType?: string;
   structuredData?: object;
+  breadcrumbs?: Array<{ name: string; url: string }>;
 }
 
 const {
@@ -17,6 +18,7 @@ const {
   canonicalURL,
   ogType = 'website',
   structuredData,
+  breadcrumbs,
 } = Astro.props;
 ---
 
@@ -51,6 +53,23 @@ const {
     {structuredData && (
       <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     )}
+
+    <!-- BreadcrumbList structured data -->
+    {breadcrumbs && breadcrumbs.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": breadcrumbs.map((crumb, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "name": crumb.name,
+          "item": crumb.url,
+        })),
+      })} />
+    )}
+
+    <!-- RSS feed -->
+    <link rel="alternate" type="application/rss+xml" title="Kai Reffert — Blog" href="/rss.xml" />
 
     <!-- Google Fonts: Newsreader (serif) + Manrope (body) + Inter (label) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

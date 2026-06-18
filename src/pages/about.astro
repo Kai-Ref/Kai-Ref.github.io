@@ -3,11 +3,19 @@
 import BaseLayout from '../components/layout/BaseLayout.astro';
 import TopNav from '../components/layout/TopNav.astro';
 import PhotoGrid from '../components/about/PhotoGrid.tsx';
+
+const canonicalURL = 'https://kai-ref.github.io/about/';
+const breadcrumbs = [
+  { name: 'Home', url: 'https://kai-ref.github.io/' },
+  { name: 'About', url: canonicalURL },
+];
 ---
 
 <BaseLayout
   title="Kai Reffert - About"
   description="Learn about Kai Reffert — data scientist, ML engineer, and time series enthusiast."
+  canonicalURL={canonicalURL}
+  breadcrumbs={breadcrumbs}
 >
   <TopNav />
 

@@ -3,11 +3,19 @@
 import BaseLayout from '../components/layout/BaseLayout.astro';
 import TopNav from '../components/layout/TopNav.astro';
 import ContactForm from '../components/contact/ContactForm.tsx';
+
+const canonicalURL = 'https://kai-ref.github.io/contact/';
+const breadcrumbs = [
+  { name: 'Home', url: 'https://kai-ref.github.io/' },
+  { name: 'Contact', url: canonicalURL },
+];
 ---
 
 <BaseLayout
   title="Contact | Kai Reffert"
   description="Get in touch with Kai Reffert."
+  canonicalURL={canonicalURL}
+  breadcrumbs={breadcrumbs}
 >
   <TopNav />
 
