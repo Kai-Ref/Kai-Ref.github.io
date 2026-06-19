@@ -11,6 +11,11 @@ interface ScrollCanvasProps {
 export default function ScrollCanvas({ phase, forecastProgress, fillOpacity, className = '' }: ScrollCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const phaseRef = useRef(phase);
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
+
   const forecastProgressRef = useRef(forecastProgress);
   useEffect(() => {
     forecastProgressRef.current = forecastProgress;
@@ -303,7 +308,6 @@ export default function ScrollCanvas({ phase, forecastProgress, fillOpacity, cla
     // -------------------------------------------------------------------------
     let rafId: number;
     let lastFrame = 0;
-    const currentPhase = phase; // captured at effect creation time
 
     function animate(timestamp: number) {
       rafId = requestAnimationFrame(animate);
@@ -317,7 +321,7 @@ export default function ScrollCanvas({ phase, forecastProgress, fillOpacity, cla
       ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
       drawDotGrid();
 
-      if (currentPhase === 'history') {
+      if (phaseRef.current === 'history') {
         drawHistoryLine(t);
       } else {
         // forecast phase: show divider, history portion, then band + fan
@@ -343,8 +347,8 @@ export default function ScrollCanvas({ phase, forecastProgress, fillOpacity, cla
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', handleResize);
     };
-  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
-  // forecastProgress is intentionally read via ref inside the loop
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // phase, forecastProgress, and fillOpacity are intentionally read via refs inside the loop
 
   return (
     <canvas
