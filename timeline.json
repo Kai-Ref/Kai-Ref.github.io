@@ -101,5 +101,30 @@
         "logo": "img/logos/sit.webp",
         "lat": 49.8728,
         "lng": 8.6512
+    },
+    {
+        "type": "professional",
+        "start": "2026-01",
+        "location": "Frankfurt, Germany",
+        "title": "Junior Data Science Consultant - Time Series Forecasting",
+        "company": "statworx",
+        "website": "https://www.statworx.com/",
+        "description": "<p>Joined statworx as a Junior Data Science Consultant - Time Series Forecasting.</p>",
+        "skills": [
+            "Python",
+            "Machine Learning",
+            "Data Science",
+            "Time Series Forecasting",
+            "SQL",
+            "PyTorch",
+            "Scikit-Learn",
+            "Pandas",
+            "Numpy",
+            "databricks",
+            "Docker"
+        ],
+        "logo": "img/logos/statworx-Logo-Black.jpg",
+        "lat": 50.1109,
+        "lng": 8.6821
     }
 ]
