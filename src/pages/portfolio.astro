@@ -1,8 +1,24 @@
 ---
 // src/pages/portfolio.astro
+import { getCollection } from 'astro:content';
+import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import BaseLayout from '../components/layout/BaseLayout.astro';
 import TopNav from '../components/layout/TopNav.astro';
-import PortfolioMap from '../components/portfolio/map/PortfolioMap';
+import TimelineExperience from '../components/portfolio/TimelineExperience/TimelineExperience';
+import { serializeTimelineEntry } from '../components/portfolio/TimelineExperience/serialize.js';
+
+const timelineEntries = await getCollection('timeline', (entry) => !entry.id.startsWith('_'));
+const markdown = await createMarkdownProcessor();
+const initialEntries = await Promise.all(
+  timelineEntries.map(async (entry) => {
+    const rendered = await markdown.render(entry.body, {
+      fileURL: new URL(`../content/timeline/${entry.id}`, import.meta.url),
+      frontmatter: entry.data,
+    });
+
+    return serializeTimelineEntry(entry, rendered.code);
+  })
+);
 
 const canonicalURL = 'https://kai-ref.github.io/portfolio/';
 const breadcrumbs = [
@@ -19,7 +35,7 @@ const breadcrumbs = [
 >
   <TopNav />
 
-  <main class="main-content flex-1 min-h-screen" aria-label="Portfolio map timeline">
-    <PortfolioMap client:load />
+  <main class="main-content flex-1 min-h-screen bg-bg-secondary" aria-label="Portfolio timeline">
+    <TimelineExperience client:load initialEntries={initialEntries} />
   </main>
 </BaseLayout>

@@ -33,7 +33,28 @@ const blogCollection = defineCollection({
   }),
 });
 
+const timelineCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    type: z.enum(['education', 'professional']),
+    start: z.string(),
+    end: z.string().optional(),
+    title: z.string(),
+    institution: z.string().optional(),
+    company: z.string().optional(),
+    location: z.string().optional(),
+    lat: z.number().optional(),
+    lng: z.number().optional(),
+    skills: z.array(z.string()).optional(),
+    logo: z.string().optional(),
+    portrait: z.string().optional(),
+    portraitPosition: z.string().optional(),
+    website: z.string().optional(),
+  }),
+});
+
 export const collections = {
   projects: projectsCollection,
   blog: blogCollection,
+  timeline: timelineCollection,
 };
