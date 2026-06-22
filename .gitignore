@@ -3,6 +3,7 @@ node_modules/
 opencode.json
 .astro/
 dist/
+docs/
 .DS_Store
 
 # Legacy blog source/archive files kept locally only.

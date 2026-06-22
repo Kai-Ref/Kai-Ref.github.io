@@ -365,6 +365,7 @@
 .description p {
   margin: 0;
   color: inherit;
+  text-align: justify;
 }
 
 .description p + p {

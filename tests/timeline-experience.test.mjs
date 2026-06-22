@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import {
   buildTimelineModel,
@@ -46,6 +47,11 @@ const entries = [
     description: 'Exchange',
   },
 ];
+
+const timelineStyles = readFileSync(
+  new URL('../src/components/portfolio/TimelineExperience/styles.module.css', import.meta.url),
+  'utf8'
+);
 
 test('buildTimelineModel sorts entries and creates intro plus gap chapters', () => {
   const model = buildTimelineModel(entries);
@@ -158,4 +164,11 @@ test('mobile rail labels abbreviate long company and institution names', () => {
 test('mobile jump offset leaves extra room below the sticky rail', () => {
   assert.equal(getMobileJumpOffset(88), 244);
   assert.equal(getMobileJumpOffset(96), 252);
+});
+
+test('timeline markdown paragraphs are justified', () => {
+  assert.match(
+    timelineStyles,
+    /\.description p\s*\{[^}]*text-align:\s*justify;/s
+  );
 });
