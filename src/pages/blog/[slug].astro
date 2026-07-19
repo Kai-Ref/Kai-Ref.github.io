@@ -649,6 +649,21 @@ const estimatedWords = 1500; // rough fallback; ideally computed from content
     border-radius: 1px;
   }
 
+  .article-body .demo-figure {
+    width: 100%;
+  }
+
+  .article-body .demo-figure video {
+    display: block;
+    width: min(100%, var(--video-width, 720px));
+    height: auto;
+    margin: 0 auto;
+    border: 1px solid rgba(26, 28, 28, 0.12);
+    border-radius: 3px;
+    background: #1a1c1c;
+    box-shadow: 0 12px 30px rgba(26, 28, 28, 0.12);
+  }
+
   /* KaTeX math */
   .katex-display {
     overflow-x: auto;

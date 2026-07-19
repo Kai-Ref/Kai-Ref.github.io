@@ -11,18 +11,34 @@ interface Props {
   demo: string | null;
 }
 const { title, description, image, technologies, date, status, github, demo } = Astro.props;
+const isVideo = image.toLowerCase().endsWith('.mp4');
 ---
 
 <article class="content-card project-card bg-white shadow-light overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-medium flex flex-col">
   <div class="card-image relative overflow-hidden group" style="height: 220px;">
-    <img
-      src={image}
-      alt={title}
-      width="400"
-      height="220"
-      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-      loading="lazy"
-    />
+    {isVideo ? (
+      <video
+        src={image}
+        aria-label={title}
+        width="400"
+        height="220"
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+      />
+    ) : (
+      <img
+        src={image}
+        alt={title}
+        width="400"
+        height="220"
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        loading="lazy"
+      />
+    )}
     <div class="card-overlay absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
       {github && (
         <a

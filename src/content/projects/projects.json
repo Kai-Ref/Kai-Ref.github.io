@@ -1,5 +1,15 @@
 [
   {
+    "title": "Habit Tracker",
+    "description": "Built a local-first Flutter app that brings recurring habits, one-time tasks, reminders, completion history, and performance insights into one focused workflow.",
+    "image": "/img/posts/i-accidentally-vibe-coded-the-perfect-to-do-list-app/best-to-do-list-apps.jpg",
+    "technologies": ["Flutter", "Dart", "SQLite", "Local Notifications"],
+    "date": "2026",
+    "status": "in progress",
+    "github": "https://github.com/Kai-Ref/Habit_tracker",
+    "demo": null
+  },
+  {
     "title": "Master's Thesis: Probabilistic LTSF",
     "description": "Explored IMS vs. DMS trade-offs in probabilistic long-term and short-term time series forecasting. Combined probabilistic and point LTSF methods, demonstrating strong performance with quantile-based techniques.",
     "image": "/data/ltsf.png",
